@@ -1,0 +1,55 @@
+# Roost website
+
+The public site at **https://maartz.github.io/swift-roost/**. Plain HTML, CSS,
+and JavaScript; no build step, package install, analytics, or external font service.
+
+## Preview
+
+From the repository root:
+
+```sh
+python3 -m http.server 4077 --bind 127.0.0.1 --directory website
+```
+
+Open http://127.0.0.1:4077. The interactive reading-list preview runs entirely in
+the browser and resets on reload. It does not connect to the Swift app or store
+visitor input. The framework copy and code remain readable without JavaScript.
+
+## Check
+
+```sh
+node --check website/script.js
+python3 website/check.py
+git diff --check
+```
+
+Before publishing visual changes, review desktop, 390px and 320px layouts in a
+browser. Exercise code tabs with arrow keys, copy buttons, save-link validation,
+reading filters, mark-as-finished, reset, and the project-status disclosures.
+Check reduced motion, keyboard focus, and the dialog's Escape/close behavior.
+
+## Publish
+
+`.github/workflows/pages.yml` checks website pull requests and publishes changes
+to `website/` on `main` using GitHub Actions. In repository settings, Pages uses
+**GitHub Actions** as its source. Only the public HTML/CSS/JS, assets, sitemap,
+robots file, and `.nojekyll` marker go into the deployment artifact.
+
+The workflow follows GitHub's [custom Pages workflow](https://docs.github.com/en/pages/getting-started-with-github-pages/using-custom-workflows-with-github-pages).
+For a custom domain, update the canonical URL, social metadata, sitemap,
+`robots.txt`, the 404 home link, and the Pages domain setting together.
+
+## Content and identity
+
+- Preserve the original falcon artwork; the wordmark is `roost.` with an orange dot.
+- `index.html` contains the overview, code samples, preview, and project status.
+- `style.css` defines the pale blue, ink, blue, and orange palette and responsive layouts.
+- `script.js` adds code copying, accessible code tabs, and the disposable preview.
+- Keep the development-status copy honest when releases change. The launch version
+  shows the current local Roost API; the renamed framework release and ESW template
+  fixes have not been published yet. Update those notes when they are released.
+- Manrope and IBM Plex Mono are self-hosted from the [Google Fonts source repository](https://github.com/google/fonts).
+  Their SIL Open Font License files are included in `assets/fonts/`.
+
+The website was developed in a separate Git worktree to preserve the in-progress
+framework rename and DX work. Deploying this site does not publish those changes.

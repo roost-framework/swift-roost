@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://maartz.github.io/swift-roost/sitemap.xml
