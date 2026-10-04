@@ -1,0 +1,282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f0f4fa" />
+    <meta
+      name="description"
+      content="A little Swift, live. Explore Roost's one-file examples in an interactive editor and preview."
+    />
+    <title>Playground — Roost.</title>
+    <link
+      rel="canonical"
+      href="https://maartz.github.io/swift-roost/playground.html"
+    />
+    <link rel="icon" type="image/png" href="assets/roost-mark.png" />
+    <link
+      rel="preload"
+      href="assets/fonts/manrope.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="playground.css" />
+    <script type="module" src="playground/app.mjs"></script>
+  </head>
+  <body class="playground-page">
+    <a class="skip-link" href="#workspace">Skip to playground</a>
+    <header class="site-header playground-wrap">
+      <div class="playground-identity">
+        <a class="brand" href="./" aria-label="Roost home"
+          ><img
+            src="assets/roost-mark.png"
+            width="42"
+            height="42"
+            alt=""
+          /><span>roost<span class="orange">.</span></span></a
+        >
+        <span class="identity-divider" aria-hidden="true">/</span>
+        <span class="product-name">Playground</span>
+      </div>
+      <nav aria-label="Playground navigation">
+        <a class="back-to-site" href="./"
+          >The framework <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </header>
+    <main class="playground-wrap">
+      <div class="playground-heading">
+        <div>
+          <p class="eyebrow">ROOST PLAYGROUND / BROWSER EDITION</p>
+          <h1>A little Swift, live<span class="orange">.</span></h1>
+          <p>Edit an example. Run it. Make it yours.</p>
+        </div>
+        <a class="playground-about-link" href="#about-playground"
+          >How this playground works <span aria-hidden="true">↓</span></a
+        >
+      </div>
+      <p class="execution-note">
+        <strong>Guided Swift examples.</strong> The preview runs in JavaScript.
+        Your code stays in this tab; it isn’t uploaded or compiled.
+      </p>
+      <noscript
+        ><p class="no-script-note">
+          This playground needs JavaScript. You can still
+          <a href="./#workflow">read the framework examples</a>.
+        </p></noscript
+      >
+      <section
+        id="workspace"
+        class="playground-workspace"
+        aria-label="Code editor and preview"
+      >
+        <div class="playground-toolbar">
+          <div
+            id="example-tabs"
+            class="example-tabs"
+            role="tablist"
+            aria-label="Choose an example"
+          >
+            <button
+              role="tab"
+              id="counter-tab"
+              aria-selected="true"
+              aria-controls="editor-pane"
+              data-example="counter"
+              disabled
+            >
+              Counter
+            </button>
+            <button
+              role="tab"
+              id="greeting-tab"
+              aria-selected="false"
+              aria-controls="editor-pane"
+              data-example="greeting"
+              tabindex="-1"
+              disabled
+            >
+              Greeting
+            </button>
+            <button
+              role="tab"
+              id="toggle-tab"
+              aria-selected="false"
+              aria-controls="editor-pane"
+              data-example="toggle"
+              tabindex="-1"
+              disabled
+            >
+              Toggle
+            </button>
+          </div>
+          <div class="editor-actions">
+            <button id="reset-source" class="plain-action" disabled>
+              Reset</button
+            ><button id="run-source" class="button run-button" disabled>
+              <span aria-hidden="true">▷</span> Run example
+            </button>
+          </div>
+        </div>
+        <div class="workspace-panes">
+          <section
+            id="editor-pane"
+            class="editor-pane"
+            role="tabpanel"
+            aria-labelledby="counter-tab"
+          >
+            <div class="pane-heading">
+              <span
+                ><span class="file-dot" aria-hidden="true"></span
+                ><span id="source-filename">Counter.swift</span></span
+              >
+              <div>
+                <button id="copy-source" class="copy-button" disabled>
+                  Copy</button
+                ><button id="download-source" class="copy-button" disabled>
+                  Download
+                </button>
+              </div>
+            </div>
+            <div class="edit-shortcuts">
+              <span id="editor-help">Jump to edit:</span>
+              <div
+                id="edit-shortcuts"
+                aria-label="Editable example values"
+              ></div>
+            </div>
+            <div class="source-editor">
+              <pre id="line-numbers" class="line-numbers" aria-hidden="true">
+1</pre
+              >
+              <textarea
+                id="source-editor"
+                aria-label="Swift source code"
+                aria-describedby="editor-help"
+                autocapitalize="off"
+                autocomplete="off"
+                autocorrect="off"
+                spellcheck="false"
+                wrap="off"
+                disabled
+              ></textarea>
+            </div>
+            <div class="editor-footer">
+              <span id="editor-position">Line 1, column 1</span
+              ><span id="run-shortcut">⌘ / Ctrl + Enter to run</span>
+            </div>
+          </section>
+          <section class="preview-pane" aria-label="Application preview">
+            <div class="pane-heading preview-pane-heading">
+              <span>Preview</span
+              ><span
+                id="preview-status"
+                class="preview-status"
+                role="status"
+                aria-live="polite"
+                >Loading…</span
+              >
+            </div>
+            <div
+              id="preview-root"
+              class="playground-preview"
+              aria-label="Interactive example"
+            ></div>
+            <div
+              id="preview-message"
+              class="preview-message"
+              role="status"
+              aria-live="polite"
+            ></div>
+            <aside class="lesson-hint">
+              <p class="eyebrow">TRY A SMALL CHANGE</p>
+              <p id="lesson-instruction"></p>
+            </aside>
+          </section>
+        </div>
+        <div
+          id="diagnostics"
+          class="playground-diagnostics"
+          role="alert"
+          hidden
+        >
+          <div>
+            <strong id="diagnostic-title">Check this edit</strong
+            ><span>The last working preview is still available.</span>
+          </div>
+          <p id="diagnostic-detail"></p>
+        </div>
+      </section>
+      <section
+        id="about-playground"
+        class="playground-about"
+        aria-labelledby="about-title"
+      >
+        <div>
+          <p class="eyebrow">FROM AN IDEA TO A LIVE APP</p>
+          <h2 id="about-title">
+            One file.<br />
+            Room to play<span class="orange">.</span>
+          </h2>
+        </div>
+        <div id="execution-description">
+          <h3>A small taste of the development loop.</h3>
+          <p>
+            Each lesson recognizes a few editable values in an ordinary Swift
+            example. Change those values and run it to update the browser
+            preview. You can explore a counter, a form event, and Boolean state
+            without installing anything.
+          </p>
+          <p>
+            This page doesn’t execute Swift, contact a server, or render
+            arbitrary templates. The surrounding program stays fixed.
+            Unsupported edits show guidance and keep the working preview;
+            running valid edits resets state. Your drafts stay in this tab until
+            you reload.
+          </p>
+          <details>
+            <summary>
+              Take it into the local Roost Playground
+              <span aria-hidden="true">+</span>
+            </summary>
+            <p>
+              Download the Swift file and run it from a configured Roost
+              Playground checkout:
+            </p>
+            <pre
+              class="local-command"
+            ><code>./playground /path/to/Counter.swift</code></pre>
+            <p>
+              The local playground uses the real Swift compiler and ESW Live.
+              Edit and save to rebuild; compiler errors leave the previous app
+              running. Successful reloads reset state.
+            </p>
+            <p>
+              That companion project currently requires macOS 14+, Swift 6.3+,
+              and the local Roost, ESW Live, and Nexus checkouts. It has not
+              been published as a standalone release yet.
+            </p>
+          </details>
+        </div>
+      </section>
+    </main>
+    <footer class="site-footer playground-wrap">
+      <a class="brand" href="./" aria-label="Roost home"
+        ><span>roost<span class="orange">.</span></span></a
+      >
+      <p>Swift on the server. Alive in the browser.</p>
+      <div>
+        <a href="./#workflow">Explore the framework ↗</a
+        ><a href="./#status">Project status</a>
+      </div>
+    </footer>
+    <p
+      id="playground-announcement"
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+    ></p>
+  </body>
+</html>

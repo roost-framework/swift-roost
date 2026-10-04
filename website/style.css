@@ -871,6 +871,37 @@ h2 {
 .reset-button span {
   margin-left: 8px;
 }
+.playground-invitation {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 60px;
+  padding-block: 66px;
+  border-block: 1px solid var(--line);
+  margin-top: 80px;
+}
+.playground-invitation h2 {
+  font-size: clamp(34px, 3.5vw, 49px);
+  margin-bottom: 18px;
+}
+.playground-invitation .eyebrow {
+  margin-bottom: 19px;
+}
+.playground-invitation p:not(.eyebrow) {
+  max-width: 470px;
+  font-size: 13px;
+  line-height: 1.9;
+}
+.playground-invitation > div:last-child {
+  flex-shrink: 0;
+}
+.playground-invitation .button {
+  font-size: 12px;
+}
+.playground-invitation > div:last-child p {
+  font: 9px/1.8 var(--mono);
+  margin-top: 13px;
+}
 .status-section {
   border-top: 1px solid var(--line);
 }
@@ -1169,6 +1200,13 @@ h3 .orange,
   }
 }
 @media (max-width: 820px) {
+  .playground-invitation {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 28px;
+    padding-block: 44px;
+    margin-top: 50px;
+  }
   .site-header {
     min-height: 88px;
   }
@@ -1368,7 +1406,7 @@ h3 .orange,
   .site-header nav {
     gap: 18px;
   }
-  .site-header nav a:not(.nav-github) {
+  .site-header nav a:not(.nav-github):not(.nav-playground) {
     display: none;
   }
   .site-header nav .nav-github {

@@ -27,6 +27,9 @@ jobs:
       - name: Check JavaScript and local links
         run: |
           node --check website/script.js
+          node --check website/playground/app.mjs
+          node --check website/playground/examples.mjs
+          node --test website/playground/examples.test.mjs
           python3 website/check.py
 
   deploy:
@@ -45,8 +48,9 @@ jobs:
       - uses: actions/configure-pages@v5
       - name: Prepare static files
         run: |
-          mkdir -p _site
-          cp website/index.html website/404.html website/style.css website/script.js website/robots.txt website/sitemap.xml website/.nojekyll _site/
+          mkdir -p _site/playground
+          cp website/index.html website/404.html website/playground.html website/style.css website/playground.css website/script.js website/robots.txt website/sitemap.xml website/.nojekyll _site/
+          cp website/playground/app.mjs website/playground/examples.mjs _site/playground/
           cp -R website/assets _site/assets
       - uses: actions/upload-pages-artifact@v4
         with:

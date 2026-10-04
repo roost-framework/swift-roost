@@ -15,10 +15,24 @@ Open http://127.0.0.1:4077. The interactive reading-list preview runs entirely i
 the browser and resets on reload. It does not connect to the Swift app or store
 visitor input. The framework copy and code remain readable without JavaScript.
 
+Open `/playground.html` for the browser playground. Counter, Greeting, and Toggle
+are guided Swift examples with a JavaScript preview. Only the named numeric,
+Boolean, and text values are editable; arbitrary Swift and templates are not
+executed. Drafts live in the current tab and disappear on reload. Nothing is
+uploaded, and no compiler service or third-party editor is required.
+
+Visitors can jump to supported values, run with Command/Ctrl+Enter, reset, copy,
+and download the Swift file. Unsupported edits retain the last working preview.
+The download targets the separate local `RoostPlayground` companion project,
+whose unpublished status and setup requirements are explained on the page.
+
 ## Check
 
 ```sh
 node --check website/script.js
+node --check website/playground/app.mjs
+node --check website/playground/examples.mjs
+node --test website/playground/examples.test.mjs
 python3 website/check.py
 git diff --check
 ```
@@ -27,6 +41,9 @@ Before publishing visual changes, review desktop, 390px and 320px layouts in a
 browser. Exercise code tabs with arrow keys, copy buttons, save-link validation,
 reading filters, mark-as-finished, reset, and the project-status disclosures.
 Check reduced motion, keyboard focus, and the dialog's Escape/close behavior.
+For the playground, exercise all three lessons, supported edits, invalid edits
+with preview retention, draft switching, jump shortcuts, copy/download, and
+Command/Ctrl+Enter. Confirm the editor scrolls independently on narrow screens.
 
 ## Publish
 
@@ -45,6 +62,10 @@ For a custom domain, update the canonical URL, social metadata, sitemap,
 - `index.html` contains the overview, code samples, preview, and project status.
 - `style.css` defines the pale blue, ink, blue, and orange palette and responsive layouts.
 - `script.js` adds code copying, accessible code tabs, and the disposable preview.
+- `playground.html` and `playground.css` contain the browser playground.
+- `playground/examples.mjs` defines the Swift samples and validates supported edits;
+  `playground/app.mjs` manages the editor and safe DOM previews. The focused Node
+  tests cover the boundary between editable values and fixed program structure.
 - Keep the development-status copy honest when releases change. The launch version
   shows the current local Roost API; the renamed framework release and ESW template
   fixes have not been published yet. Update those notes when they are released.

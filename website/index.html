@@ -49,6 +49,7 @@
         <a href="#framework">The framework</a>
         <a href="#workflow">The workflow</a>
         <a href="#example">The example</a>
+        <a class="nav-playground" href="playground.html">Playground</a>
         <a class="nav-github" href="https://github.com/Maartz/swift-roost"
           >GitHub <span aria-hidden="true">↗</span></a
         >
@@ -71,8 +72,8 @@
             brings the pieces together, so you can get on with your idea.
           </p>
           <div class="hero-actions">
-            <a class="button" href="#workflow"
-              >See how it comes together <span aria-hidden="true">↓</span></a
+            <a class="button" href="playground.html"
+              >Open the playground <span aria-hidden="true">↗</span></a
             >
             <a class="text-link" href="https://github.com/Maartz/swift-roost"
               >Explore the source <span aria-hidden="true">↗</span></a
@@ -564,6 +565,28 @@ roost gen resource Bookmark \
       </section>
 
       <section
+        class="playground-invitation wrap"
+        aria-labelledby="playground-invitation-title"
+      >
+        <div>
+          <p class="eyebrow">ROOST PLAYGROUND / BROWSER EDITION</p>
+          <h2 id="playground-invitation-title">
+            A little Swift, live<span class="orange">.</span>
+          </h2>
+          <p>
+            A counter, a greeting, a change of state. Edit a guided example and
+            see the result, right in your browser.
+          </p>
+        </div>
+        <div>
+          <a class="button" href="playground.html"
+            >Make a small change <span aria-hidden="true">↗</span></a
+          >
+          <p>Runs locally in your browser. No Swift compiler.</p>
+        </div>
+      </section>
+
+      <section
         id="status"
         class="status-section wrap section-space"
         aria-labelledby="status-title"
@@ -639,8 +662,10 @@ roost gen resource Bookmark \
               <p>
                 Phoenix inspires the application structure, contexts,
                 generators, and browser conventions. Roost uses Swift’s type
-                system and package tooling. It does not provide LiveView or
-                claim feature parity with Phoenix.
+                system and package tooling. The local Roost Playground explores
+                interactive apps through ESW Live. It is a development
+                integration, and Roost does not claim feature parity with
+                Phoenix.
               </p>
             </details>
             <details>
@@ -672,6 +697,7 @@ roost gen resource Bookmark \
       <p>Thoughtfully connected. Written in Swift.</p>
       <div>
         <a href="https://github.com/Maartz/swift-roost">GitHub ↗</a
+        ><a href="playground.html">Playground</a
         ><a href="#status">Project status</a><a href="#main">Back to top ↑</a>
       </div>
     </footer>
