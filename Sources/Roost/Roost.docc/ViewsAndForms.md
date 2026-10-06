@@ -120,7 +120,7 @@ template is enough:
 ```swift
 GET("/fragment") { conn in
     let name = conn.queryParams["name"] ?? "world"
-    return conn.html(#heex("<h1>Hello, {name}.</h1>"))
+    return conn.html(#hesw("<h1>Hello, {name}.</h1>"))
 }
 ```
 

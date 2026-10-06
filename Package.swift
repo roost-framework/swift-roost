@@ -28,7 +28,7 @@ let package = Package(
     dependencies: [
         ecosystem("Spectro", from: "2.0.0"),
         ecosystem("Nexus", from: "2.0.0"),
-        ecosystem("ESW", from: "1.5.0"),
+        ecosystem("ESW", from: "1.6.0"),
         .package(
             url: "https://github.com/hummingbird-project/hummingbird.git",
             from: "2.0.0"
