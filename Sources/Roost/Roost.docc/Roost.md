@@ -11,10 +11,9 @@ repository-backed contexts, and expose them through HTML pages or JSON routes.
 Start with <doc:GettingStarted>. For a complete workflow, follow
 <doc:CLIAndGenerators> through authentication and an ownership-scoped resource.
 
-> Important: These pages document the renamed development checkout. The public
-> default branch and older releases may still use Peregrine names. Nexus 2.0.0
-> and Spectro 2.0.0 are supported here. ESW 1.5.0 supplies typed views and the
-> complete template workflow without a local ESW checkout. See <doc:ProjectStatus>.
+These pages document Roost 2.0.0 with Nexus 2.0.0, Spectro 2.1.0, and ESW 1.5.0.
+Generated apps resolve published packages directly. See <doc:ProjectStatus>
+for the current implementation boundaries.
 
 ## Topics
 

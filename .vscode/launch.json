@@ -4,21 +4,21 @@
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:swift-peregrine}",
-            "name": "Debug peregrine",
-            "target": "peregrine",
+            "cwd": "${workspaceFolder}",
+            "name": "Debug roost",
+            "target": "roost",
             "configuration": "debug",
-            "preLaunchTask": "swift: Build Debug peregrine"
+            "preLaunchTask": "swift: Build Debug roost"
         },
         {
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:swift-peregrine}",
-            "name": "Release peregrine",
-            "target": "peregrine",
+            "cwd": "${workspaceFolder}",
+            "name": "Release roost",
+            "target": "roost",
             "configuration": "release",
-            "preLaunchTask": "swift: Build Release peregrine"
+            "preLaunchTask": "swift: Build Release roost"
         }
     ]
 }

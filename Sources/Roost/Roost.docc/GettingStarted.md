@@ -4,29 +4,30 @@ Generate a small app, run its first route, and test it without a database.
 
 ## Overview
 
-This guide uses the Roost development checkout with published ESW 1.5.0,
-Spectro 2.0.0, and Nexus 2.0.0. You need Swift 6.3 or later and macOS 14+ or a
+This guide uses Roost 2.0.0 with published ESW 1.5.0,
+Spectro 2.1.0, and Nexus 2.0.0. You need Swift 6.3 or later and macOS 14+ or a
 supported Linux environment. On Debian/Ubuntu, Nexus also needs `zlib1g-dev`
 at build time and `zlib1g` at runtime.
 
-No companion source checkouts are required. The framework directory can have
-any name; the explicit path below points generated apps at it.
+Generated apps resolve released packages directly. No companion source
+checkouts or dependency overrides are required.
 
 ### Build the CLI
 
-From the framework root:
+Clone the release and build its CLI:
 
 ```sh
-unset ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
-export ROOST_FRAMEWORK_PATH="$PWD"
-swift build --product roost
-export ROOST_CLI="$(swift build --show-bin-path)/roost"
+git clone --branch 2.0.0 --depth 1 https://github.com/Maartz/swift-roost.git Roost
+cd Roost
+unset ROOST_FRAMEWORK_PATH ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
+swift build -c release --product roost
+export ROOST_CLI="$(swift build -c release --show-bin-path)/roost"
+"$ROOST_CLI" --version
 ```
 
-Keep `ROOST_FRAMEWORK_PATH` set in the shell used to generate and build apps.
-It points generated manifests at the renamed local package. Without it, they
-attempt to resolve a published framework version. Leave the ESW and ecosystem
-overrides unset to use the companion releases.
+Keep `ROOST_CLI` set in this shell. To use `roost` directly, copy the executable
+to a directory on your `PATH`. Leave the dependency overrides unset to select
+published versions of Roost and its companion packages.
 
 ### Create an application
 

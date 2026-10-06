@@ -4,9 +4,8 @@ Distinguish the implemented application workflow from development integrations.
 
 ## Overview
 
-This catalog is generated from the current Roost development checkout. It
-documents the renamed framework and its current generators. The public default
-branch and older releases may still use the previous names.
+This catalog documents Roost 2.0.0 and its generators. Releases before 2.0.0
+use the earlier Peregrine module and executable names.
 
 The core development path is a PostgreSQL-backed app with authentication,
 ownership-scoped resources, HTML and JSON responses, Spectro migrations,
@@ -15,13 +14,13 @@ and in-process tests.
 ### Dependency and release boundaries
 
 The framework and generated applications use published Nexus 2.0.0, Spectro
-2.0.0, and ESW 1.5.0. ESW's release includes typed views and namespaced generated
-output, so companion source checkouts are optional. The renamed Roost package
-still requires this development checkout; follow <doc:GettingStarted>.
+2.1.0, and ESW 1.5.0. ESW's release includes typed views and namespaced generated
+output. Roost 2.0.0 is the first release with the renamed modules and CLI;
+follow <doc:GettingStarted> to create an app using released dependencies.
 
 The detailed acceptance record is kept in `guides/dx-acceptance.md` in the
-checkout. Earlier Linux evidence predates the framework rename; it is separate
-from later macOS checks. A documentation build does not rerun that acceptance
+checkout. Each record identifies the dependency revisions, platform, and
+verification performed. A documentation build does not rerun that acceptance
 workflow or establish production readiness.
 
 ### Service implementation status

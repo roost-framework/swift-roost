@@ -6,10 +6,10 @@ Resolve common setup, compilation, and browser-workflow problems.
 
 ### The compiler cannot find Roost
 
-Check the selected checkout's `Package.swift`. The renamed development package
-exports `Roost` and `RoostTest`; older published source still uses Peregrine
-names. Point `ROOST_FRAMEWORK_PATH` at the renamed checkout before resolving a
-generated app. An app itself cannot be named `Roost`.
+Require `swift-roost` 2.0.0 or later and select the `Roost` or `RoostTest`
+product. The 1.x tags contain the earlier Peregrine names. Unset stale
+`ROOST_FRAMEWORK_PATH` and `ROOST_ECOSYSTEM_PATH` overrides, then run
+`swift package resolve`. An app itself cannot be named `Roost`.
 
 ### Templates collide or typed views are missing
 

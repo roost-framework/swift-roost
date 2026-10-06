@@ -4,8 +4,7 @@ Create connected application files, then make the domain code your own.
 
 ## Overview
 
-Build the CLI and keep `ROOST_FRAMEWORK_PATH` set as shown in
-<doc:GettingStarted>. The commands below use `"$ROOST_CLI"` so no global
+Build the CLI as shown in <doc:GettingStarted>. The commands below use `"$ROOST_CLI"` so no global
 installation is required. If the binary is on your `PATH`, use `roost` directly.
 
 ### Generate a reading room

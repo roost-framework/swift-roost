@@ -10,9 +10,8 @@ combined **Roost Libraries** navigator includes both libraries.
 - [RoostTest](../Sources/RoostTest/RoostTest.docc/RoostTest.md): HTTP assertions,
   browser sessions, CSRF-protected workflows, and database test isolation.
 
-These catalogs document the current Roost development checkout, using released
-ESW 1.5.0, Spectro 2.0.0, and Nexus 2.0.0. The renamed Roost framework itself
-has not yet been released.
+These catalogs document Roost 2.0.0, with published ESW 1.5.0,
+Spectro 2.1.0, and Nexus 2.0.0 dependencies.
 
 ## Build
 

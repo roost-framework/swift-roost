@@ -3,6 +3,7 @@
 
 python3 scripts/check_generated_app.py --ecosystem ..
 Omit --ecosystem to check published ESW/Nexus/Spectro dependencies.
+Use --published-framework after a release to also resolve Roost from its tag.
 Set ROOST_ESW_PATH to use only local ESW while checking released Spectro/Nexus.
 Requires Swift 6.3+, PostgreSQL client tools on PATH, and a local Postgres server.
 DB_HOST/DB_PORT/DB_USER/DB_PASSWORD configure the local test server. DB_NAME is
@@ -138,7 +139,7 @@ def check_http(base):
     print("HTTP: auth, CSRF, flash, forms, JSON, updates, two-user isolation and second resource passed.", flush=True)
 
 
-def prepare(cli, workspace, ecosystem):
+def prepare(cli, workspace):
     app = workspace / "TodoWorkshop"
     run([cli, "new", "TodoWorkshop"], cwd=workspace, log=workspace / "generate.log")
     run([cli, "gen", "auth"], cwd=app)
@@ -148,10 +149,6 @@ def prepare(cli, workspace, ecosystem):
     before = model.read_bytes()
     result = run([cli, "gen", "resource", "Todo", "title:string"], cwd=app, succeeds=False)
     assert "Refusing to overwrite" in result and model.read_bytes() == before
-    manifest = (app / "Package.swift").read_text()
-    manifest = re.sub(r'\.package\(url: "https://github.com/Maartz/swift-roost", from: "[^"]+"\)',
-                      f'.package(name: "swift-roost", path: "{ROOT}")', manifest)
-    (app / "Package.swift").write_text(manifest)
     (app / "Tests/TodoWorkshopTests/DatabaseWorkflowTests.swift").write_text((ROOT / "scripts/fixtures/DatabaseWorkflowTests.swift").read_text())
     return app
 
@@ -159,24 +156,38 @@ def prepare(cli, workspace, ecosystem):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--ecosystem", type=Path)
+    parser.add_argument("--published-framework", action="store_true",
+                        help="Use published Roost matching the CLI version, with all local dependency overrides removed")
     parser.add_argument("--work-dir", type=Path)
     parser.add_argument("--prepare-only", action="store_true")
     parser.add_argument("--release", action="store_true", help="Also build and exercise the optimized release executable")
     parser.add_argument("--reuse", action="store_true", help="Resume a previously prepared, owned fixture while debugging")
     options = parser.parse_args()
+    if options.published_framework and (options.ecosystem or options.reuse):
+        parser.error("--published-framework requires a fresh fixture without --ecosystem or --reuse")
     if options.ecosystem:
         os.environ["ROOST_ECOSYSTEM_PATH"] = str(options.ecosystem.resolve())
-    os.environ["ROOST_FRAMEWORK_PATH"] = str(ROOT)
+    if options.published_framework:
+        for key in ("ROOST_FRAMEWORK_PATH", "ROOST_ESW_PATH", "ROOST_ECOSYSTEM_PATH"):
+            os.environ.pop(key, None)
+    else:
+        os.environ["ROOST_FRAMEWORK_PATH"] = str(ROOT)
     workspace = (options.work_dir or Path(tempfile.mkdtemp(prefix="roost-acceptance-"))).resolve()
     workspace.mkdir(parents=True, exist_ok=True)
     print(f"Acceptance workspace: {workspace}", flush=True)
     run(["swift", "build", "--product", "roost"], log=workspace / "cli-build.log")
     binary_dir = Path(run(["swift", "build", "--show-bin-path"]).strip().splitlines()[-1])
     cli = binary_dir / "roost"
-    app = workspace / "TodoWorkshop" if options.reuse else prepare(cli, workspace, options.ecosystem.resolve() if options.ecosystem else None)
+    app = workspace / "TodoWorkshop" if options.reuse else prepare(cli, workspace)
     if options.prepare_only:
         return
     run(["swift", "build"], cwd=app, log=workspace / "app-build.log")
+    if options.published_framework:
+        version = run([cli, "--version"]).strip()
+        pins = json.loads((app / "Package.resolved").read_text())["pins"]
+        framework = next(pin for pin in pins if pin["identity"] == "swift-roost")
+        assert framework["state"]["version"] == version, f"Expected Roost {version}, resolved {framework}"
+        print(f"Published Roost {version} resolved at {framework['state']['revision']}.", flush=True)
     print("Generated SwiftPM app compiled.", flush=True)
     env = dict(os.environ)
     env.update(DB_HOST=env.get("DB_HOST", "localhost"), DB_PORT=env.get("DB_PORT", "5432"),

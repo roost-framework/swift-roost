@@ -43,10 +43,10 @@ struct Hello: RoostApp {
 }
 ```
 
-**This README describes the Roost development checkout.** The public default
-branch still uses the earlier package names; the renamed API is not released.
-This checkout uses published Nexus 2.0.0, Spectro 2.0.0, and ESW 1.5.0.
-The template workflow no longer requires a sibling ESW checkout.
+**Roost 2.0.0** introduces the renamed framework and CLI, with published
+Nexus 2.0.0, Spectro 2.1.0, and ESW 1.5.0 dependencies. Generated apps resolve
+these packages directly. Moving from Peregrine? Follow the
+[upgrade guide](guides/renaming-to-roost.md).
 [See what has been verified and what remains.](guides/dx-acceptance.md)
 
 <details>
@@ -132,26 +132,25 @@ You need Swift **6.3 or later**, macOS 14+ or Linux, and PostgreSQL with its cli
 tools for the database-backed example. On Debian/Ubuntu, install `zlib1g-dev` for
 Nexus. No Node.js toolchain is needed for the default Pico CSS setup.
 
-SwiftPM downloads ESW 1.5.0, Spectro 2.0.0, and Nexus 2.0.0. Only the renamed
-Roost framework needs a development checkout; no companion source checkouts are
-required. ESW 1.5.0 includes typed views and namespaced template output.
-
-From the `Roost` checkout:
+Clone the release and build its CLI:
 
 ```sh
-unset ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
-export ROOST_FRAMEWORK_PATH="$PWD"
-swift build --product roost
-export ROOST_CLI="$(swift build --show-bin-path)/roost"
+git clone --branch 2.0.0 --depth 1 https://github.com/Maartz/swift-roost.git Roost
+cd Roost
+unset ROOST_FRAMEWORK_PATH ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
+swift build -c release --product roost
+export ROOST_CLI="$(swift build -c release --show-bin-path)/roost"
+"$ROOST_CLI" --version
 ```
 
-Keep `ROOST_FRAMEWORK_PATH` set for the commands below. It points generated apps
-at this checkout, regardless of its folder name. Unsetting the other overrides
-selects published companion packages, including when you previously used local ESW.
+Generated apps download Roost 2.0.0, Spectro 2.1.0, Nexus 2.0.0, and ESW 1.5.0
+through SwiftPM. No companion source checkouts or dependency overrides are needed.
+Keep `ROOST_CLI` set for the commands below, or copy that executable to a directory
+on your `PATH` and use `roost` directly.
 
-For development across all four repositories, `ROOST_ECOSYSTEM_PATH` remains an
-optional parent directory override. Set `ROOST_ESW_PATH` only when developing ESW
-itself; this overrides ESW alone and takes precedence over its ecosystem checkout.
+Framework contributors can optionally set `ROOST_FRAMEWORK_PATH` to a checkout.
+`ROOST_ECOSYSTEM_PATH` selects the parent of all four repositories; `ROOST_ESW_PATH`
+overrides ESW alone. Leave these unset when trying the published release.
 
 ### 2. Start with one route
 
@@ -338,7 +337,7 @@ your process/container environment. `.env` files are not loaded automatically.
 | `DB_PASSWORD`          | `postgres`; override for your environment.                                                                                                        |
 | `DB_NAME`              | Overrides the database name. Otherwise a configured base gets `_dev` or `_test`; production uses the base name. Set it explicitly for deployment. |
 | `ROOST_ECOSYSTEM_PATH` | Optional parent directory of the companion source checkouts, used during SwiftPM resolution.                                                      |
-| `ROOST_FRAMEWORK_PATH` | Optional framework checkout path for generated apps; defaults to `$ROOST_ECOSYSTEM_PATH/Roost`.                                                   |
+| `ROOST_FRAMEWORK_PATH` | Optional framework checkout; otherwise uses `$ROOST_ECOSYSTEM_PATH/Roost` if set, or the published package.                                                   |
 | `ROOST_ESW_PATH`       | Optional ESW checkout path; overrides ESW alone and takes precedence over ecosystem mode.                                                         |
 
 The generated `MemorySessionStore` lasts for one process. Provide a shared,
@@ -433,15 +432,14 @@ and `Sources/Migrations/`. Starting the server does not apply migrations.
 `roost gen dockerfile` generates a Swift 6.3.3 build stage and matching slim
 runtime, installs zlib, and includes public assets and migrations. Supply the
 `DB_*` variables to the container. Generated Dockerfiles resolve published
-dependencies. Until the renamed Roost package is released, make this framework
-checkout available in the build context and set `ROOST_FRAMEWORK_PATH` there.
-ESW, Spectro, and Nexus can resolve from their published packages.
+dependencies, including Roost 2.0.0; no framework source checkout is required
+in the container build context.
 
 ## Troubleshooting
 
-- **The compiler cannot find `Roost`.** Check that you have the renamed
-  development checkout, and that `ROOST_FRAMEWORK_PATH` points to it.
-  The public default branch still exports the earlier module names.
+- **The compiler cannot find `Roost`.** Require `swift-roost` 2.0.0 or later
+  and use the `Roost` product. The 1.x tags contain the earlier Peregrine names.
+  Unset stale dependency overrides and run `swift package resolve`.
 - **Templates collide or typed views are missing.** Require ESW 1.5.0 or later
   in the app's direct dependency, and run `swift package resolve`. Remove an
   outdated `ROOST_ESW_PATH` or `ROOST_ECOSYSTEM_PATH` override. File templates

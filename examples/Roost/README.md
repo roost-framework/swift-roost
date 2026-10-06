@@ -39,7 +39,7 @@ Prerequisites: Swift 6.3+, Python 3, a local PostgreSQL server, and `psql`,
 
 `./dev` and `./check` locate the framework from this example and set
 `ROOST_FRAMEWORK_PATH`, so its directory can have any name. SwiftPM resolves
-**ESW 1.5.0, Spectro 2.0.0, and Nexus 2.0.0 from published packages**. No sibling
+**ESW 1.5.0, Spectro 2.1.0, and Nexus 2.0.0 from published packages**. No sibling
 source checkout is needed. If you previously used local dependencies, run
 `unset ROOST_ESW_PATH ROOST_ECOSYSTEM_PATH` before starting the helper.
 

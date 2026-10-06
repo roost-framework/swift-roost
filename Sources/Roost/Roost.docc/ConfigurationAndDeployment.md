@@ -38,7 +38,7 @@ tests use `roost_dev` and `roost_test`; production fails.
 | `ROOST_ESW_PATH` | Optional ESW development checkout, taking precedence over ecosystem mode. |
 | `ROOST_ECOSYSTEM_PATH` | Optional parent directory containing all companion source checkouts. |
 
-Leave `ROOST_ESW_PATH` and `ROOST_ECOSYSTEM_PATH` unset to resolve published
+Leave all three overrides unset to resolve published Roost,
 ESW, Spectro, and Nexus. These values affect SwiftPM resolution, not database
 selection.
 
@@ -64,10 +64,8 @@ them. Preserve any additional SwiftPM resource bundles your application uses.
 
 `roost gen dockerfile` creates a Swift 6.3.3 build stage and matching slim
 runtime, installs Linux zlib dependencies, and copies the public assets and
-migrations. The default recipe resolves published packages. Until the renamed
-Roost package is released, make this framework checkout available in the build
-context and set `ROOST_FRAMEWORK_PATH` there. ESW, Spectro, and Nexus can resolve
-from their published releases.
+migrations. The default recipe resolves published Roost 2.0.0 and its companion
+packages without additional framework checkouts in the build context.
 
 ### Understand server and storage boundaries
 

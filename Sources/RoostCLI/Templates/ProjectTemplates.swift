@@ -65,7 +65,7 @@ enum ProjectTemplates {
             ?? ecosystem.map { "\\($0)/Roost" }
         let frameworkDependency: Package.Dependency = frameworkPath.map {
             .package(name: "swift-roost", path: $0)
-        } ?? .package(url: "https://github.com/Maartz/swift-roost", from: "1.0.0")
+        } ?? .package(url: "https://github.com/Maartz/swift-roost", from: "\(RoostCLI.version)")
         let eswPath = ProcessInfo.processInfo.environment["ROOST_ESW_PATH"]
             ?? ecosystem.map { "\\($0)/esw" }
         let eswDependency: Package.Dependency = eswPath.map {

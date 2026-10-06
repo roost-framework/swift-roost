@@ -5,27 +5,28 @@ run creates an app with two resources, applies its migrations to an isolated
 PostgreSQL database, runs its generated tests, and checks two users over HTTP.
 
 Use Swift 6.3 or later, PostgreSQL, and the `roost` CLI. ESW 1.5.0 includes the
-typed views and namespaced templates used below; Spectro 2.0.0 includes the
+typed views and namespaced templates used below; Spectro 2.1.0 includes the
 required database fixes. No companion source checkouts are needed.
 
-Roost requires Spectro 2.0.0 and Nexus 2.0.0. On Debian/Ubuntu, install `zlib1g-dev` before
+Roost requires Spectro 2.1.0 and Nexus 2.0.0. On Debian/Ubuntu, install `zlib1g-dev` before
 building. The generated Dockerfile installs the build headers and runtime zlib
 package, and CI installs the headers too.
 
 ## Build the CLI
 
-From the Roost development checkout, select released companion packages:
+Clone Roost 2.0.0 and build the CLI:
 
 ```sh
-unset ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
-export ROOST_FRAMEWORK_PATH="$PWD"
-swift build --product roost
-export ROOST_CLI="$(swift build --show-bin-path)/roost"
+git clone --branch 2.0.0 --depth 1 https://github.com/Maartz/swift-roost.git Roost
+cd Roost
+unset ROOST_FRAMEWORK_PATH ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
+swift build -c release --product roost
+export ROOST_CLI="$(swift build -c release --show-bin-path)/roost"
 ```
 
-Keep `ROOST_FRAMEWORK_PATH` set while generating and building the app.
-`ROOST_ECOSYSTEM_PATH` remains available for developing all four repositories
-together, and `ROOST_ESW_PATH` can select a local ESW checkout. Both are optional.
+The generated application resolves Roost and its companions from their releases.
+Framework contributors can opt into local sources with `ROOST_FRAMEWORK_PATH`,
+`ROOST_ECOSYSTEM_PATH`, or `ROOST_ESW_PATH`.
 
 ## Generate and start
 

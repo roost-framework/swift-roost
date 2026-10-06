@@ -151,3 +151,37 @@ swift test
 python3 scripts/check_generated_app.py --release
 python3 scripts/build_docs.py
 ```
+
+## Roost 2.0.0 / Spectro 2.1.0 release preflight
+
+The release candidate raises the Spectro minimum to 2.1.0, reports `roost
+--version` as 2.0.0, and generates applications requiring published Roost 2.0.0.
+The renamed source is merged with the published website and Linux fixes.
+
+Before Spectro's 2.1.0 tag was available, macOS validation used an immutable
+snapshot of its release-preparation commit
+`4a75b08911b41cbbd3feb724c8527a32f98b16b6`, ESW 1.5.0 at
+`8ff401e6efdf20cfc52d27cbfaf0fd0686e38337`, and Nexus 2.0.0 at
+`1fc010e02ac912ceca1c31a3304fca115117fc89`. These were selected through the
+existing ecosystem override; this is source compatibility evidence, not proof
+that a published Spectro 2.1.0 package resolves.
+
+- All 445 framework and CLI tests passed with Swift 6.4.
+- The reading-list example passed all eight PostgreSQL tests from a clean copy
+  outside the synced checkout; its owned test database was removed.
+- A fresh generated app compiled, applied four migrations to an owned local
+  PostgreSQL database, and passed its four tests, including rollback isolation.
+- Its optimized executable passed the HTTP authentication, CSRF, flash,
+  validation, HTML/JSON, two-user ownership, and second-resource checks.
+- The copied release executable rolled back and reapplied a migration. The
+  owned database was removed when acceptance completed.
+- Generated manifests keep the published dependency as their default, with no
+  hardcoded checkout path. `--published-framework` now checks a fresh app against
+  the released Roost version reported by the CLI, with local overrides removed.
+- The browser playground's eight checks and static-site checks passed. DocC
+  conversion passed after the release guide updates; it does not exercise the
+  database or network workflows.
+
+Publication still requires the remote Spectro 2.1.0 tag, followed by verification
+against published packages and the Roost release tag. Hosted Roost CI has not
+run for this candidate yet.

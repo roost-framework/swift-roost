@@ -4,8 +4,8 @@ The framework is now **Roost.** The falcon stays, and the wordmark ends with an
 orange dot. Swift identifiers and shell commands omit the punctuation.
 
 This is a breaking source rename. There are no deprecated modules or executable
-aliases under the former name. Use this checkout for the renamed APIs; existing
-release tags still contain the API from the time they were published.
+aliases under the former name. Require Roost 2.0.0 or later for the renamed
+APIs; the 1.x release tags keep their original Peregrine API.
 
 ## Application code
 
@@ -43,9 +43,10 @@ export ROOST_CLI="$(swift build --show-bin-path)/roost"
 ```
 
 `ROOST_FRAMEWORK_PATH` allows an existing checkout to keep its directory name.
-When omitted, generated apps look for `$ROOST_ECOSYSTEM_PATH/Roost`.
-The reading-list helpers infer this path automatically.
-ESW 1.5.0 and Spectro/Nexus 2.0.0 resolve from published packages. Set
+When omitted, generated apps use `$ROOST_ECOSYSTEM_PATH/Roost` if that override
+is set, or the published Roost 2.0.0 package otherwise. The reading-list helpers
+infer the containing framework path automatically. ESW 1.5.0, Spectro 2.1.0,
+and Nexus 2.0.0 resolve from published packages. Set
 `ROOST_ESW_PATH` only when you want to develop against a local ESW checkout.
 
 ## Runtime names
