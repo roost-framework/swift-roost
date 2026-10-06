@@ -2,19 +2,19 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01), ESW templates (spec 01)
+**Depends on:** Roost core (spec 01), ESW templates (spec 01)
 
 ---
 
 ## 1. Goal
 
 Every web app sends emails: confirmation links, password resets,
-notifications. Phoenix has Swoosh, Rails has ActionMailer. Peregrine
+notifications. Phoenix has Swoosh, Rails has ActionMailer. Roost
 needs a mailer that:
 
 1. Uses ESW templates for email bodies (same engine as web views).
 2. Supports multiple delivery backends (SMTP, API-based services).
-3. Works with `PeregrineToken` for signed confirmation/reset links.
+3. Works with `RoostToken` for signed confirmation/reset links.
 4. Has a dev mode that logs emails instead of sending them.
 
 ```swift
@@ -44,12 +44,12 @@ public struct Email: Sendable {
 }
 ```
 
-### 2.2 PeregrineEmail Protocol
+### 2.2 RoostEmail Protocol
 
 Define emails as types:
 
 ```swift
-public protocol PeregrineEmail: Sendable {
+public protocol RoostEmail: Sendable {
     /// Build the email with recipients, subject, and body.
     func build() async throws -> Email
 }
@@ -58,13 +58,13 @@ public protocol PeregrineEmail: Sendable {
 Example:
 
 ```swift
-struct WelcomeEmail: PeregrineEmail {
+struct WelcomeEmail: RoostEmail {
     let user: User
 
     func build() async throws -> Email {
-        let token = PeregrineToken.sign(
+        let token = RoostToken.sign(
             user.id.uuidString,
-            secret: Peregrine.secret
+            secret: Roost.secret
         )
         return Email(
             to: [user.email],
@@ -131,11 +131,11 @@ public enum Mailer {
     public static func configure(_ delivery: MailDelivery)
 
     /// Deliver an email using the configured backend.
-    public static func deliver(_ email: PeregrineEmail) async throws
+    public static func deliver(_ email: RoostEmail) async throws
 
     /// Deliver using a specific backend (overrides default).
     public static func deliver(
-        _ email: PeregrineEmail,
+        _ email: RoostEmail,
         via delivery: MailDelivery
     ) async throws
 }
@@ -161,14 +161,14 @@ MAIL_FROM=hello@myapp.com
 ### 2.6 CLI Generator
 
 ```bash
-$ peregrine gen.email WelcomeEmail
+$ roost gen.email WelcomeEmail
   create  Sources/MyApp/Emails/WelcomeEmail.swift
   create  Sources/MyApp/Views/emails/welcome.esw
   create  Sources/MyApp/Views/emails/welcome.text.esw
 ```
 
 Generates:
-- Email struct conforming to `PeregrineEmail`.
+- Email struct conforming to `RoostEmail`.
 - HTML email template (ESW).
 - Plain text email template (ESW).
 
@@ -177,7 +177,7 @@ Generates:
 ## 3. Acceptance Criteria
 
 - [ ] `Email` struct with to, from, subject, text/html body, cc, bcc
-- [ ] `PeregrineEmail` protocol for type-safe email definitions
+- [ ] `RoostEmail` protocol for type-safe email definitions
 - [ ] `MailDelivery` protocol for delivery backends
 - [ ] `LoggerDelivery` prints emails to console (dev default)
 - [ ] `SMTPDelivery` sends emails via SMTP with STARTTLS
@@ -187,7 +187,7 @@ Generates:
 - [ ] ESW templates work for email bodies
 - [ ] Environment-aware defaults (logger in dev, test in test, explicit in prod)
 - [ ] SMTP reads config from environment variables
-- [ ] `peregrine gen.email` generates email struct + templates
+- [ ] `roost gen.email` generates email struct + templates
 - [ ] Emails support both HTML and plain text bodies
 - [ ] `swift test` passes
 

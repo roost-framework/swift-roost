@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01)
+**Depends on:** Roost core (spec 01)
 
 ---
 

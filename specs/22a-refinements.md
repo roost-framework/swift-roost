@@ -128,7 +128,7 @@ extension Connection {
     /// - `conn.sessionData["key"]` - Read from session storage
     /// - `conn.putSession("key", value)` - Write to session storage
     ///
-    /// The session() method is NOT used in Peregrine - we use sessionData instead
+    /// The session() method is NOT used in Roost - we use sessionData instead
     /// to avoid confusion with HTTP sessions.
 }
 ```

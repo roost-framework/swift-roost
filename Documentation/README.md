@@ -1,0 +1,100 @@
+# Roost documentation
+
+Roost uses Swift DocC, like ESW: authored guides sit beside API pages generated
+from the public Swift declarations and their documentation comments. The
+combined **Roost Libraries** navigator includes both libraries.
+
+- [Roost](../Sources/Roost/Roost.docc/Roost.md): getting started, routes,
+  middleware, typed views, forms, authentication, data, migrations, generators,
+  configuration, deployment, and current implementation boundaries.
+- [RoostTest](../Sources/RoostTest/RoostTest.docc/RoostTest.md): HTTP assertions,
+  browser sessions, CSRF-protected workflows, and database test isolation.
+
+These catalogs document the current Roost development checkout, using released
+ESW 1.5.0, Spectro 2.0.0, and Nexus 2.0.0. The renamed Roost framework itself
+has not yet been released.
+
+## Build
+
+Use Python 3 and a Swift toolchain containing DocC with `convert` and `merge`
+support. The local build has been verified with Xcode 27.2 beta 2 (Swift 6.4).
+From the framework root:
+
+```sh
+unset ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
+python3 scripts/build_docs.py
+```
+
+The script builds the libraries and test modules, extracts their public symbol
+graphs (including Roost's extensions to Nexus connections), checks both catalogs,
+then merges them. **It compiles tests but does not run them or connect to a
+database.** DocC conversion uses `--analyze --warnings-as-errors`; a failed build
+keeps any previously generated archive intact.
+
+The archive and SwiftPM build cache live outside the checkout by default:
+
+```text
+macOS:  ~/Library/Caches/roost-documentation/<checkout-id>/
+Linux:  $XDG_CACHE_HOME/roost-documentation/<checkout-id>/
+        (or ~/.cache/roost-documentation/<checkout-id>/)
+```
+
+The script prints the exact archive path and a local preview command. This
+keeps generated files out of source control and avoids signed SwiftPM resource
+bundles inside a synced source directory.
+
+SwiftPM's native build backend is selected explicitly because the Xcode 27
+Swift Build backend attempts to extract unrelated dependency C headers during
+symbol graph generation. The preliminary test build provides the synthetic
+test-runner module requested by SwiftPM 6.4. These are toolchain workarounds,
+not additional application requirements.
+
+## Browse locally
+
+Run the printed `python3 -m http.server` command, or choose your own archive
+location and port:
+
+```sh
+python3 scripts/build_docs.py --output /tmp/Roost.doccarchive
+python3 -m http.server 61415 --bind 127.0.0.1 --directory /tmp/Roost.doccarchive
+```
+
+Open [Roost Libraries](http://127.0.0.1:61415/documentation/) or go directly to
+[Getting started](http://127.0.0.1:61415/documentation/roost/gettingstarted/).
+Use the sidebar filter to find guides and declarations. API links lead to the
+current declaration, parameters, and related symbols.
+
+The `.docc` catalogs are also available to Xcode's **Build Documentation**
+command. The script is the reproducible path for the merged, two-library site.
+
+## Prepare a GitHub Pages artifact
+
+Build for the URL prefix where the archive will be served:
+
+```sh
+python3 scripts/build_docs.py \
+  --hosting-base-path /swift-roost/docs \
+  --output /tmp/Roost-Pages.doccarchive
+```
+
+Copy the **contents** of that archive into `docs/` in the GitHub Pages artifact,
+beside the existing site's files. The entry point will then be
+`/swift-roost/docs/documentation/`; deep links and assets use that same prefix.
+This command prepares files only. It does not publish a site or change the
+repository's deployment settings.
+
+An archive built for `/` is for a server root. Rebuild with the hosting prefix
+before placing it under a project site's subdirectory.
+
+## Maintain the guides
+
+Edit articles in `Sources/Roost/Roost.docc/` or
+`Sources/RoostTest/RoostTest.docc/`, and API comments beside the Swift declarations.
+Add new guides to their module landing page's `Topics` section so they appear
+in the navigator. Rebuild after changing symbol links or signatures.
+
+Keep examples aligned with the generators and actual request lifecycle. State
+when an example needs PostgreSQL, a generated model, a session store, or a local
+dependency override. Use the [acceptance record](../guides/dx-acceptance.md) for
+framework verification; a successful documentation build validates neither
+database workflows nor network transports.

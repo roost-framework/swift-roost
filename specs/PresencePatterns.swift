@@ -1,5 +1,5 @@
 // PresencePatterns.swift
-// Design specification for Peregrine.Presence — inspired by Phoenix.Presence
+// Design specification for Roost.Presence — inspired by Phoenix.Presence
 //
 // Presence tracks which users are currently connected to a Channel topic,
 // broadcasts join/leave diffs to all subscribers, and provides a consistent

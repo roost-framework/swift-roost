@@ -1,0 +1,6 @@
+<div class="editor">
+    <a class="back-link" href="/bookmarks/<%= bookmark.id %>">← Back to link</a>
+    <p class="eyebrow">A little revision</p>
+    <h1>Edit your link<span class="accent">.</span></h1>
+    <%== BookmarkFormView(action: "/bookmarks/\(bookmark.id)", method: "PUT", values: values, errors: errors, button: "Save changes").render() %>
+</div>

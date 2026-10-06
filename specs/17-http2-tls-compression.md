@@ -2,13 +2,13 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01), Hummingbird HTTP/2 and TLS modules
+**Depends on:** Roost core (spec 01), Hummingbird HTTP/2 and TLS modules
 
 ---
 
 ## 1. Goal
 
-Three production essentials that Hummingbird already provides — Peregrine
+Three production essentials that Hummingbird already provides — Roost
 just needs to expose them through `ServerConfig` and the plug pipeline.
 
 1. **HTTP/2** — multiplexed connections, header compression, server push.
@@ -77,7 +77,7 @@ changes — Hummingbird's `HummingbirdHTTP2` module handles the protocol.
 Support two modes:
 
 1. **File paths** — PEM-encoded certificate and private key files.
-2. **Self-signed (dev only)** — `peregrine server --tls` generates an
+2. **Self-signed (dev only)** — `roost server --tls` generates an
    ephemeral self-signed certificate for local HTTPS development.
 
 ```swift
@@ -91,9 +91,9 @@ var server: ServerConfig {
 
 ```bash
 # Development: self-signed
-$ peregrine server --tls
+$ roost server --tls
   Generated self-signed certificate for localhost
-  Peregrine running on https://127.0.0.1:8080
+  Roost running on https://127.0.0.1:8080
 ```
 
 #### 2.4 HTTPS Redirect Plug
@@ -174,7 +174,7 @@ Never compress:
 
 - [ ] `ServerConfig.TLSConfig` accepts certificate and key paths
 - [ ] Server starts with HTTPS when TLS is configured
-- [ ] `peregrine server --tls` generates self-signed cert for dev
+- [ ] `roost server --tls` generates self-signed cert for dev
 - [ ] `httpsRedirect()` plug redirects HTTP to HTTPS in prod
 - [ ] `httpsRedirect()` is a no-op in dev
 - [ ] Invalid certificate paths produce a clear error

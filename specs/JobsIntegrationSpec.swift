@@ -1,8 +1,8 @@
 import Testing
-import PeregrineTest
+import RoostTest
 @testable import DonutShop
 
-/// Integration specs for Peregrine.Jobs (background job queue).
+/// Integration specs for Roost.Jobs (background job queue).
 ///
 /// Uses the in-memory driver with inline (synchronous) execution in tests —
 /// no Valkey or Postgres worker process required.

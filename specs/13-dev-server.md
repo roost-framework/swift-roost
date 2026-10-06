@@ -15,14 +15,14 @@ compile → test. This is painful. Every other framework has solved this:
 - **Rails:** `bin/dev` runs server + CSS watcher via `Procfile.dev`.
 - **Vapor:** no built-in watcher (people use `entr` or `watchexec`).
 
-Peregrine should make the dev loop fast and automatic:
+Roost should make the dev loop fast and automatic:
 
 ```bash
-$ peregrine build --watch
+$ roost build --watch
   Watching Sources/ and Public/ for changes...
   Building...
   Build complete. (2.1s)
-  Peregrine running on http://127.0.0.1:8080
+  Roost running on http://127.0.0.1:8080
 
   [changed] Sources/DonutShop/Routes/DonutRoutes.swift
   Rebuilding...
@@ -36,22 +36,22 @@ One command. Edit a file. See the result.
 
 ## 2. Scope
 
-### 2.1 `peregrine build`
+### 2.1 `roost build`
 
 A build command that compiles assets (if Tailwind) and Swift in sequence:
 
 ```bash
-$ peregrine build
+$ roost build
 ```
 
 Steps:
 1. If `tailwind.config.js` exists: run Tailwind CLI to compile CSS.
 2. Run `swift build`.
 
-This replaces `swift build` as the standard build command for Peregrine
+This replaces `swift build` as the standard build command for Roost
 projects, since it handles both assets and Swift.
 
-### 2.2 `peregrine build --watch`
+### 2.2 `roost build --watch`
 
 A development mode that:
 
@@ -61,8 +61,8 @@ A development mode that:
 4. On change: kills the server, rebuilds, restarts.
 
 ```bash
-$ peregrine build --watch
-$ peregrine build --watch --port 4000   # custom port
+$ roost build --watch
+$ roost build --watch --port 4000   # custom port
 ```
 
 #### Watch Targets
@@ -105,18 +105,18 @@ Package.swift via `ProjectDiscovery`).
 Clear, color-coded output so the developer knows what's happening:
 
 ```
-[peregrine] Watching for changes...
-[peregrine] Building... done (1.8s)
-[peregrine] Server started on http://127.0.0.1:8080
+[roost] Watching for changes...
+[roost] Building... done (1.8s)
+[roost] Server started on http://127.0.0.1:8080
 
-[peregrine] Changed: Sources/DonutShop/Routes/DonutRoutes.swift
-[peregrine] Rebuilding... done (0.6s)
-[peregrine] Server restarted.
+[roost] Changed: Sources/DonutShop/Routes/DonutRoutes.swift
+[roost] Rebuilding... done (0.6s)
+[roost] Server restarted.
 
-[peregrine] Build failed:
+[roost] Build failed:
             error: type 'Donut' has no member 'nam'
             → Sources/DonutShop/Routes/DonutRoutes.swift:12:42
-[peregrine] Fix the error and save to retry.
+[roost] Fix the error and save to retry.
 ```
 
 Key behaviors:
@@ -138,23 +138,23 @@ When `tailwind.config.js` exists and `--watch` is active:
    no server restart needed for CSS-only changes.
 4. On `Ctrl+C`, kill both the Tailwind process and the server process.
 
-### 2.7 Upgrade of `peregrine server`
+### 2.7 Upgrade of `roost server`
 
-The existing `peregrine server` command (Sprint 5) becomes an alias for
-`peregrine build --watch`:
+The existing `roost server` command (Sprint 5) becomes an alias for
+`roost build --watch`:
 
 ```bash
-$ peregrine server           # same as: peregrine build --watch
-$ peregrine server --port 4000
+$ roost server           # same as: roost build --watch
+$ roost server --port 4000
 ```
 
-The non-watch `peregrine build` remains for CI and production builds.
+The non-watch `roost build` remains for CI and production builds.
 
 ---
 
 ## 3. Acceptance Criteria
 
-### `peregrine build`
+### `roost build`
 
 - [ ] Compiles Tailwind CSS if `tailwind.config.js` exists
 - [ ] Runs `swift build` after CSS compilation
@@ -162,7 +162,7 @@ The non-watch `peregrine build` remains for CI and production builds.
 - [ ] Works without Tailwind (Swift-only build)
 - [ ] Shows build duration
 
-### `peregrine build --watch`
+### `roost build --watch`
 
 - [ ] Performs initial build and starts the server
 - [ ] Detects changes to `.swift` files in `Sources/`
@@ -185,9 +185,9 @@ The non-watch `peregrine build` remains for CI and production builds.
 - [ ] Both processes are killed on `Ctrl+C`
 - [ ] Works without Tailwind (Pico-only projects)
 
-### `peregrine server`
+### `roost server`
 
-- [ ] Acts as alias for `peregrine build --watch`
+- [ ] Acts as alias for `roost build --watch`
 - [ ] Accepts `--port` flag
 
 ### General

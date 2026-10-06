@@ -130,7 +130,7 @@ extension SessionScope {
 **Test Helpers:**
 
 ```swift
-// In Sources/PeregrineTest/ScopeTestHelpers.swift
+// In Sources/RoostTest/ScopeTestHelpers.swift
 
 extension TestApp {
     /// Create a test connection with user scope

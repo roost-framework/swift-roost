@@ -1,8 +1,8 @@
 import Testing
-import PeregrineTest
+import RoostTest
 @testable import ChatApp
 
-/// Integration specs for Peregrine.Presence.
+/// Integration specs for Roost.Presence.
 ///
 /// Validates join/leave tracking, diff broadcasts, and multi-tab handling.
 /// Uses the in-memory Presence adapter — no Valkey required.

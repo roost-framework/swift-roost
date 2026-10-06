@@ -1,0 +1,7 @@
+<div class="editor">
+    <a class="back-link" href="/bookmarks">← Your reading queue</a>
+    <p class="eyebrow">For another moment</p>
+    <h1>Save a link<span class="accent">.</span></h1>
+    <p class="lede">Give it a name. Leave yourself a little context.</p>
+    <%== BookmarkFormView(action: "/bookmarks", method: "POST", values: values, errors: errors, button: "Save link").render() %>
+</div>

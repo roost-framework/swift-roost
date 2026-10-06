@@ -1,10 +1,10 @@
 import Testing
-import PeregrineTest
+import RoostTest
 @testable import DashboardApp
 
-/// Integration specs for Peregrine Server-Sent Events.
+/// Integration specs for Roost Server-Sent Events.
 ///
-/// PeregrineTest provides `collectSSE(path:count:timeout:)` which connects
+/// RoostTest provides `collectSSE(path:count:timeout:)` which connects
 /// to an SSE endpoint, collects N events, then disconnects — all in-process.
 @Suite("SSE Integration Specs")
 struct SSEIntegrationSpecs {

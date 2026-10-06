@@ -2,13 +2,13 @@
 
 **Status:** Proposed
 **Date:** 2026-04-07
-**Depends on:** Peregrine core (spec 01), Spectro ORM, Environment (spec 04)
+**Depends on:** Roost core (spec 01), Spectro ORM, Environment (spec 04)
 
 ---
 
 ## 1. Goal
 
-Peregrine lacks a database migration system. Developers must manually create and apply schema changes, which is error-prone and makes collaboration difficult. Rails solved this with a migration system that:
+Roost lacks a database migration system. Developers must manually create and apply schema changes, which is error-prone and makes collaboration difficult. Rails solved this with a migration system that:
 
 1. **Version control database schema** - Track all schema changes in SQL files
 2. **Apply changes incrementally** - Run pending migrations in order
@@ -38,7 +38,7 @@ MyApp/
 │   ├── test.sql
 │   ├── production.sql
 │   └── README.md
-└── .peregrine/
+└── .roost/
     └── schema.sql  # Schema dump for source control
 ```
 
@@ -86,7 +86,7 @@ COMMIT;
 #### 2.1.3 Migration File Creation API
 
 ```swift
-// In Sources/PeregrineCLI/MigrationCommand.swift
+// In Sources/RoostCLI/MigrationCommand.swift
 
 public enum MigrationGenerator {
     /// Create a new migration file
@@ -158,7 +158,7 @@ COMMIT;
 
 ```sql
 -- Auto-created on first migration run
-CREATE TABLE IF NOT EXISTS "peregrine_migrations" (
+CREATE TABLE IF NOT EXISTS "roost_migrations" (
     "version" BIGINT PRIMARY KEY,
     "name" TEXT NOT NULL,
     "applied_at" TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -168,7 +168,7 @@ CREATE TABLE IF NOT EXISTS "peregrine_migrations" (
 #### 2.2.2 Migration State API
 
 ```swift
-// In Sources/Peregrine/Migrations/Migration.swift
+// In Sources/Roost/Migrations/Migration.swift
 
 public enum Migration {
     /// Get all applied migrations
@@ -176,7 +176,7 @@ public enum Migration {
         database: SpectroClient
     ) async throws -> [BigInt] {
         let rows = try await database.query(
-            "SELECT version FROM peregrine_migrations ORDER BY version"
+            "SELECT version FROM roost_migrations ORDER BY version"
         )
 
         return rows.compactMap { row in
@@ -201,7 +201,7 @@ public enum Migration {
         database: SpectroClient
     ) async throws -> Bool {
         let result = try await database.query(
-            "SELECT 1 FROM peregrine_migrations WHERE version = $1",
+            "SELECT 1 FROM roost_migrations WHERE version = $1",
             [version]
         )
 
@@ -215,7 +215,7 @@ public enum Migration {
         database: SpectroClient
     ) async throws {
         try await database.execute(
-            "INSERT INTO peregrine_migrations (version, name) VALUES ($1, $2)",
+            "INSERT INTO roost_migrations (version, name) VALUES ($1, $2)",
             [version, name]
         )
     }
@@ -226,7 +226,7 @@ public enum Migration {
         database: SpectroClient
     ) async throws {
         try await database.execute(
-            "DELETE FROM peregrine_migrations WHERE version = $1",
+            "DELETE FROM roost_migrations WHERE version = $1",
             [version]
         )
     }
@@ -258,17 +258,17 @@ public enum Migration {
 
 ```bash
 # Create a new migration
-$ peregrine db:migration CreateUsersTable
+$ roost db:migration CreateUsersTable
   create  Migrations/20260407143000_create_users_table.sql
 
 # Run pending migrations
-$ peregrine db:migrate
+$ roost db:migrate
 Migrating: 20260407143000_create_users_table.sql
   -> UP: Create users table with indexes
 ✅ Applied 1 migration
 
 # Run with verbose output
-$ peregrine db:migrate --verbose
+$ roost db:migrate --verbose
 Migrating: 20260407143000_create_users_table.sql
   -> UP: Create users table with indexes
   -> BEGIN
@@ -278,18 +278,18 @@ Migrating: 20260407143000_create_users_table.sql
 ✅ Applied 1 migration
 
 # Rollback last migration
-$ peregrine db:rollback
+$ roost db:rollback
 Rolling back: 20260407143000_create_users_table.sql
   -> DOWN: Drop users table
 ✅ Rolled back 1 migration
 
 # Rollback specific version
-$ peregrine db:rollback --version 20260407143000
+$ roost db:rollback --version 20260407143000
 Rolling back to: 20260407143000
 ✅ Rolled back 1 migration
 
 # Rollback N steps
-$ peregrine db:rollback --steps 3
+$ roost db:rollback --steps 3
 Rolling back 3 migrations...
   -> 20260407150000_create_posts_table.sql
   -> 20260407145230_add_email_index.sql
@@ -297,7 +297,7 @@ Rolling back 3 migrations...
 ✅ Rolled back 3 migrations
 
 # Check migration status
-$ peregrine db:status
+$ roost db:status
 Database: myapp_dev
 Status:    2 migrations pending
 
@@ -308,7 +308,7 @@ Migration Status:
   Pending  20260407153000  Add comments table
 
 # Redo last migration (down then up)
-$ peregrine db:redo
+$ roost db:redo
 Rolling back: 20260407150000_create_posts_table.sql
   -> DOWN: Drop posts table
 ✅ Rolled back
@@ -317,23 +317,23 @@ Migrating: 20260407150000_create_posts_table.sql
 ✅ Applied
 
 # Run seed data
-$ peregrine db:seed
+$ roost db:seed
 Seeding from: Seeds/development.sql
 ✅ Seeded 25 records
 
 # Run environment-specific seed
-$ peregrine db:seed --environment test
+$ roost db:seed --environment test
 Seeding from: Seeds/test.sql
 ✅ Seeded 10 records
 
 # Dry-run mode (preview changes)
-$ peregrine db:migrate --dry-run
+$ roost db:migrate --dry-run
 Would apply 2 migrations:
   -> 20260407150000_create_posts_table.sql
   -> 20260407153000_add_comments_table.sql
 
 # Force migration (skip safety checks)
-$ peregrine db:migrate --force
+$ roost db:migrate --force
 ⚠️  Force mode enabled - skipping safety checks
 Migrating: 20260407150000_create_posts_table.sql
 ✅ Applied 1 migration
@@ -342,7 +342,7 @@ Migrating: 20260407150000_create_posts_table.sql
 #### 2.3.2 Programmatic API
 
 ```swift
-// In Sources/Peregrine/Migrations/Migrator.swift
+// In Sources/Roost/Migrations/Migrator.swift
 
 public final class Migrator: Sendable {
     public let database: SpectroClient
@@ -670,7 +670,7 @@ public final class Migrator: Sendable {
 
     private func getAppliedAt(_ version: BigInt) async throws -> Date? {
         let rows = try await database.query(
-            "SELECT applied_at FROM peregrine_migrations WHERE version = $1",
+            "SELECT applied_at FROM roost_migrations WHERE version = $1",
             [version]
         )
 
@@ -765,7 +765,7 @@ private struct MigrationFile {
 #### 2.4.1 Drift Detection API
 
 ```swift
-// In Sources/Peregrine/Migrations/DriftDetector.swift
+// In Sources/Roost/Migrations/DriftDetector.swift
 
 public enum DriftDetector {
     /// Detect schema drift by comparing actual schema to migrations
@@ -896,7 +896,7 @@ public enum DriftDetector {
 
     private static func formatSchemaDump(_ schema: DatabaseSchema) -> String {
         var lines: [String] = []
-        lines.append("-- Peregrine Schema Dump")
+        lines.append("-- Roost Schema Dump")
         lines.append("-- Generated: \(ISO8601DateFormatter().string(from: Date()))")
         lines.append("")
 
@@ -1010,7 +1010,7 @@ private struct ColumnSchema {
 
 ```bash
 # Detect schema drift
-$ peregrine db:drift
+$ roost db:drift
 ⚠️  Schema drift detected!
 
 Unexpected tables found in database:
@@ -1026,15 +1026,15 @@ Missing columns:
 Type mismatches:
   - users.created_at: database=TIMESTAMP, migration=TIMESTAMPTZ
 
-Run `peregrine db:schema:dump` to update schema dump.
+Run `roost db:schema:dump` to update schema dump.
 
 # Dump current schema
-$ peregrine db:schema:dump
-Dumping schema to: .peregrine/schema.sql
+$ roost db:schema:dump
+Dumping schema to: .roost/schema.sql
 ✅ Schema dumped
 
 # Verify schema matches migrations
-$ peregrine db:schema:verify
+$ roost db:schema:verify
 ✅ Schema matches migrations
 ```
 
@@ -1090,7 +1090,7 @@ FROM "users" WHERE email = 'test@example.com';
 #### 2.5.2 Seeder API
 
 ```swift
-// In Sources/Peregrine/Migrations/Seeder.swift
+// In Sources/Roost/Migrations/Seeder.swift
 
 public enum Seeder {
     /// Run seed file for current environment
@@ -1129,7 +1129,7 @@ public enum Seeder {
             SELECT table_name
             FROM information_schema.tables
             WHERE table_schema = 'public'
-            AND table_name != 'peregrine_migrations'
+            AND table_name != 'roost_migrations'
             ORDER BY table_name
         """)
 
@@ -1159,13 +1159,13 @@ This directory contains seed data for different environments.
 
 ```bash
 # Run seeds for current environment
-$ peregrine db:seed
+$ roost db:seed
 
 # Run seeds for specific environment
-$ peregrine db:seed --environment test
+$ roost db:seed --environment test
 
 # Reset database (truncate all tables)
-$ peregrine db:reset
+$ roost db:reset
 ```
 
 ## Guidelines
@@ -1183,7 +1183,7 @@ $ peregrine db:reset
 #### 2.6.1 Auto-Migration in Tests
 
 ```swift
-// In Sources/PeregrineTest/DatabaseTestHelper.swift
+// In Sources/RoostTest/DatabaseTestHelper.swift
 
 extension TestApp {
     /// Setup test database with migrations
@@ -1239,7 +1239,7 @@ extension TestApp {
 #### 2.6.2 Test Assertions
 
 ```swift
-// In Sources/PeregrineTest/MigrationAssertions.swift
+// In Sources/RoostTest/MigrationAssertions.swift
 
 extension XCTestCase {
     /// Assert a specific migration is applied
@@ -1364,7 +1364,7 @@ struct MigrationTests {
 - [ ] Filenames are sanitized and URL-safe
 
 ### 3.2 Migration Tracking
-- [ ] `peregrine_migrations` table auto-created on first run
+- [ ] `roost_migrations` table auto-created on first run
 - [ ] Table tracks version, name, and applied_at timestamp
 - [ ] `Migration.appliedVersions()` returns list of applied versions
 - [ ] `Migration.pendingVersions()` returns list of pending versions
@@ -1375,37 +1375,37 @@ struct MigrationTests {
 - [ ] Migration versions are sorted correctly
 
 ### 3.3 Migration Workflow
-- [ ] `peregrine db:migration <name>` generates new migration file
-- [ ] `peregrine db:migrate` runs all pending migrations
-- [ ] `peregrine db:migrate --dry-run` previews migrations without running
-- [ ] `peregrine db:migrate --verbose` shows detailed SQL execution
-- [ ] `peregrine db:rollback` reverts last migration
-- [ ] `peregrine db:rollback --steps N` reverts N migrations
-- [ ] `peregrine db:rollback --version V` rolls back to specific version
-- [ ] `peregrine db:redo` rolls back and re-applies last migration
-- [ ] `peregrine db:status` shows migration status
-- [ ] `peregrine db:status` indicates if migrations are pending
+- [ ] `roost db:migration <name>` generates new migration file
+- [ ] `roost db:migrate` runs all pending migrations
+- [ ] `roost db:migrate --dry-run` previews migrations without running
+- [ ] `roost db:migrate --verbose` shows detailed SQL execution
+- [ ] `roost db:rollback` reverts last migration
+- [ ] `roost db:rollback --steps N` reverts N migrations
+- [ ] `roost db:rollback --version V` rolls back to specific version
+- [ ] `roost db:redo` rolls back and re-applies last migration
+- [ ] `roost db:status` shows migration status
+- [ ] `roost db:status` indicates if migrations are pending
 - [ ] Failed migrations roll back automatically (transactional)
 - [ ] Failed migrations stop execution chain
 - [ ] Migration errors are reported clearly
 
 ### 3.4 Schema Drift Detection
-- [ ] `peregrine db:drift` detects schema drift
+- [ ] `roost db:drift` detects schema drift
 - [ ] Drift report shows unexpected tables
 - [ ] Drift report shows unexpected columns
 - [ ] Drift report shows missing tables
 - [ ] Drift report shows missing columns
 - [ ] Drift report shows type mismatches
-- [ ] `peregrine db:schema:dump` dumps schema to `.peregrine/schema.sql`
-- [ ] `peregrine db:schema:verify` checks schema matches migrations
+- [ ] `roost db:schema:dump` dumps schema to `.roost/schema.sql`
+- [ ] `roost db:schema:verify` checks schema matches migrations
 - [ ] Schema dump includes all tables and columns
 - [ ] Schema dump is formatted as valid SQL
 
 ### 3.5 Seed Data
 - [ ] Seed files exist for dev/test/prod environments
-- [ ] `peregrine db:seed` runs seeds for current environment
-- [ ] `peregrine db:seed --environment <env>` runs specific environment seed
-- [ ] `peregrine db:reset` truncates all tables
+- [ ] `roost db:seed` runs seeds for current environment
+- [ ] `roost db:seed --environment <env>` runs specific environment seed
+- [ ] `roost db:reset` truncates all tables
 - [ ] Seeds are idempotent (use `ON CONFLICT DO NOTHING`)
 - [ ] Seeds are transactional
 - [ ] Seed execution reports records inserted
@@ -1438,7 +1438,7 @@ struct MigrationTests {
 - [ ] Dry-run mode previews changes
 - [ ] Status output is human-readable
 - [ ] Error messages are actionable
-- [ ] Commands respect `PEREGRINE_ENV` environment variable
+- [ ] Commands respect `ROOST_ENV` environment variable
 
 ---
 
@@ -1476,21 +1476,21 @@ This spec introduces a new migration system. Migration guide for existing apps:
 1. **New apps** - Start using migrations immediately
 2. **Existing schemas** - Create baseline migration from current schema
 3. **Manual schema changes** - Create migration files before applying changes
-4. **Team collaboration** - Commit migration files, run `peregrine db:migrate` after pull
+4. **Team collaboration** - Commit migration files, run `roost db:migrate` after pull
 
 To create a baseline migration for existing databases:
 
 ```bash
 # Dump current schema
-$ peregrine db:schema:dump > baseline.sql
+$ roost db:schema:dump > baseline.sql
 
 # Create baseline migration
-$ peregrine db:migration Baseline
+$ roost db:migration Baseline
 # Edit migration file, paste schema dump into UP section
 # Leave DOWN section empty (or DROP all tables)
 
 # Mark as applied without running
-$ peregrine db:migrate --mark-only 20260407143000
+$ roost db:migrate --mark-only 20260407143000
 ```
 
 ---

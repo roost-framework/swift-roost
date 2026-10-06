@@ -2,19 +2,19 @@
 
 **Status:** Proposed
 **Date:** 2026-03-28
-**Depends on:** Peregrine core framework (spec 01)
+**Depends on:** Roost core framework (spec 01)
 
 ---
 
 ## 1. Goal
 
-Peregrine apps need to behave differently in development, test, and production
+Roost apps need to behave differently in development, test, and production
 without `#if` flags or manual env var checking scattered through code. Provide
 a lightweight environment system — not a config file DSL, just a clear
 convention for how environment shapes behavior.
 
 ```swift
-if Peregrine.env == .dev {
+if Roost.env == .dev {
     // verbose logging, pretty-printed JSON
 }
 ```
@@ -33,13 +33,13 @@ public enum Environment: String, Sendable {
 }
 ```
 
-Read from `PEREGRINE_ENV` env var. Default: `.dev`.
+Read from `ROOST_ENV` env var. Default: `.dev`.
 
 ```swift
-public enum Peregrine {
-    /// Current environment. Read once at startup from PEREGRINE_ENV.
+public enum Roost {
+    /// Current environment. Read once at startup from ROOST_ENV.
     public static let env: Environment = {
-        guard let raw = ProcessInfo.processInfo.environment["PEREGRINE_ENV"] else {
+        guard let raw = ProcessInfo.processInfo.environment["ROOST_ENV"] else {
             return .dev
         }
         return Environment(rawValue: raw) ?? .dev
@@ -49,7 +49,7 @@ public enum Peregrine {
 
 ### 2.2 Environment-Aware Defaults
 
-The `PeregrineApp` default implementations change behavior based on
+The `RoostApp` default implementations change behavior based on
 environment:
 
 | Behavior | dev | test | prod |
@@ -60,10 +60,10 @@ environment:
 | Startup banner | yes | no | yes |
 | CORS default | `*` (permissive) | `*` | none (must configure) |
 
-### 2.3 `PeregrineApp` Environment Hook
+### 2.3 `RoostApp` Environment Hook
 
 ```swift
-extension PeregrineApp {
+extension RoostApp {
     /// Override to configure per-environment behavior.
     /// Called during main() before pipeline construction.
     public func configure(for env: Environment) { }
@@ -92,7 +92,7 @@ func configure(for env: Environment) {
 Convention for database naming:
 
 ```swift
-Database.postgres(database: "donut_shop") // reads PEREGRINE_ENV
+Database.postgres(database: "donut_shop") // reads ROOST_ENV
 
 // Resolves to:
 // dev:  donut_shop_dev   (or donut_shop if DB_NAME is set)
@@ -107,7 +107,7 @@ In prod, `DB_NAME` env var is required — no guessing.
 
 ## 3. Acceptance Criteria
 
-- [ ] `Peregrine.env` reads from `PEREGRINE_ENV` env var
+- [ ] `Roost.env` reads from `ROOST_ENV` env var
 - [ ] Defaults to `.dev` when env var is unset
 - [ ] Accepts "dev", "test", "prod" as valid values
 - [ ] Invalid values fall back to `.dev`

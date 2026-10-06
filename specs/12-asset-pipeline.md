@@ -8,9 +8,9 @@
 
 ## 1. Goal
 
-Generated Peregrine pages should look professional out of the box. No unstyled
-HTML. No "add your own CSS" hand-waving. `peregrine new` gives you a beautiful
-starting point, and `peregrine gen.auth` produces login pages you wouldn't be
+Generated Roost pages should look professional out of the box. No unstyled
+HTML. No "add your own CSS" hand-waving. `roost new` gives you a beautiful
+starting point, and `roost gen.auth` produces login pages you wouldn't be
 embarrassed to ship.
 
 Two modes:
@@ -31,13 +31,13 @@ Two modes:
 
 #### 2.1 Color Themes
 
-Pico CSS offers color-themed variants. Peregrine defaults to **orange**
+Pico CSS offers color-themed variants. Roost defaults to **orange**
 (matching the framework's brand) but supports all Pico colors via a flag:
 
 ```bash
-$ peregrine new MyApp                    # default: orange
-$ peregrine new MyApp --color pumpkin    # pumpkin theme
-$ peregrine new MyApp --color blue       # blue theme
+$ roost new MyApp                    # default: orange
+$ roost new MyApp --color pumpkin    # pumpkin theme
+$ roost new MyApp --color blue       # blue theme
 ```
 
 Available colors (from Pico v2):
@@ -48,9 +48,9 @@ Available colors (from Pico v2):
 
 CDN pattern: `https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.{color}.min.css`
 
-#### 2.2 Integration with `peregrine new`
+#### 2.2 Integration with `roost new`
 
-When `peregrine new MyApp` runs:
+When `roost new MyApp` runs:
 
 1. Downloads the Pico CSS file for the chosen color into
    `Public/css/pico.min.css`.
@@ -108,7 +108,7 @@ switching the attribute.
 #### 2.5 Tailwind Flag
 
 ```bash
-$ peregrine new MyApp --tailwind
+$ roost new MyApp --tailwind
 ```
 
 This changes the generated project:
@@ -160,10 +160,10 @@ Generated `Public/css/input.css`:
 
 #### 2.8 Tailwind Build Integration
 
-`peregrine build` compiles CSS:
+`roost build` compiles CSS:
 
 ```bash
-$ peregrine build
+$ roost build
   Running tailwindcss...
   Building Swift...
   Build complete.
@@ -182,7 +182,7 @@ The `--watch` variant runs both Tailwind and Swift in parallel (see spec 13).
 
 ### Pico CSS (Default)
 
-- [ ] `peregrine new MyApp` downloads Pico CSS orange into `Public/css/pico.min.css`
+- [ ] `roost new MyApp` downloads Pico CSS orange into `Public/css/pico.min.css`
 - [ ] `--color blue` downloads the blue variant instead
 - [ ] All 19 Pico color names are accepted
 - [ ] Invalid color names produce a clear error
@@ -196,12 +196,12 @@ The `--watch` variant runs both Tailwind and Swift in parallel (see spec 13).
 
 ### Tailwind CSS (Optional)
 
-- [ ] `peregrine new MyApp --tailwind` downloads the Tailwind CLI binary
+- [ ] `roost new MyApp --tailwind` downloads the Tailwind CLI binary
 - [ ] Correct binary is downloaded for the current OS/arch
 - [ ] `tailwind.config.js` is generated with correct content paths
 - [ ] `Public/css/input.css` is generated with Tailwind directives
 - [ ] `.gitignore` excludes `.build/tailwindcss`
-- [ ] `peregrine build` compiles Tailwind CSS before Swift build
+- [ ] `roost build` compiles Tailwind CSS before Swift build
 - [ ] Generated CSS output is minified in production
 - [ ] `--tailwind` and `--color` flags are mutually exclusive (clear error)
 

@@ -1,10 +1,12 @@
 
 .build/
 .swiftpm/
+__pycache__/
 Package.resolved
 *.xcodeproj
 xcuserdata/
 DerivedData/
+*.doccarchive/
 
 # ===========================================
 # OS Files

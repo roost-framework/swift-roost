@@ -1,0 +1,13 @@
+<section class="auth-layout">
+    <div class="auth-intro"><p class="eyebrow">A place of your own</p><h1>Make room<br>for curiosity<span class="accent">.</span></h1><p>Save a link now. Follow the thread when you have time.</p><div class="book-spines" aria-hidden="true"><span></span><span></span><span></span><span></span></div></div>
+    <div class="auth-form"><h2>Create your account</h2><p>Your links and notes stay in your own reading list.</p>
+        <% if let error { %><p class="field-error" role="alert"><%= error %></p><% } %>
+        <.form action="/auth/register" method="post">
+            <label for="email">Email</label><input id="email" type="email" name="email" value="<%= email %>" autocomplete="username" required>
+            <label for="password">Password</label><input id="password" type="password" name="password" autocomplete="new-password" minlength="8" required aria-describedby="password-help">
+            <small id="password-help">At least 8 characters.</small>
+            <button type="submit">Create account</button>
+        </.form>
+        <p class="auth-switch">Already have a queue? <a href="/auth/login">Log in</a></p>
+    </div>
+</section>

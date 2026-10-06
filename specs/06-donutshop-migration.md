@@ -1,4 +1,4 @@
-# Spec: Migrate DonutShop to Peregrine
+# Spec: Migrate DonutShop to Roost
 
 **Status:** Proposed
 **Date:** 2026-03-28
@@ -9,8 +9,8 @@
 ## 1. Goal
 
 Migrate DonutShop from manually wiring Spectro + Nexus + ESW + Hummingbird
-to using Peregrine as its single dependency. This is the proof that the
-framework works — if DonutShop gets simpler and nothing breaks, Peregrine
+to using Roost as its single dependency. This is the proof that the
+framework works — if DonutShop gets simpler and nothing breaks, Roost
 delivers on its promise.
 
 This is not a feature spec. It's a validation exercise. Every line of
@@ -51,14 +51,14 @@ targets: [
 **After (1 dependency, 1 product + 1 plugin):**
 ```swift
 dependencies: [
-    .package(path: "../Peregrine"),
+    .package(path: "../Roost"),
     .package(path: "../esw"),  // still needed for ESWBuildPlugin
 ],
 targets: [
     .executableTarget(
         name: "DonutShop",
         dependencies: [
-            .product(name: "Peregrine", package: "Peregrine"),
+            .product(name: "Roost", package: "Roost"),
         ],
         plugins: [
             .plugin(name: "ESWBuildPlugin", package: "esw"),
@@ -83,10 +83,10 @@ targets: [
 
 **After (~25 lines):**
 ```swift
-import Peregrine
+import Roost
 
 @main
-struct DonutShop: PeregrineApp {
+struct DonutShop: RoostApp {
     var database: Database? {
         Database.postgres(database: "donut_shop")
     }
@@ -137,7 +137,7 @@ func donutRoutes() -> [Route] {
 
 ### 2.4 Model Files
 
-Replace `import Spectro` with `import Peregrine`. Everything else stays.
+Replace `import Spectro` with `import Roost`. Everything else stays.
 
 ### 2.5 Delete Dead Code
 
@@ -148,7 +148,7 @@ Replace `import Spectro` with `import Peregrine`. Everything else stays.
 
 ### 2.6 Tests
 
-Update test target to depend on `PeregrineTest`. Rewrite integration tests
+Update test target to depend on `RoostTest`. Rewrite integration tests
 to use `TestApp`:
 
 ```swift
@@ -180,9 +180,9 @@ Track these before/after the migration:
 
 ## 4. Acceptance Criteria
 
-- [ ] DonutShop depends on `Peregrine` (and `esw` for plugin only)
+- [ ] DonutShop depends on `Roost` (and `esw` for plugin only)
 - [ ] `App.swift` is < 30 lines
-- [ ] `import Peregrine` is the only import in `App.swift`
+- [ ] `import Roost` is the only import in `App.swift`
 - [ ] No `DB` struct, no `Helpers.swift`, no `setupDatabase()`
 - [ ] All route functions take zero infrastructure parameters
 - [ ] Route handlers access database via `conn.repo()`
@@ -190,7 +190,7 @@ Track these before/after the migration:
 - [ ] `test.sh` passes with no changes to curl commands
 - [ ] `swift build` succeeds with zero warnings
 - [ ] `swift test` passes all existing and new tests
-- [ ] App boots with: `Peregrine running on http://127.0.0.1:8080`
+- [ ] App boots with: `Roost running on http://127.0.0.1:8080`
 - [ ] Health endpoint still returns `requestId` and `visits` cookie
 
 ---

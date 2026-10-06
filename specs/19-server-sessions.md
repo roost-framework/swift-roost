@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01), Hummingbird PersistDriver
+**Depends on:** Roost core (spec 01), Hummingbird PersistDriver
 
 ---
 
@@ -20,7 +20,7 @@ cookie to the client. This enables:
 - Server-side session invalidation (logout everywhere).
 
 Hummingbird provides the `PersistDriver` protocol with an in-memory
-implementation. Peregrine adds a Postgres-backed driver (via Spectro)
+implementation. Roost adds a Postgres-backed driver (via Spectro)
 and a session plug that works like Phoenix's session store.
 
 ```swift
@@ -66,7 +66,7 @@ public final class MemorySessionStore: SessionStore, @unchecked Sendable {
 
 ```swift
 public final class PostgresSessionStore: SessionStore {
-    // Uses Spectro to read/write a `peregrine_sessions` table
+    // Uses Spectro to read/write a `roost_sessions` table
     // Schema: id TEXT PRIMARY KEY, data JSONB, expires_at TIMESTAMPTZ
 }
 ```
@@ -88,7 +88,7 @@ public enum SessionStoreFactory {
 ```swift
 public func session(
     store: SessionStoreFactory = .memory,
-    cookieName: String = "_peregrine_session",
+    cookieName: String = "_roost_session",
     maxAge: Int = 86400 * 7,  // 1 week
     secure: Bool? = nil,       // auto: true in prod, false in dev
     httpOnly: Bool = true,
@@ -134,22 +134,22 @@ The `gen.auth` login handler should call this automatically.
 
 For the Postgres store, expired sessions are cleaned up:
 - Automatically on each request (probabilistic: 1% chance per request).
-- Via a `peregrine session:cleanup` CLI command for cron jobs.
+- Via a `roost session:cleanup` CLI command for cron jobs.
 
 For the memory store, a background Task runs cleanup every 60 seconds.
 
 ### 2.7 Migration
 
-The Postgres store needs a `peregrine_sessions` table:
+The Postgres store needs a `roost_sessions` table:
 
 ```sql
-CREATE TABLE IF NOT EXISTS peregrine_sessions (
+CREATE TABLE IF NOT EXISTS roost_sessions (
     id TEXT PRIMARY KEY,
     data JSONB NOT NULL DEFAULT '{}',
     expires_at TIMESTAMPTZ NOT NULL
 );
 
-CREATE INDEX idx_sessions_expires ON peregrine_sessions (expires_at);
+CREATE INDEX idx_sessions_expires ON roost_sessions (expires_at);
 ```
 
 Auto-created on first use. No manual migration required.

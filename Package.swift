@@ -1,30 +1,34 @@
 // swift-tools-version: 6.0
 
 import PackageDescription
+import Foundation
+
+// Opt in when developing the four repositories together. Published dependencies
+// remain the default and are tested separately in CI.
+func ecosystem(_ name: String, from version: Version) -> Package.Dependency {
+    if name == "ESW", let path = ProcessInfo.processInfo.environment["ROOST_ESW_PATH"] {
+        return .package(name: "esw", path: path)
+    }
+    if let root = ProcessInfo.processInfo.environment["ROOST_ECOSYSTEM_PATH"] {
+        return .package(name: name.lowercased(), path: "\(root)/\(name == "ESW" ? "esw" : name)")
+    }
+    return .package(url: "https://github.com/Spectro-ORM/\(name).git", from: version)
+}
 
 let package = Package(
-    name: "swift-peregrine",
+    name: "swift-roost",
     platforms: [
         .macOS(.v14),
     ],
     products: [
-        .library(name: "Peregrine", targets: ["Peregrine"]),
-        .library(name: "PeregrineTest", targets: ["PeregrineTest"]),
-        .executable(name: "peregrine", targets: ["PeregrineCLI"]),
+        .library(name: "Roost", targets: ["Roost"]),
+        .library(name: "RoostTest", targets: ["RoostTest"]),
+        .executable(name: "roost", targets: ["RoostCLI"]),
     ],
     dependencies: [
-        .package(
-            url: "https://github.com/Spectro-ORM/Spectro.git",
-            from: "1.2.0"
-        ),
-        .package(
-            url: "https://github.com/Spectro-ORM/Nexus.git",
-            from: "1.3.0"
-        ),
-        .package(
-            url: "https://github.com/Spectro-ORM/ESW.git",
-            from: "1.2.0"
-        ),
+        ecosystem("Spectro", from: "2.0.0"),
+        ecosystem("Nexus", from: "2.0.0"),
+        ecosystem("ESW", from: "1.5.0"),
         .package(
             url: "https://github.com/hummingbird-project/hummingbird.git",
             from: "2.0.0"
@@ -56,13 +60,12 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Peregrine",
+            name: "Roost",
             dependencies: [
                 .product(name: "SpectroKit", package: "Spectro"),
                 .product(name: "Nexus", package: "Nexus"),
                 .product(name: "NexusRouter", package: "Nexus"),
                 .product(name: "NexusHummingbird", package: "Nexus"),
-                .product(name: "NexusTest", package: "Nexus"),
                 .product(name: "ESW", package: "esw"),
                 .product(name: "Hummingbird", package: "hummingbird"),
                 .product(name: "Crypto", package: "swift-crypto"),
@@ -72,27 +75,28 @@ let package = Package(
             ]
         ),
         .target(
-            name: "PeregrineTest",
+            name: "RoostTest",
             dependencies: [
-                "Peregrine",
+                "Roost",
                 .product(name: "NexusTest", package: "Nexus"),
             ]
         ),
         .executableTarget(
-            name: "PeregrineCLI",
+            name: "RoostCLI",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Noora", package: "Noora"),
             ]
         ),
         .testTarget(
-            name: "PeregrineTests",
+            name: "RoostTests",
             dependencies: [
-                "Peregrine",
-                "PeregrineTest",
+                "Roost",
+                "RoostTest",
                 .product(name: "NexusTest", package: "Nexus"),
                 .product(name: "Crypto", package: "swift-crypto"),
             ]
         ),
+        .testTarget(name: "RoostCLITests", dependencies: ["RoostCLI"]),
     ]
 )

@@ -14,7 +14,7 @@ write-once, read-once, session-scoped storage that survives exactly one
 redirect.
 
 Phoenix has `put_flash(conn, :info, "Donut created!")` and `<%= @flash[:info] %>`
-in templates. Rails has `flash[:notice]`. Peregrine needs the same.
+in templates. Rails has `flash[:notice]`. Roost needs the same.
 
 ```swift
 // In a POST handler:
@@ -45,7 +45,7 @@ A plug that runs early in the pipeline (after `sessionPlug`) to:
    via a `beforeSend` hook.
 
 ```swift
-// Sources/Peregrine/Plugs/FlashPlug.swift
+// Sources/Roost/Plugs/FlashPlug.swift
 public func flashPlug() -> Plug
 ```
 
@@ -106,7 +106,7 @@ template can include a flash partial:
 <% } %>
 ```
 
-This requires `flash` to be passed through the layout's assigns. Peregrine's
+This requires `flash` to be passed through the layout's assigns. Roost's
 default layout helper should inject it automatically.
 
 ---

@@ -1,18 +1,18 @@
-# Peregrine Specifications
+# Roost Specifications
 
-This directory contains specifications and examples demonstrating Peregrine's architecture and patterns.
+This directory contains specifications and examples demonstrating Roost's architecture and patterns.
 
 ## Files
 
 ### ArchitectureComparison.md
-Compares Peregrine with Hummingbird and Vapor, highlighting:
+Compares Roost with Hummingbird and Vapor, highlighting:
 - Immutable vs mutable routing
 - Declarative vs imperative route definition
 - Testing strategies
 - Rails/Phoenix inspiration
 
 ### RoutingPatterns.md
-Documents Peregrine's routing patterns:
+Documents Roost's routing patterns:
 - Route functions as data
 - Composable routes with `scope` and `forward`
 - Controller-free handlers
@@ -50,7 +50,7 @@ The following specs define the intended API for features under development.
 Tests are written to the final API — they will compile once each feature ships.
 
 ### PubSubPatterns.swift
-API design for `Peregrine.PubSub` (inspired by `Phoenix.PubSub`):
+API design for `Roost.PubSub` (inspired by `Phoenix.PubSub`):
 - In-memory adapter (dev/test, no external deps)
 - Valkey adapter (production, distributed)
 - `subscribe`, `broadcast`, `unsubscribe` interface
@@ -66,7 +66,7 @@ Integration specs for PubSub:
 - Adapter selection by environment
 
 ### ChannelPatterns.swift
-API design for `Peregrine.Channel` (inspired by `Phoenix.Channel`):
+API design for `Roost.Channel` (inspired by `Phoenix.Channel`):
 - `channel("/socket")` endpoint declaration
 - `ChannelRouter` with topic pattern matching (`"room:*"`)
 - `Channel` protocol: `join`, `handle`, `leave`
@@ -86,7 +86,7 @@ Integration specs for Channels:
 - Server push without a client event
 
 ### PresencePatterns.swift
-API design for `Peregrine.Presence` (inspired by `Phoenix.Presence`):
+API design for `Roost.Presence` (inspired by `Phoenix.Presence`):
 - `Presence.track` / `Presence.untrack` / `Presence.list`
 - Automatic `presence_diff` broadcasts on join/leave
 - Multiple metas per key (multi-tab users)
@@ -101,8 +101,8 @@ Integration specs for Presence:
 - User disappears only when all tabs leave
 
 ### JobsPatterns.swift
-API design for `Peregrine.Jobs` (inspired by Elixir's Oban):
-- `PeregrineJob` protocol with `Parameters: Codable`
+API design for `Roost.Jobs` (inspired by Elixir's Oban):
+- `RoostJob` protocol with `Parameters: Codable`
 - `RetryStrategy` per job type
 - `conn.jobs.push(_:parameters:)` from route handlers
 - Scheduled jobs (cron strings + convenience helpers)
@@ -120,9 +120,9 @@ Integration specs for background jobs:
 - Job with database access
 
 ### SSEPatterns.swift
-API design for `Peregrine.SSE` (Server-Sent Events):
+API design for `Roost.SSE` (Server-Sent Events):
 - `conn.sse(stream:)` response helper
-- `SSEBroadcaster<T>` fan-out actor (Peregrine service)
+- `SSEBroadcaster<T>` fan-out actor (Roost service)
 - `conn.sseStream(from:filter:eventType:id:)` — typed stream from broadcaster
 - Per-client filtering
 - Background job → broadcaster publish
@@ -146,7 +146,7 @@ API design for router pipelines (inspired by Phoenix router pipelines):
 - Layered pipelines (`:browser` + `:authenticated`)
 - Anonymous inline pipelines for one-off middleware
 - Pipeline as a reusable value
-- Built-in pipeline plugs provided by Peregrine
+- Built-in pipeline plugs provided by Roost
 - Dev server routing table with pipeline column
 
 ---

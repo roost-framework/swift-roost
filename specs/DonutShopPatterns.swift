@@ -1,8 +1,8 @@
-import Peregrine
+import Roost
 
 // MARK: - Pattern 1: Dual Frontend/API Routes
 //
-// Peregrine makes it trivial to maintain both HTML and JSON endpoints
+// Roost makes it trivial to maintain both HTML and JSON endpoints
 // for the same resources. No need for separate controllers or complex
 // content negotiation.
 
@@ -144,7 +144,7 @@ func analyticsRoutes() -> [Route] {
 // No global state, no mutation. The app is a struct with
 // computed properties returning configuration.
 
-struct DonutShop: PeregrineApp {
+struct DonutShop: RoostApp {
     // Database config: computed, not stored
     var database: Database? {
         Database.postgres(
@@ -156,13 +156,13 @@ struct DonutShop: PeregrineApp {
     // Middleware pipeline: just an array
     var plugs: [Plug] {
         [
-            peregrine_staticFiles(from: "Public", at: "/"),
+            roost_staticFiles(from: "Public", at: "/"),
             requestId(),
             responseTimer(),
             requestLogger(),
             corsPlug(CORSConfig(allowedOrigin: "*")),
             flashPlug(),
-            peregrine_csrfProtection(except: ["/admin/seed"]),
+            roost_csrfProtection(except: ["/admin/seed"]),
             methodOverride(),
         ]
     }
@@ -177,7 +177,7 @@ struct DonutShop: PeregrineApp {
 
 // MARK: - Pattern 6: Request Context (Conn vs Req/Res)
 //
-// Peregrine uses a single Connection object that carries
+// Roost uses a single Connection object that carries
 // request, response, and assigns. No need to return Response
 // and manually manage state.
 
@@ -188,7 +188,7 @@ func handler(request: Request, context: Context) async throws -> Response {
     return Response(status: .ok, body: .init(data: body))
 }
 
-// Peregrine: Connection accumulates state
+// Roost: Connection accumulates state
 @RouteBuilder
 func routes() -> [Route] {
     GET("/") { conn in
@@ -255,7 +255,7 @@ func routes() -> [Route] {
 
 var plugs: [Plug] {
     [
-        peregrine_csrfProtection(),  // Protects all routes
+        roost_csrfProtection(),  // Protects all routes
         // JSON requests (Content-Type: application/json) bypass CSRF
         // HTML form submissions require token
     ]
@@ -276,7 +276,7 @@ var plugs: [Plug] {
         // - Hidden files (starting with .) return 404
         // - Path traversal blocked
         // - Environment-aware caching headers
-        peregrine_staticFiles(from: "Public", at: "/"),
+        roost_staticFiles(from: "Public", at: "/"),
 
         // Other middleware...
     ]

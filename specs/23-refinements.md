@@ -35,30 +35,30 @@ The current drift detection implementation:
 **Replace Section 2.4 entirely with:**
 
 ```swift
-// In Sources/Peregrine/Migrations/DriftDetector.swift
+// In Sources/Roost/Migrations/DriftDetector.swift
 
 public enum DriftDetector {
     /// Detect schema drift by comparing actual database schema to snapshot file
     /// 
     /// **How it works:**
     /// 1. Extract current database schema via `information_schema`
-    /// 2. Load expected schema from `.peregrine/schema.sql` snapshot file
+    /// 2. Load expected schema from `.roost/schema.sql` snapshot file
     /// 3. Compare both schemas and report differences
     ///
     /// **Workflow:**
-    /// - Run migrations: `peregrine db:migrate`
-    /// - Update snapshot: `peregrine db:schema:dump`
-    /// - Commit snapshot to git: `git add .peregrine/schema.sql`
-    /// - Check drift in CI: `peregrine db:drift`
+    /// - Run migrations: `roost db:migrate`
+    /// - Update snapshot: `roost db:schema:dump`
+    /// - Commit snapshot to git: `git add .roost/schema.sql`
+    /// - Check drift in CI: `roost db:drift`
     ///
     /// - Parameters:
     ///   - database: Database connection
-    ///   - snapshotFile: Path to .peregrine/schema.sql (default: .peregrine/schema.sql)
+    ///   - snapshotFile: Path to .roost/schema.sql (default: .roost/schema.sql)
     /// - Returns: Drift report with differences
     /// - Throws: ReadError if snapshot file doesn't exist
     public static func detectDrift(
         database: SpectroClient,
-        snapshotFile: URL = URL(fileURLWithPath: ".peregrine/schema.sql")
+        snapshotFile: URL = URL(fileURLWithPath: ".roost/schema.sql")
     ) async throws -> DriftReport {
         // Get actual database schema
         let actualSchema = try await extractDatabaseSchema(database: database)
@@ -71,7 +71,7 @@ public enum DriftDetector {
     }
     
     /// Load schema from snapshot file
-    /// - Parameter file: Path to .peregrine/schema.sql
+    /// - Parameter file: Path to .roost/schema.sql
     /// - Returns: Parsed database schema
     /// - Throws: ReadError if file doesn't exist, ParseError if invalid format
     private static func loadSchemaSnapshot(from file: URL) throws -> DatabaseSchema {
@@ -171,7 +171,7 @@ public enum DriftDetector {
     /// Create a schema dump for source control
     /// - Parameter database: Database connection
     /// - Returns: SQL dump of current schema
-    /// - Note: Output goes to .peregrine/schema.sql for version control
+    /// - Note: Output goes to .roost/schema.sql for version control
     public static func dumpSchema(
         database: SpectroClient
     ) async throws -> String {
@@ -182,11 +182,11 @@ public enum DriftDetector {
     /// Verify schema matches snapshot
     /// - Parameters:
     ///   - database: Database connection
-    ///   - snapshotFile: Path to .peregrine/schema.sql
+    ///   - snapshotFile: Path to .roost/schema.sql
     /// - Returns: true if schema matches snapshot, false otherwise
     public static func verifySchema(
         database: SpectroClient,
-        snapshotFile: URL = URL(fileURLWithPath: ".peregrine/schema.sql")
+        snapshotFile: URL = URL(fileURLWithPath: ".roost/schema.sql")
     ) async throws -> Bool {
         let report = try await detectDrift(
             database: database,
@@ -235,9 +235,9 @@ public enum DriftDetector {
     /// Format schema as SQL CREATE TABLE statements
     private static func formatSchemaDump(_ schema: DatabaseSchema) -> String {
         var lines: [String] = []
-        lines.append("-- Peregrine Schema Dump")
+        lines.append("-- Roost Schema Dump")
         lines.append("-- Generated: \(ISO8601DateFormatter().string(from: Date()))")
-        lines.append("-- Run `peregrine db:schema:dump` to update")
+        lines.append("-- Run `roost db:schema:dump` to update")
         lines.append("")
         
         for (_, table) in schema.tables.sorted(by: { $0.key < $1.key }) {
@@ -356,7 +356,7 @@ public struct DriftReport: Sendable {
     
     public func printReport() {
         if !hasDrift {
-            print("✅ Schema matches snapshot (.peregrine/schema.sql)")
+            print("✅ Schema matches snapshot (.roost/schema.sql)")
             return
         }
         
@@ -401,7 +401,7 @@ public struct DriftReport: Sendable {
             }
         }
         
-        print("\nRun `peregrine db:schema:dump` to update snapshot")
+        print("\nRun `roost db:schema:dump` to update snapshot")
     }
 }
 
@@ -452,7 +452,7 @@ private struct ColumnSchema {
 
 ```bash
 # Check for drift against snapshot
-$ peregrine db:drift
+$ roost db:drift
 ⚠️  Schema drift detected!
 
 Unexpected tables (in DB, not in snapshot):
@@ -468,20 +468,20 @@ Missing columns (in snapshot, not in DB):
 Type mismatches:
   - users.created_at: database=TIMESTAMP, migration=TIMESTAMPTZ
 
-Run `peregrine db:schema:dump` to update snapshot
+Run `roost db:schema:dump` to update snapshot
 
 # Update/create snapshot
-$ peregrine db:schema:dump
-Dumping schema to: .peregrine/schema.sql
+$ roost db:schema:dump
+Dumping schema to: .roost/schema.sql
 ✅ Schema dumped
 
 # Verify schema matches snapshot
-$ peregrine db:schema:verify
+$ roost db:schema:verify
 ✅ Schema matches snapshot
 
 # Show snapshot status
-$ peregrine db:schema:status
-Snapshot file: .peregrine/schema.sql
+$ roost db:schema:status
+Snapshot file: .roost/schema.sql
 Last updated: 2026-04-07 14:30:00
 Status: ✅ Up to date
 ```
@@ -508,9 +508,9 @@ Status: ✅ Up to date
 
 ```
 ### Schema Drift Detection
-- [ ] `peregrine db:drift` compares database schema against snapshot file
-- [ ] `peregrine db:schema:dump` dumps current schema to .peregrine/schema.sql
-- [ ] `peregrine db:schema:verify` checks if schema matches snapshot
+- [ ] `roost db:drift` compares database schema against snapshot file
+- [ ] `roost db:schema:dump` dumps current schema to .roost/schema.sql
+- [ ] `roost db:schema:verify` checks if schema matches snapshot
 - [ ] Drift detection reports unexpected tables
 - [ ] Drift detection reports unexpected columns
 - [ ] Drift detection reports missing tables
@@ -530,30 +530,30 @@ Status: ✅ Up to date
 1. **Initial Setup** (one-time):
    ```bash
    # Run all migrations
-   $ peregrine db:migrate
+   $ roost db:migrate
    
    # Create initial snapshot
-   $ peregrine db:schema:dump
-   ✅ Schema dumped to .peregrine/schema.sql
+   $ roost db:schema:dump
+   ✅ Schema dumped to .roost/schema.sql
    
    # Commit to git
-   $ git add .peregrine/schema.sql
+   $ git add .roost/schema.sql
    $ git commit -m "Initial schema snapshot"
    ```
 
 2. **Development** (repeat as needed):
    ```bash
    # Create migration
-   $ peregrine generate migration AddColumnToPosts
+   $ roost generate migration AddColumnToPosts
    # Edit migration file
-   $ peregrine db:migrate
+   $ roost db:migrate
    
    # Update snapshot
-   $ peregrine db:schema:dump
+   $ roost db:schema:dump
    ✅ Schema dumped
    
    # Commit both migration and snapshot
-   $ git add Migrations/ .peregrine/schema.sql
+   $ git add Migrations/ .roost/schema.sql
    $ git commit -m "Add column to posts"
    ```
 
@@ -562,7 +562,7 @@ Status: ✅ Up to date
    # .github/workflows/ci.yml
    - name: Check schema drift
      run: |
-       peregrine db:drift
+       roost db:drift
    ```
 
 **Why This Approach:**

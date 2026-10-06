@@ -2,13 +2,13 @@
 
 **Status:** Proposed
 **Date:** 2026-04-07
-**Depends on:** Peregrine core (spec 01), Sessions (spec 19), Spectro ORM
+**Depends on:** Roost core (spec 01), Sessions (spec 19), Spectro ORM
 
 ---
 
 ## 1. Goal
 
-Peregrine lacks a foundational authentication system. Developers must manually implement password hashing, session management, and token-based authentication, which leads to security vulnerabilities and inconsistent patterns.
+Roost lacks a foundational authentication system. Developers must manually implement password hashing, session management, and token-based authentication, which leads to security vulnerabilities and inconsistent patterns.
 
 This spec implements **core authentication features** that all web applications need:
 
@@ -28,7 +28,7 @@ This is **Part 1 of 2** for authentication. See Spec 22B for the advanced scope 
 #### 2.1.1 Auth Enum
 
 ```swift
-// In Sources/Peregrine/Auth/Auth.swift
+// In Sources/Roost/Auth/Auth.swift
 public enum Auth {
     /// Hash a password using bcrypt (cost factor 12)
     /// - Parameter password: Plain text password (min 8 characters)
@@ -72,7 +72,7 @@ public enum AuthError: Error {
 #### 2.2.1 Connection Extensions
 
 ```swift
-// In Sources/Peregrine/Auth/SessionAuth.swift
+// In Sources/Roost/Auth/SessionAuth.swift
 extension Connection {
     /// Load authenticated user from session token
     /// - Parameter userType: Model type conforming to Schema
@@ -180,7 +180,7 @@ extension Connection {
 #### 2.2.2 requireAuth Plug
 
 ```swift
-// In Sources/Peregrine/Auth/Plugs.swift
+// In Sources/Roost/Auth/Plugs.swift
 
 /// Require authentication - redirect to login if not authenticated
 /// - Parameters:
@@ -231,7 +231,7 @@ public func optionalAuth() -> Plug {
 #### 2.3.1 AuthToken Model
 
 ```swift
-// In Sources/Peregrine/Auth/AuthToken.swift
+// In Sources/Roost/Auth/AuthToken.swift
 import SpectroKit
 
 @Schema("user_tokens")
@@ -430,9 +430,9 @@ COMMIT;
 
 ```swift
 // In Sources/MyApp/Routes/AuthRoutes.swift
-import Peregrine
+import Roost
 
-extension PeregrineApp {
+extension RoostApp {
     var authRoutes: [Route] {
         [
             // GET /auth/login - Show login form
@@ -562,7 +562,7 @@ var routes: [Route] {
 
 ```swift
 // In Sources/MyApp/Routes/ApiRoutes.swift
-extension PeregrineApp {
+extension RoostApp {
     var apiRoutes: [Route] {
         [
             // API authentication required

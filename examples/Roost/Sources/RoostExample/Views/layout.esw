@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title><%= title %> · Roost</title>
+    <link rel="icon" href="/images/roost.png">
+    <link rel="stylesheet" href="/css/app.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header">
+        <a class="brand" href="/"><img src="/images/roost.png" width="38" height="38" alt=""><span>roost<span class="brand-dot">.</span></span></a>
+        <nav aria-label="Account">
+            <% if let user = conn.currentUser(User.self) { %>
+            <span class="account-email"><%= user.email %></span>
+            <.form action="/auth/logout" method="delete">
+                <button class="text-button" type="submit">Log out</button>
+            </.form>
+            <% } else { %>
+            <span class="header-note">A little room for good reading.</span>
+            <% } %>
+        </nav>
+    </header>
+    <main id="main" class="page">
+        <% if let message = conn.flash.info { %>
+        <p class="flash" role="status"><%= message %></p>
+        <% } %>
+        <% if let message = conn.flash.error { %>
+        <p class="flash error" role="alert"><%= message %></p>
+        <% } %>
+        <%== content %>
+    </main>
+    <footer class="site-footer"><span>Save something worth coming back to.</span><span>Made with <a href="https://github.com/Maartz/swift-roost">Roost</a></span></footer>
+</body>
+</html>

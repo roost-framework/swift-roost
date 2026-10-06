@@ -1,10 +1,10 @@
 import Testing
-import PeregrineTest
+import RoostTest
 @testable import ChatApp
 
-/// Integration specs for Peregrine.Channel (Phoenix Channel wire protocol over WebSocket).
+/// Integration specs for Roost.Channel (Phoenix Channel wire protocol over WebSocket).
 ///
-/// PeregrineTest provides a `TestChannel` helper that speaks the Phoenix wire
+/// RoostTest provides a `TestChannel` helper that speaks the Phoenix wire
 /// protocol in-process — no browser or WebSocket server required.
 @Suite("Channel Integration Specs")
 struct ChannelIntegrationSpecs {

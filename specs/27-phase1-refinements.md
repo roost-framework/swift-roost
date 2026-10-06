@@ -18,8 +18,8 @@
 **Impact:** Reduces implementation risk from 3-4 months to 2-3 sprints per spec
 
 **Files Created:**
-- `/Users/maartz/Documents/swift-projects/Peregrine/specs/22a-authentication-basic.md`
-- `/Users/maartz/Documents/swift-projects/Peregrine/specs/22b-scope-system.md`
+- `/Users/maartz/Documents/swift-projects/Roost/specs/22a-authentication-basic.md`
+- `/Users/maartz/Documents/swift-projects/Roost/specs/22b-scope-system.md`
 
 **Files Deleted:**
 - `specs/22-authentication-and-scope-system.md` (replaced by 22A + 22B)
@@ -39,17 +39,17 @@
 **Replace Section 2.4 in Spec 23 with:**
 
 ```swift
-// In Sources/Peregrine/Migrations/DriftDetector.swift
+// In Sources/Roost/Migrations/DriftDetector.swift
 
 public enum DriftDetector {
     /// Detect schema drift by comparing actual database schema to snapshot file
     /// - Parameters:
     ///   - database: Database connection
-    ///   - snapshotFile: Path to .peregrine/schema.sql
+    ///   - snapshotFile: Path to .roost/schema.sql
     /// - Returns: Drift report
     public static func detectDrift(
         database: SpectroClient,
-        snapshotFile: URL = URL(fileURLWithPath: ".peregrine/schema.sql")
+        snapshotFile: URL = URL(fileURLWithPath: ".roost/schema.sql")
     ) async throws -> DriftReport {
         // Get actual database schema
         let actualSchema = try await extractDatabaseSchema(database: database)
@@ -83,25 +83,25 @@ public enum DriftDetector {
 
 ```bash
 # Check for drift
-$ peregrine db:drift
+$ roost db:drift
 ⚠️  Schema drift detected!
 
 Unexpected tables: temp_imports
 Missing columns: posts.slug
 
 # Update snapshot
-$ peregrine db:schema:dump
-Dumped schema to .peregrine/schema.sql
+$ roost db:schema:dump
+Dumped schema to .roost/schema.sql
 
 # Verify matches
-$ peregrine db:schema:verify
+$ roost db:schema:verify
 ✅ Schema matches snapshot
 ```
 
 **Changes:**
 - ✅ Remove `extractMigrationSchema()` - too complex
 - ✅ Remove SQL parsing from migrations
-- ✅ Compare against `.peregrine/schema.sql` snapshot instead
+- ✅ Compare against `.roost/schema.sql` snapshot instead
 - ✅ Simplify diff algorithm
 - ✅ Add non-goal: "Full migration-based drift detection (use external tools like pgtd)"
 
@@ -169,7 +169,7 @@ public enum ValidationStrategy {
 **Add Performance Section to Spec 25:**
 
 ```swift
-// In Sources/Peregrine/Validations/Performance.swift
+// In Sources/Roost/Validations/Performance.swift
 
 /// Performance guidelines for validation
 public enum ValidationPerformance {
@@ -352,10 +352,10 @@ private func parseMigration(content: String, filename: String) throws -> Migrati
 
 ```bash
 # No tests (default)
-$ peregrine generate resource Post title:string
+$ roost generate resource Post title:string
 
 # With tests
-$ peregrine generate resource Post title:string --tests
+$ roost generate resource Post title:string --tests
 ```
 
 This keeps generators simple and lets developers write their own tests.

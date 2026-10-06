@@ -5,60 +5,99 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
+    inputs:
+      spectro_ref:
+        description: Spectro revision for ecosystem acceptance
+        default: "2.0.0"
+      nexus_ref:
+        description: Nexus revision for ecosystem acceptance
+        default: "2.0.0"
+      esw_ref:
+        description: ESW revision for ecosystem acceptance
+        default: "1.5.0"
+
+permissions:
+  contents: read
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  build-and-test:
-    runs-on: macos-15
+  published-dependencies:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-15, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout Peregrine
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+      - uses: swift-actions/setup-swift@v2
         with:
-          path: Peregrine
+          swift-version: "6.3.3"
+      - name: Install Linux system dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y zlib1g-dev
+      - name: Test against published dependency versions
+        run: swift test
 
-      - name: Checkout Spectro
-        uses: actions/checkout@v4
+  generated-app:
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DB_HOST: localhost
+      DB_PORT: "5432"
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: Roost
+      - uses: actions/checkout@v4
         with:
           repository: Spectro-ORM/Spectro
+          ref: ${{ inputs.spectro_ref || '2.0.0' }}
           path: Spectro
-
-      - name: Checkout Nexus
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           repository: Spectro-ORM/Nexus
+          ref: ${{ inputs.nexus_ref || '2.0.0' }}
           path: Nexus
-
-      - name: Checkout ESW
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
         with:
           repository: Spectro-ORM/ESW
+          ref: ${{ inputs.esw_ref || '1.5.0' }}
           path: esw
-
-      - name: Pin ESW to Swift 6.1 tools version
+      - uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.3.3"
+      - name: Install PostgreSQL client tools and system dependencies
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client zlib1g-dev
+      - name: Record ecosystem revisions
         run: |
-          sed -i '' 's|swift-tools-version: 6.3|swift-tools-version: 6.1|' esw/Package.swift
-
-      - name: Override remote deps with local checkouts
-        working-directory: Peregrine
-        run: |
-          python3 -c "
-          import re
-          with open('Package.swift') as f:
-              s = f.read()
-          s = re.sub(r'\.package\(\s*url:\s*\"https://github\.com/Spectro-ORM/Spectro\.git\",\s*from:\s*\"[^\"]+\"\s*\)', '.package(path: \"../Spectro\")', s)
-          s = re.sub(r'\.package\(\s*url:\s*\"https://github\.com/Spectro-ORM/Nexus\.git\",\s*from:\s*\"[^\"]+\"\s*\)', '.package(path: \"../Nexus\")', s)
-          s = re.sub(r'\.package\(\s*url:\s*\"https://github\.com/Spectro-ORM/ESW\.git\",\s*from:\s*\"[^\"]+\"\s*\)', '.package(path: \"../esw\")', s)
-          with open('Package.swift', 'w') as f:
-              f.write(s)
-          "
-
-      - name: Build
-        working-directory: Peregrine
-        run: swift build
-
-      - name: Test
-        working-directory: Peregrine
-        run: swift test
+          git -C Roost rev-parse HEAD
+          git -C Spectro rev-parse HEAD
+          git -C Nexus rev-parse HEAD
+          git -C esw rev-parse HEAD
+      - name: Generate, migrate, test and exercise a Linux release
+        working-directory: Roost
+        run: python3 scripts/check_generated_app.py --ecosystem .. --release --work-dir "$RUNNER_TEMP/roost-acceptance"
+      - name: Keep acceptance diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-app-logs
+          path: ${{ runner.temp }}/roost-acceptance/*.log

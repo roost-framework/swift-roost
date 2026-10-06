@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-03-28
-**Depends on:** Peregrine core framework (spec 01), Environment (spec 04)
+**Depends on:** Roost core framework (spec 01), Environment (spec 04)
 
 ---
 
@@ -19,7 +19,7 @@ by default so developers never ship a stack trace to production.
 
 ### 2.1 Default Error Rescue
 
-Peregrine's default `main()` wraps the pipeline in `rescueErrors()` (already
+Roost's default `main()` wraps the pipeline in `rescueErrors()` (already
 exists in Nexus). Extend the behavior so the error response format depends on
 environment and content negotiation:
 
@@ -60,7 +60,7 @@ Views/
     500.esw     ← custom Server Error page
 ```
 
-If present, Peregrine renders these instead of the default. The template
+If present, Roost renders these instead of the default. The template
 receives:
 
 ```html

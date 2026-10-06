@@ -2,16 +2,16 @@
 
 **Status:** Proposed
 **Date:** 2026-04-07
-**Depends on:** Peregrine core (spec 01), Spectro ORM, Auth & Scope System (spec 22), Database Migrations (spec 23)
+**Depends on:** Roost core (spec 01), Spectro ORM, Auth & Scope System (spec 22), Database Migrations (spec 23)
 
 ---
 
 ## 1. Goal
 
-Developers waste time writing boilerplate code for models, routes, contexts, and views. Rails and Phoenix solved this with generators that create complete CRUD resources from a single command. Peregrine needs a generator system that:
+Developers waste time writing boilerplate code for models, routes, contexts, and views. Rails and Phoenix solved this with generators that create complete CRUD resources from a single command. Roost needs a generator system that:
 
 1. **Eliminates boilerplate** - Generate models, contexts, routes, and views automatically
-2. **Follows conventions** - Enforce Peregrine best practices out of the box
+2. **Follows conventions** - Enforce Roost best practices out of the box
 3. **Supports workflows** - Generate HTML views, JSON APIs, or both
 4. **Integrates with scopes** - All generated code is secure-by-default
 5. **Works with existing tools** - Uses Spectro schemas, ESW templates, and migration system
@@ -28,7 +28,7 @@ This spec implements a **Rails/Phoenix-style generator system** with built-in Sw
 
 ```bash
 # Generate HTML resource with views
-$ peregrine generate resource Post title:string body:text published:bool
+$ roost generate resource Post title:string body:text published:bool
       create  Models/Post.swift
       create  Contexts/PostsContext.swift
       create  Routes/PostsRoutes.swift
@@ -39,14 +39,14 @@ $ peregrine generate resource Post title:string body:text published:bool
       create  Migrations/20260407143000_create_posts.sql
 
 # Generate JSON API resource
-$ peregrine generate resource Comment --json post:reference body:text
+$ roost generate resource Comment --json post:reference body:text
       create  Models/Comment.swift
       create  Contexts/CommentsContext.swift
       create  Routes/CommentsRoutes.swift
       create  Migrations/20260407143100_create_comments.sql
 
 # Generate both HTML and JSON
-$ peregrine generate resource Tag --both name:string color:string
+$ roost generate resource Tag --both name:string color:string
       create  Models/Tag.swift
       create  Contexts/TagsContext.swift
       create  Routes/TagsRoutes.swift
@@ -58,7 +58,7 @@ $ peregrine generate resource Tag --both name:string color:string
       create  Migrations/20260407143200_create_tags.sql
 
 # Generate model-only (no routes/views)
-$ peregrine generate resource Category --model-only name:string parent:reference?
+$ roost generate resource Category --model-only name:string parent:reference?
       create  Models/Category.swift
       create  Contexts/CategoriesContext.swift
       create  Migrations/20260407143300_create_categories.sql
@@ -70,7 +70,7 @@ Generators support field types with optional modifiers:
 
 ```bash
 # Basic types
-$ peregrine generate resource Post \
+$ roost generate resource Post \
     title:string \
     body:text \
     rating:int \
@@ -81,20 +81,20 @@ $ peregrine generate resource Post \
     attachment:data
 
 # Optional fields
-$ peregrine generate resource User \
+$ roost generate resource User \
     name:string \
     email:string \
     age:int? \
     bio:text?
 
 # Foreign key references
-$ peregrine generate resource Comment \
+$ roost generate resource Comment \
     post:reference \
     user:reference \
     body:text
 
 # Array types (Postgres only)
-$ peregrine generate resource Article \
+$ roost generate resource Article \
     title:string \
     tags:string[] \
     scores:int[]
@@ -122,7 +122,7 @@ struct Post {
 
 ```swift
 // Contexts/PostsContext.swift
-import Peregrine
+import Roost
 import SpectroKit
 
 struct PostsContext {
@@ -199,9 +199,9 @@ struct PostsContext {
 
 ```swift
 // Routes/PostsRoutes.swift
-import Peregrine
+import Roost
 
-extension PeregrineApp {
+extension RoostApp {
     var postsRoutes: [Route] {
         [
             GET("/posts") { conn in
@@ -380,9 +380,9 @@ var csrfToken: String
 
 ```swift
 // Routes/CommentsApiRoutes.swift
-import Peregrine
+import Roost
 
-extension PeregrineApp {
+extension RoostApp {
     var commentsApiRoutes: [Route] {
         [
             GET("/api/comments") { conn in
@@ -431,17 +431,17 @@ extension PeregrineApp {
 
 ```bash
 # Generate standalone model
-$ peregrine generate model User name:string email:string age:int
+$ roost generate model User name:string email:string age:int
       create  Models/User.swift
       create  Migrations/20260407144000_create_users.sql
 
 # Generate model with references
-$ peregrine generate model Book author:reference publisher:reference title:string isbn:string
+$ roost generate model Book author:reference publisher:reference title:string isbn:string
       create  Models/Book.swift
       create  Migrations/20260407144100_create_books.sql
 
 # Generate model with options
-$ peregrine generate model Product name:string price:decimal? description:text? stock:int
+$ roost generate model Product name:string price:decimal? description:text? stock:int
       create  Models/Product.swift
       create  Migrations/20260407144200_create_products.sql
 ```
@@ -491,11 +491,11 @@ Optional types add `?` to Swift type and make column nullable.
 
 ```bash
 # Generate migration
-$ peregrine generate migration AddAuthorIdToPosts
+$ roost generate migration AddAuthorIdToPosts
       create  Migrations/20260407145000_add_author_id_to_posts.sql
 
 # Generate migration with change
-$ peregrine generate migration AddIndexToEmails --change
+$ roost generate migration AddIndexToEmails --change
       create  Migrations/20260407145100_add_index_to_emails.sql
 ```
 
@@ -536,11 +536,11 @@ COMMIT;
 
 ```bash
 # Generate context for existing model
-$ peregrine generate context Post
+$ roost generate context Post
       create  Contexts/PostsContext.swift
 
 # Generate context with custom methods
-$ peregrine generate context User --methods active-admins
+$ roost generate context User --methods active-admins
       create  Contexts/UsersContext.swift
 ```
 
@@ -548,7 +548,7 @@ $ peregrine generate context User --methods active-admins
 
 ```swift
 // Contexts/UsersContext.swift
-import Peregrine
+import Roost
 import SpectroKit
 
 struct UsersContext {
@@ -617,7 +617,7 @@ struct UsersContext {
 #### 2.5.1 Built-in Templates
 
 ```swift
-// In Sources/PeregrineCLI/Templates/ModelTemplate.swift
+// In Sources/RoostCLI/Templates/ModelTemplate.swift
 
 public enum ModelTemplate {
     public static func render(
@@ -650,7 +650,7 @@ struct \(name) {
     }
 }
 
-// In Sources/PeregrineCLI/Templates/ContextTemplate.swift
+// In Sources/RoostCLI/Templates/ContextTemplate.swift
 
 public enum ContextTemplate {
     public static func render(
@@ -674,7 +674,7 @@ public enum ContextTemplate {
 """
 
         return """
-import Peregrine
+import Roost
 import SpectroKit
 
 struct \(plural)Context {
@@ -734,7 +734,7 @@ struct \(plural)Context {
 #### 2.5.2 Field Definition
 
 ```swift
-// In Sources/PeregrineCLI/Generators/FieldDefinition.swift
+// In Sources/RoostCLI/Generators/FieldDefinition.swift
 
 public struct FieldDefinition: Sendable {
     public let name: String
@@ -814,7 +814,7 @@ public struct FieldDefinition: Sendable {
 #### 2.6.1 Generator API
 
 ```swift
-// In Sources/PeregrineCLI/Generators/Generator.swift
+// In Sources/RoostCLI/Generators/Generator.swift
 
 public enum Generator {
     /// Generate a complete CRUD resource
@@ -879,7 +879,7 @@ public struct GeneratedFile {
 #### 2.6.2 Field Parsing
 
 ```swift
-// In Sources/PeregrineCLI/Generators/FieldParser.swift
+// In Sources/RoostCLI/Generators/FieldParser.swift
 
 public enum FieldParser {
     public static func parse(_ fieldStrings: [String]) throws -> [FieldDefinition] {
@@ -922,7 +922,7 @@ public enum GeneratorError: Error {
 ## 3. Acceptance Criteria
 
 ### 3.1 Resource Generator
-- [ ] `peregrine generate resource` creates complete CRUD resources
+- [ ] `roost generate resource` creates complete CRUD resources
 - [ ] `--json` flag generates JSON API resources
 - [ ] `--both` flag generates both HTML and JSON variants
 - [ ] `--model-only` flag generates only model and context
@@ -936,7 +936,7 @@ public enum GeneratorError: Error {
 - [ ] Generator warns if files already exist
 
 ### 3.2 Model Generator
-- [ ] `peregrine generate model` creates standalone models
+- [ ] `roost generate model` creates standalone models
 - [ ] Supports field types: string, text, int, double, bool, date, json, data, uuid
 - [ ] Supports optional fields with `?` suffix
 - [ ] Supports foreign key references with `reference` type
@@ -946,7 +946,7 @@ public enum GeneratorError: Error {
 - [ ] Migration uses correct Postgres types for field types
 
 ### 3.3 Migration Generator
-- [ ] `peregrine generate migration` creates migration file
+- [ ] `roost generate migration` creates migration file
 - [ ] Migration file has UP and DOWN sections
 - [ ] Migration file is properly formatted
 - [ ] `--change` flag generates change-based migration
@@ -954,7 +954,7 @@ public enum GeneratorError: Error {
 - [ ] Migration description is human-readable
 
 ### 3.4 Context Generator
-- [ ] `peregrine generate context` creates context for existing model
+- [ ] `roost generate context` creates context for existing model
 - [ ] `--methods` flag generates custom query methods
 - [ ] Generated context follows Phoenix pattern
 - [ ] Context methods are scoped to current user
@@ -965,7 +965,7 @@ public enum GeneratorError: Error {
 - [ ] Templates use Swift String interpolation
 - [ ] Model template generates valid Spectro schemas
 - [ ] Context template generates valid Swift code
-- [ ] Route template generates valid Peregrine routes
+- [ ] Route template generates valid Roost routes
 - [ ] View template generates valid ESW templates
 - [ ] Migration template generates valid SQL
 - [ ] All templates are Sendable and thread-safe
@@ -1031,23 +1031,23 @@ public enum GeneratorError: Error {
 
 ```bash
 # Typical workflow for a new resource
-$ peregrine generate resource Post title:string body:text published:bool
-$ peregrine db:migrate
+$ roost generate resource Post title:string body:text published:bool
+$ roost db:migrate
 # Add postsRoutes to App.swift
 $ swift build
 
 # Generate JSON API for mobile app
-$ peregrine generate resource ApiKey --json name:string key:string scopes:json
-$ peregrine db:migrate
+$ roost generate resource ApiKey --json name:string key:string scopes:json
+$ roost db:migrate
 
 # Add fields to existing model
-$ peregrine generate migration AddSlugToPosts
+$ roost generate migration AddSlugToPosts
 # Edit migration to add slug column
-$ peregrine db:migrate
+$ roost db:migrate
 
 # Generate context for legacy table
-$ peregrine generate model LegacyUser name:string email:string
-$ peregrine generate context LegacyUser
+$ roost generate model LegacyUser name:string email:string
+$ roost generate context LegacyUser
 ```
 
 ---
@@ -1056,7 +1056,7 @@ $ peregrine generate context LegacyUser
 
 Possible follow-up features:
 
-- **Template override system** - Custom templates in `.peregrine/templates/`
+- **Template override system** - Custom templates in `.roost/templates/`
 - **Generator configuration** - Customize defaults via config file
 - **Test generation** - Generate Swift Testing test files
 - **Factory generation** - Generate test data factories

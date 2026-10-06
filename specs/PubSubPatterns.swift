@@ -1,5 +1,5 @@
 // PubSubPatterns.swift
-// Design specification for Peregrine.PubSub — inspired by Phoenix.PubSub
+// Design specification for Roost.PubSub — inspired by Phoenix.PubSub
 //
 // Two adapters, one interface:
 //   .inMemory()  — actor-based, no external deps (dev, test)
@@ -10,10 +10,10 @@
 
 // MARK: - 1. App-level configuration
 
-struct ChatApp: PeregrineApp {
-    var pubSub: some PeregrinePubSub {
+struct ChatApp: RoostApp {
+    var pubSub: some RoostPubSub {
         // In dev/test: in-memory actor (no external process needed)
-        if Peregrine.env == .test || Peregrine.env == .dev {
+        if Roost.env == .test || Roost.env == .dev {
             return PubSub.inMemory()
         }
         // In production: Valkey-backed, distributed across all nodes
@@ -61,7 +61,7 @@ func leaveRoom(_ conn: Connection) -> Connection {
 
 // MARK: - 5. PubSub protocol — the interface both adapters implement
 
-// protocol PeregrinePubSub: Sendable {
+// protocol RoostPubSub: Sendable {
 //     func subscribe(_ topic: String, handler: @escaping @Sendable (PubSubMessage) async -> Void)
 //     func broadcast(_ topic: String, event: String, payload: [String: Any]) async throws
 //     func unsubscribe(_ topic: String)

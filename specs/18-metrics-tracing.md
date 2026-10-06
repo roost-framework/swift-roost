@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01), Hummingbird metrics/tracing middleware
+**Depends on:** Roost core (spec 01), Hummingbird metrics/tracing middleware
 
 ---
 
@@ -12,7 +12,7 @@ Replace the simple `responseTimer()` plug with proper observability.
 Hummingbird ships `MetricsMiddleware` and `TracingMiddleware` built on
 Apple's `swift-metrics` and `swift-distributed-tracing` packages.
 
-Peregrine wraps these as plugs and adds a built-in dev dashboard so
+Roost wraps these as plugs and adds a built-in dev dashboard so
 developers can see request metrics without setting up Prometheus or
 Datadog.
 
@@ -23,7 +23,7 @@ var plugs: [Plug] {
 ```
 
 In production, wire up a real metrics backend. In development, visit
-`/_peregrine/metrics` for a live view.
+`/_roost/metrics` for a live view.
 
 ---
 
@@ -50,7 +50,7 @@ backend (Prometheus, StatsD, Datadog) works via a metrics factory.
 #### 2.2 Built-in Dev Metrics
 
 In dev mode, bootstrap a simple in-memory metrics backend that powers
-a `/_peregrine/metrics` endpoint:
+a `/_roost/metrics` endpoint:
 
 - Request count by route and status code.
 - Average and p95 response times.
@@ -58,7 +58,7 @@ a `/_peregrine/metrics` endpoint:
 - Error rate.
 
 JSON response for easy consumption. Only available when
-`Peregrine.env == .dev`.
+`Roost.env == .dev`.
 
 #### 2.3 Startup Metrics
 
@@ -109,7 +109,7 @@ with attributes:
 - `http.url`
 - `http.status_code`
 - `http.route` (pattern, not the actual path)
-- `peregrine.request_id`
+- `roost.request_id`
 
 Propagates trace context via W3C `traceparent` / `tracestate` headers.
 
@@ -134,7 +134,7 @@ This is an enhancement — skip if Spectro doesn't expose trace hooks.
 - [ ] `metrics()` plug records request count, duration, size
 - [ ] Uses `swift-metrics` API (Counter, Histogram, Gauge)
 - [ ] Any `swift-metrics` backend works (Prometheus, StatsD, etc.)
-- [ ] Dev mode exposes `/_peregrine/metrics` JSON endpoint
+- [ ] Dev mode exposes `/_roost/metrics` JSON endpoint
 - [ ] Metrics include method, path pattern, and status code
 - [ ] In-flight request gauge tracks concurrent requests
 

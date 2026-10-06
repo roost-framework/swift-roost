@@ -1,0 +1,19 @@
+<article class="detail">
+    <a class="back-link" href="/bookmarks">← Your reading queue</a>
+    <p class="eyebrow"><%= bookmark.read ? "Finished reading" : "Saved for later" %> · <%= bookmark.domain %></p>
+    <h1><%= bookmark.title %></h1>
+    <a class="destination" href="<%= bookmark.url %>" target="_blank" rel="noopener noreferrer"><%= bookmark.url %> ↗<span class="sr-only"> (opens in a new tab)</span></a>
+    <% if !bookmark.note.isEmpty { %><div class="saved-note"><p class="eyebrow">Your note</p><p><%= bookmark.note %></p></div><% } %>
+    <div class="detail-actions">
+        <.form action={"/bookmarks/\(bookmark.id)/read"} method="post">
+            <input type="hidden" name="read" value="<%= bookmark.read ? "false" : "true" %>">
+            <button type="submit"><%= bookmark.read ? "Move back to reading queue" : "Mark as read" %></button>
+        </.form>
+        <a href="/bookmarks/<%= bookmark.id %>/edit">Edit link</a>
+    </div>
+    <details class="remove-link"><summary>Remove this link</summary><p>This removes the link and your note from Roost.</p>
+        <.form action={"/bookmarks/\(bookmark.id)"} method="delete">
+            <button class="danger-button" type="submit">Remove link</button>
+        </.form>
+    </details>
+</article>

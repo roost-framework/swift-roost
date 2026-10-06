@@ -2,14 +2,14 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01)
+**Depends on:** Roost core (spec 01)
 
 ---
 
 ## 1. Goal
 
 APIs need to be callable from browser JavaScript on different origins.
-Hummingbird already ships `CORSMiddleware` — Peregrine wraps it as a
+Hummingbird already ships `CORSMiddleware` — Roost wraps it as a
 plug with sensible defaults and framework-idiomatic configuration.
 
 ```swift

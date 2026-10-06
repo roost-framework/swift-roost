@@ -2,17 +2,17 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01), Hummingbird WebSocket package
+**Depends on:** Roost core (spec 01), Hummingbird WebSocket package
 
 ---
 
 ## 1. Goal
 
 Real-time communication without LiveView. Phoenix has Channels, Rails has
-ActionCable — Peregrine needs a way to push updates to connected clients.
+ActionCable — Roost needs a way to push updates to connected clients.
 
 `hummingbird-websocket` already provides the low-level WebSocket upgrade,
-framing, and compression. Peregrine wraps it into a channel abstraction
+framing, and compression. Roost wraps it into a channel abstraction
 that feels native to the framework's plug-based architecture.
 
 ```swift
@@ -20,7 +20,7 @@ that feels native to the framework's plug-based architecture.
 ws("/chat/:room", to: ChatChannel.self)
 
 // Channel definition:
-struct ChatChannel: PeregrineChannel {
+struct ChatChannel: RoostChannel {
     func onJoin(socket: WebSocket, params: ChannelParams) async {
         socket.send("Welcome to \(params["room"]!)")
     }
@@ -52,10 +52,10 @@ Add `hummingbird-websocket` to Package.swift:
 
 Products needed: `HummingbirdWebSocket` (server-side upgrade).
 
-### 2.2 PeregrineChannel Protocol
+### 2.2 RoostChannel Protocol
 
 ```swift
-public protocol PeregrineChannel: Sendable {
+public protocol RoostChannel: Sendable {
     /// Called when a client connects and the WebSocket upgrade succeeds.
     func onJoin(socket: WebSocket, params: ChannelParams) async throws
 
@@ -163,7 +163,7 @@ The `ws` function:
 
 ### 2.7 Heartbeat / Ping-Pong
 
-Hummingbird handles WebSocket ping/pong at the protocol level. Peregrine
+Hummingbird handles WebSocket ping/pong at the protocol level. Roost
 adds an application-level heartbeat:
 
 - Server sends a ping every 30 seconds (configurable).
@@ -193,7 +193,7 @@ which is the default behavior.
 ## 3. Acceptance Criteria
 
 - [ ] `hummingbird-websocket` added as a dependency
-- [ ] `PeregrineChannel` protocol with `onJoin`, `onMessage`, `onData`, `onLeave`
+- [ ] `RoostChannel` protocol with `onJoin`, `onMessage`, `onData`, `onLeave`
 - [ ] `WebSocket` wrapper with `send(text)`, `send(data)`, `close`
 - [ ] `ChannelParams` with path and query params
 - [ ] `Broadcast.send(to:message:)` sends to all clients on a topic

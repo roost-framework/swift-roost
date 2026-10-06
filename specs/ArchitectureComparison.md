@@ -1,4 +1,4 @@
-# Peregrine vs Other Swift Web Frameworks
+# Roost vs Other Swift Web Frameworks
 
 ## The Mutability Problem
 
@@ -51,7 +51,7 @@ app.post("todos", use: todos.create)
 
 ---
 
-## Peregrine's Solution: Immutable Route Trees
+## Roost's Solution: Immutable Route Trees
 
 ### Routes as Data
 
@@ -85,8 +85,8 @@ app.databases.use(...)  // global state
 app.middleware.use(...) // global state
 app.routes.get(...)     // global state
 
-// Peregrine: Config struct, immutable pipeline
-struct DonutShop: PeregrineApp {
+// Roost: Config struct, immutable pipeline
+struct DonutShop: RoostApp {
     var database: Database? { .postgres(...) }
     var plugs: [Plug] { [...] }  // just an array
     @RouteBuilder var routes: [Route] { [...] }  // just an array
@@ -107,7 +107,7 @@ let app = Application(.testing)
 try configure(app)
 // ... app carries entire dependency graph
 
-// Peregrine: Just the routes
+// Roost: Just the routes
 let testApp = try await TestApp(DonutShop.self)
 let response = try await testApp.get("/api/v1/donuts")
 #expect(response.status == .ok)
@@ -143,15 +143,15 @@ end
 ```
 
 ```swift
-// Peregrine: Same concept, Swift syntax
+// Roost: Same concept, Swift syntax
 var plugs: [Plug] {
     [
-        peregrine_staticFiles(from: "Public"),
+        roost_staticFiles(from: "Public"),
         requestId(),
         responseTimer(),
         corsPlug(...),
         flashPlug(),
-        peregrine_csrfProtection(),
+        roost_csrfProtection(),
     ]
 }
 
@@ -187,7 +187,7 @@ resources :users
 ```
 
 ```swift
-// Peregrine: Sources/DonutShop/Routes/CustomerRoutes.swift
+// Roost: Sources/DonutShop/Routes/CustomerRoutes.swift
 @RouteBuilder
 func customerRoutes() -> [Route] {
     GET("/") { conn in
@@ -203,7 +203,7 @@ func customerRoutes() -> [Route] {
 }
 ```
 
-**Key insight:** Peregrine eliminates the controller class. The route *is* the action.
+**Key insight:** Roost eliminates the controller class. The route *is* the action.
 
 ---
 
@@ -245,7 +245,7 @@ app.get("users", ":id") { ... }  // silent overwrite!
 ### Pure Functions Enable Testing
 
 ```swift
-// Peregrine: Route handler is pure
+// Roost: Route handler is pure
 func showDonut(conn: Connection) async throws -> Connection {
     let id = conn.params["id"]
     let donut = try await conn.repo().get(Donut.self, id: id)
@@ -279,7 +279,7 @@ func showDonut(req: Request) async throws -> Donut { ... }
 
 ## Summary Table
 
-| Feature | Hummingbird | Vapor | Peregrine |
+| Feature | Hummingbird | Vapor | Roost |
 |---------|-------------|-------|-----------|
 | **Route definition** | Imperative mutation | Imperative mutation | Declarative data |
 | **Route composition** | Awkward (group closures) | Awkward (controllers) | Natural (functions) |
@@ -304,7 +304,7 @@ func showDonut(req: Request) async throws -> Donut { ... }
 - You prefer controller classes
 - You need ORM integration (Fluent)
 
-**Use Peregrine when:**
+**Use Roost when:**
 - You want Rails/Phoenix patterns in Swift
 - You value testability
 - You prefer functional composition

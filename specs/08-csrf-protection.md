@@ -2,16 +2,16 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Nexus sessionPlug (complete), Peregrine core (spec 01)
+**Depends on:** Nexus sessionPlug (complete), Roost core (spec 01)
 
 ---
 
 ## 1. Goal
 
-Any Peregrine app that serves HTML forms is vulnerable to Cross-Site Request
+Any Roost app that serves HTML forms is vulnerable to Cross-Site Request
 Forgery unless it validates that form submissions originate from the app itself.
 Phoenix includes CSRF protection by default. Rails includes it by default.
-Peregrine should too.
+Roost should too.
 
 The developer should never think about CSRF. It should be on by default,
 invisible when everything is correct, and return a clear 403 when it isn't.
@@ -73,7 +73,7 @@ generates the hidden input:
 // Renders: <input type="hidden" name="_csrf_token" value="abc123...">
 ```
 
-### 2.4 Integration with PeregrineApp
+### 2.4 Integration with RoostApp
 
 When the default `plugs` are used and a session plug is configured, CSRF
 protection is included automatically. Apps that override `plugs` can add

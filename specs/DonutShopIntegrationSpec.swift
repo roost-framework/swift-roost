@@ -1,10 +1,10 @@
 import Testing
-import PeregrineTest
+import RoostTest
 @testable import DonutShop
 
-/// Integration specs demonstrating Peregrine's Rails/Phoenix-style routing patterns.
+/// Integration specs demonstrating Roost's Rails/Phoenix-style routing patterns.
 ///
-/// These tests show how Peregrine enables clean separation of concerns,
+/// These tests show how Roost enables clean separation of concerns,
 /// immutable route composition, and testing without server overhead.
 @Suite("DonutShop Integration Specs")
 struct DonutShopIntegrationSpecs {

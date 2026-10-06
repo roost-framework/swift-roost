@@ -2,15 +2,15 @@
 
 **Status:** Proposed
 **Date:** 2026-03-28
-**Depends on:** Peregrine core framework (spec 01), NexusTest (complete)
+**Depends on:** Roost core framework (spec 01), NexusTest (complete)
 
 ---
 
 ## 1. Goal
 
-Make testing a Peregrine app as frictionless as building one. Today, testing a
+Make testing a Roost app as frictionless as building one. Today, testing a
 Nexus pipeline requires manually constructing `TestConnection` objects, building
-request objects by hand, and asserting on raw connection state. Peregrine should
+request objects by hand, and asserting on raw connection state. Roost should
 provide a test DSL that reads like a conversation:
 
 ```swift
@@ -33,12 +33,12 @@ tests. Just: build request → run through pipeline → assert on response.
 
 ### 2.1 `TestApp`
 
-A test harness that instantiates a `PeregrineApp` and runs requests through
+A test harness that instantiates a `RoostApp` and runs requests through
 its pipeline without starting Hummingbird:
 
 ```swift
-// Sources/PeregrineTest/TestApp.swift
-public struct TestApp<App: PeregrineApp> {
+// Sources/RoostTest/TestApp.swift
+public struct TestApp<App: RoostApp> {
     private let app: App
     private let plug: Plug
 
@@ -155,14 +155,14 @@ let response = try await app.get("/admin/dashboard",
 ### 2.6 Package Target
 
 ```swift
-// New product in Peregrine's Package.swift
-.library(name: "PeregrineTest", targets: ["PeregrineTest"]),
+// New product in Roost's Package.swift
+.library(name: "RoostTest", targets: ["RoostTest"]),
 
 // New target
 .target(
-    name: "PeregrineTest",
+    name: "RoostTest",
     dependencies: [
-        "Peregrine",
+        "Roost",
         .product(name: "NexusTest", package: "swift-nexus"),
     ]
 )
@@ -174,7 +174,7 @@ Consumer adds to their test target:
 .testTarget(
     name: "DonutShopTests",
     dependencies: [
-        .product(name: "PeregrineTest", package: "swift-peregrine"),
+        .product(name: "RoostTest", package: "swift-roost"),
     ]
 )
 ```
@@ -183,7 +183,7 @@ Consumer adds to their test target:
 
 ## 3. Acceptance Criteria
 
-- [ ] `TestApp` can be initialized from any `PeregrineApp` conformance
+- [ ] `TestApp` can be initialized from any `RoostApp` conformance
 - [ ] Requests run through the full plug pipeline without starting a server
 - [ ] `get`, `post`, `put`, `delete` convenience methods work
 - [ ] `TestResponse` exposes `status`, `headers`, `body`, `text`, `json`
@@ -203,5 +203,5 @@ Consumer adds to their test target:
 - No browser/UI testing.
 - No snapshot testing.
 - No mocking framework — use Swift Testing's built-in capabilities.
-- No test database migration runner (use `peregrine migrate` before test run).
+- No test database migration runner (use `roost migrate` before test run).
 - No parallel test isolation (each test manages its own database state).

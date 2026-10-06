@@ -60,8 +60,8 @@ This requires:
 
 **Recommendation:**
 - Remove `extractMigrationSchema()` - just keep `extractDatabaseSchema()`
-- Change drift detection to: "Compares current schema against `.peregrine/schema.sql` dump"
-- Developers update dump manually with `peregrine db:schema:dump`
+- Change drift detection to: "Compares current schema against `.roost/schema.sql` dump"
+- Developers update dump manually with `roost db:schema:dump`
 - Mark full drift detection as "Future Enhancement"
 
 **Rationale:** Rails doesn't have built-in drift detection. Phoenix doesn't either. This is a nice-to-have, not essential.
@@ -226,7 +226,7 @@ The `setValue(_:forKey:)` assumes `M` is a `NSObject` or has reflection. Swift's
 - Spec 25 depends on spec 22 (scopes) ✓
 
 But spec 22 also references:
-- Spec 10 (gen.auth) - "Generated code from peregrine gen.auth will be updated"
+- Spec 10 (gen.auth) - "Generated code from roost gen.auth will be updated"
 - Spec 19 (sessions) - for session token handling
 
 **Recommendation:**
@@ -268,7 +268,7 @@ But spec 22 also references:
 - Template syntax reference
 
 **Recommendation:**
-- Add section: "Template storage in Sources/PeregrineCLI/Templates/"
+- Add section: "Template storage in Sources/RoostCLI/Templates/"
 - Add non-goal: "No custom templates (v2)"
 - Or reference template files directly
 

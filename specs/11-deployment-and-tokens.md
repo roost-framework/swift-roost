@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01), CLI (specs 02, 04-05)
+**Depends on:** Roost core (spec 01), CLI (specs 02, 04-05)
 
 ---
 
@@ -10,14 +10,14 @@
 
 Two related production-readiness features:
 
-**Deployment:** `peregrine gen.dockerfile` generates a multi-stage Dockerfile
+**Deployment:** `roost gen.dockerfile` generates a multi-stage Dockerfile
 optimized for Swift server apps. Get from "it works on my machine" to
 "it works in a container" with one command.
 
-**Token signing:** A `Peregrine.Token` utility for generating signed,
+**Token signing:** A `Roost.Token` utility for generating signed,
 time-limited tokens — the building block for email confirmation links,
 password reset URLs, and API authentication. Phoenix has `Phoenix.Token`;
-Peregrine needs the same.
+Roost needs the same.
 
 ---
 
@@ -28,7 +28,7 @@ Peregrine needs the same.
 #### 2.1 Command
 
 ```bash
-$ peregrine gen.dockerfile
+$ roost gen.dockerfile
   create  Dockerfile
   create  .dockerignore
 ```
@@ -52,9 +52,9 @@ RUN apt-get update && apt-get install -y libcurl4 && rm -rf /var/lib/apt/lists/*
 COPY --from=build /app/.build/release/<AppName> /usr/local/bin/app
 COPY --from=build /app/Public /app/Public
 EXPOSE 8080
-ENV PEREGRINE_HOST=0.0.0.0
-ENV PEREGRINE_PORT=8080
-ENV PEREGRINE_ENV=prod
+ENV ROOST_HOST=0.0.0.0
+ENV ROOST_PORT=8080
+ENV ROOST_ENV=prod
 ENTRYPOINT ["app"]
 ```
 
@@ -64,7 +64,7 @@ Key decisions:
 - Runtime image is bare Ubuntu (no Swift runtime — statically linked).
 - Copies `Public/` for static file serving.
 - Sets environment variables for production defaults.
-- `PEREGRINE_HOST=0.0.0.0` so the container accepts external connections.
+- `ROOST_HOST=0.0.0.0` so the container accepts external connections.
 
 #### 2.3 Generated .dockerignore
 
@@ -89,7 +89,7 @@ DerivedData/
 #### 2.5 Token API
 
 ```swift
-public enum PeregrineToken {
+public enum RoostToken {
     /// Signs data into a URL-safe token with an optional max age.
     ///
     /// - Parameters:
@@ -132,26 +132,26 @@ Signature is HMAC-SHA256 of the payload using the provided secret.
 **Email confirmation:**
 ```swift
 // Generate token
-let token = PeregrineToken.sign(user.id.uuidString, secret: secretKey)
+let token = RoostToken.sign(user.id.uuidString, secret: secretKey)
 let confirmURL = "https://myapp.com/confirm?token=\(token)"
 // Send email with confirmURL...
 
 // Verify token (valid for 24 hours)
-guard let userId = PeregrineToken.verify(token, secret: secretKey, maxAge: 86400) else {
+guard let userId = RoostToken.verify(token, secret: secretKey, maxAge: 86400) else {
     throw NexusHTTPError(.forbidden, message: "Invalid or expired link")
 }
 ```
 
 **Password reset:**
 ```swift
-let token = PeregrineToken.sign(user.email, secret: secretKey, maxAge: 3600)
+let token = RoostToken.sign(user.email, secret: secretKey, maxAge: 3600)
 // Valid for 1 hour
 ```
 
 #### 2.8 Secret Key Convention
 
-The signing secret is read from the `PEREGRINE_SECRET` environment variable.
-`peregrine new` generates a random secret and writes it to a `.env.example`
+The signing secret is read from the `ROOST_SECRET` environment variable.
+`roost new` generates a random secret and writes it to a `.env.example`
 file (not `.env` itself — that's the developer's responsibility).
 
 ---
@@ -160,7 +160,7 @@ file (not `.env` itself — that's the developer's responsibility).
 
 ### Dockerfile Generation
 
-- [ ] `peregrine gen.dockerfile` creates `Dockerfile` and `.dockerignore`
+- [ ] `roost gen.dockerfile` creates `Dockerfile` and `.dockerignore`
 - [ ] Generated Dockerfile uses multi-stage build
 - [ ] Build stage resolves dependencies before copying source (layer cache)
 - [ ] Runtime stage is minimal (no Swift toolchain)
@@ -175,16 +175,16 @@ file (not `.env` itself — that's the developer's responsibility).
 
 ### Token Signing
 
-- [ ] `PeregrineToken.sign` produces a URL-safe string
-- [ ] `PeregrineToken.verify` returns the original data for valid tokens
-- [ ] `PeregrineToken.verify` returns nil for tampered tokens
-- [ ] `PeregrineToken.verify` returns nil for tokens signed with a different secret
+- [ ] `RoostToken.sign` produces a URL-safe string
+- [ ] `RoostToken.verify` returns the original data for valid tokens
+- [ ] `RoostToken.verify` returns nil for tampered tokens
+- [ ] `RoostToken.verify` returns nil for tokens signed with a different secret
 - [ ] `maxAge` on verify rejects expired tokens
 - [ ] `maxAge` on verify accepts tokens within the time window
 - [ ] Tokens without maxAge never expire (signature-only validation)
 - [ ] Token format is compact and URL-safe (no `+`, `/`, or `=`)
 - [ ] HMAC-SHA256 is used for signing (via swift-crypto)
-- [ ] `PeregrineToken` is an enum (no instances)
+- [ ] `RoostToken` is an enum (no instances)
 - [ ] All types are Sendable
 - [ ] `swift test` passes
 

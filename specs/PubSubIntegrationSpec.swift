@@ -1,11 +1,11 @@
 import Testing
-import PeregrineTest
+import RoostTest
 @testable import ChatApp
 
-/// Integration specs for Peregrine.PubSub.
+/// Integration specs for Roost.PubSub.
 ///
 /// Uses the in-memory adapter (no external Valkey process required).
-/// The in-memory adapter is the default when Peregrine.env == .test.
+/// The in-memory adapter is the default when Roost.env == .test.
 @Suite("PubSub Integration Specs")
 struct PubSubIntegrationSpecs {
 

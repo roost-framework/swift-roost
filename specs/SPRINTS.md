@@ -1,24 +1,24 @@
-# Peregrine — Sprint Plan
+# Roost — Sprint Plan
 
 ## Sprint 0: Foundation
 
-**Goal:** Package compiles, re-exports work, `PeregrineApp` protocol exists.
+**Goal:** Package compiles, re-exports work, `RoostApp` protocol exists.
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
 | 0.1 | Create `Package.swift` with all dependencies | 01 §2.2 | Package resolves and builds |
-| 0.2 | `Exports.swift` — `@_exported import` for all sub-frameworks | 01 §2.3 | `import Peregrine` gives access to Nexus, Spectro, ESW, HTTPTypes |
-| 0.3 | `PeregrineApp` protocol with `routes` requirement | 01 §2.4 | Protocol compiles, default extensions compile |
-| 0.4 | `ServerConfig` struct with env var reading | 01 §2.6 | `PEREGRINE_HOST` / `PEREGRINE_PORT` or defaults |
-| 0.5 | `Environment` enum + `Peregrine.env` | 04 §2.1 | Reads `PEREGRINE_ENV`, defaults to `.dev` |
+| 0.2 | `Exports.swift` — `@_exported import` for all sub-frameworks | 01 §2.3 | `import Roost` gives access to Nexus, Spectro, ESW, HTTPTypes |
+| 0.3 | `RoostApp` protocol with `routes` requirement | 01 §2.4 | Protocol compiles, default extensions compile |
+| 0.4 | `ServerConfig` struct with env var reading | 01 §2.6 | `ROOST_HOST` / `ROOST_PORT` or defaults |
+| 0.5 | `Environment` enum + `Roost.env` | 04 §2.1 | Reads `ROOST_ENV`, defaults to `.dev` |
 
-**Exit criteria:** `swift build` passes. A minimal app conforming to `PeregrineApp` compiles.
+**Exit criteria:** `swift build` passes. A minimal app conforming to `RoostApp` compiles.
 
 ---
 
 ## Sprint 1: Application Bootstrap
 
-**Goal:** `PeregrineApp` boots a real server. Zero manual Hummingbird wiring.
+**Goal:** `RoostApp` boots a real server. Zero manual Hummingbird wiring.
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
@@ -29,10 +29,10 @@
 | 1.5 | `conn.spectro` and `conn.repo()` accessors | 01 §2.9 | Route handlers access DB without parameter threading |
 | 1.6 | `willStart(spectro:)` lifecycle hook | 01 §2.4 | Called after DB connect, before server accepts |
 | 1.7 | `configure(for:)` environment hook | 04 §2.3 | Called during startup |
-| 1.8 | Startup banner: `Peregrine running on http://...` | 01 §2.7 | Prints on boot, suppressed in test |
+| 1.8 | Startup banner: `Roost running on http://...` | 01 §2.7 | Prints on boot, suppressed in test |
 | 1.9 | Clean shutdown of SpectroClient on exit | 01 §2.7 | `defer` or structured concurrency |
 
-**Exit criteria:** A `PeregrineApp` conformance with `database` and `routes` starts a working HTTP server.
+**Exit criteria:** A `RoostApp` conformance with `database` and `routes` starts a working HTTP server.
 
 ---
 
@@ -57,17 +57,17 @@
 
 ## Sprint 3: Testing
 
-**Goal:** `PeregrineTest` library lets you test an app without starting a server.
+**Goal:** `RoostTest` library lets you test an app without starting a server.
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
-| 3.1 | `PeregrineTest` target in Package.swift | 03 §2.6 | New library product |
-| 3.2 | `TestApp` harness — runs pipeline without server | 03 §2.1 | Instantiate from any `PeregrineApp` |
+| 3.1 | `RoostTest` target in Package.swift | 03 §2.6 | New library product |
+| 3.2 | `TestApp` harness — runs pipeline without server | 03 §2.1 | Instantiate from any `RoostApp` |
 | 3.3 | `get`, `post`, `put`, `delete` request methods | 03 §2.2 | Convenience methods returning `TestResponse` |
 | 3.4 | `TestResponse` struct | 03 §2.3 | `status`, `headers`, `body`, `text`, `json`, `decode(as:)`, `cookies` |
 | 3.5 | Database override in TestApp | 03 §2.4 | `.postgres(database: "test_db")` or `nil` |
 | 3.6 | Assign/session injection in test requests | 03 §2.5 | Pre-populate assigns for authenticated routes |
-| 3.7 | Self-tests for PeregrineTest | 03 §3 | Test the test framework with a minimal fixture app |
+| 3.7 | Self-tests for RoostTest | 03 §3 | Test the test framework with a minimal fixture app |
 
 **Exit criteria:** A test suite using `TestApp` runs without ports, without a real server, and exercises the full pipeline.
 
@@ -75,14 +75,14 @@
 
 ## Sprint 4: CLI — Project Scaffolding
 
-**Goal:** `peregrine new MyApp` generates a buildable, runnable project.
+**Goal:** `roost new MyApp` generates a buildable, runnable project.
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
-| 4.1 | `PeregrineCLI` executable target with ArgumentParser | 02 §3 | Top-level command group |
-| 4.2 | `peregrine new <AppName>` command | 02 §2.1 | Generates project directory with all files |
-| 4.3 | Project template: `Package.swift` | 02 §2.1 | Correct Peregrine dependency |
-| 4.4 | Project template: `App.swift` | 02 §2.1 | Minimal `PeregrineApp` conformance |
+| 4.1 | `RoostCLI` executable target with ArgumentParser | 02 §3 | Top-level command group |
+| 4.2 | `roost new <AppName>` command | 02 §2.1 | Generates project directory with all files |
+| 4.3 | Project template: `Package.swift` | 02 §2.1 | Correct Roost dependency |
+| 4.4 | Project template: `App.swift` | 02 §2.1 | Minimal `RoostApp` conformance |
 | 4.5 | Project template: `layout.esw` | 02 §2.1 | Default HTML layout |
 | 4.6 | Project template: `.gitignore`, `.swift-format` | 02 §2.1 | Standard Swift ignores + formatting |
 | 4.7 | `--no-db` flag | 02 §2.1 | Omits database config |
@@ -90,7 +90,7 @@
 | 4.9 | File creation logging | 02 §4 | Prints `create path/to/file` for each file |
 | 4.10 | "Next steps" output | 02 §2.1 | `cd AppName && swift run` |
 
-**Exit criteria:** `peregrine new TestApp && cd TestApp && swift run` works first try.
+**Exit criteria:** `roost new TestApp && cd TestApp && swift run` works first try.
 
 ---
 
@@ -100,32 +100,32 @@
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
-| 5.1 | `peregrine gen.schema <Name> <fields...>` | 02 §2.2 | Generates `@Schema` model + SQL migration |
+| 5.1 | `roost gen.schema <Name> <fields...>` | 02 §2.2 | Generates `@Schema` model + SQL migration |
 | 5.2 | Field type mapping (string, int, double, bool, uuid, date) | 02 §2.2 | All types produce correct Swift + Postgres |
 | 5.3 | `:references` modifier | 02 §2.2 | FK constraint + `@ForeignKey` wrapper |
 | 5.4 | `:optional` modifier | 02 §2.2 | `T?` + drops `NOT NULL` |
-| 5.5 | `peregrine gen.json <Name> <fields...>` | 02 §2.3 | Model + migration + CRUD route file |
-| 5.6 | `peregrine gen.html <Name> <fields...>` | 02 §2.4 | Model + migration + routes + `.esw` templates |
-| 5.7 | `peregrine migrate up/down/status` | 02 §2.5 | Delegates to Spectro migration system |
-| 5.8 | `peregrine server` | 02 §2.6 | `swift run` wrapper |
+| 5.5 | `roost gen.json <Name> <fields...>` | 02 §2.3 | Model + migration + CRUD route file |
+| 5.6 | `roost gen.html <Name> <fields...>` | 02 §2.4 | Model + migration + routes + `.esw` templates |
+| 5.7 | `roost migrate up/down/status` | 02 §2.5 | Delegates to Spectro migration system |
+| 5.8 | `roost server` | 02 §2.6 | `swift run` wrapper |
 | 5.9 | Project structure discovery from `Package.swift` | 02 §4 | CLI finds correct source directories |
 
-**Exit criteria:** `peregrine new Blog && cd Blog && peregrine gen.json Post title:string body:string && swift run` produces a working CRUD API.
+**Exit criteria:** `roost new Blog && cd Blog && roost gen.json Post title:string body:string && swift run` produces a working CRUD API.
 
 ---
 
 ## Sprint 6: DonutShop Migration
 
-**Goal:** Migrate DonutShop to Peregrine. Prove the framework works.
+**Goal:** Migrate DonutShop to Roost. Prove the framework works.
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
-| 6.1 | Update `Package.swift` to depend on Peregrine only | 06 §2.1 | 1 dependency instead of 4 |
-| 6.2 | Rewrite `App.swift` using `PeregrineApp` | 06 §2.2 | < 30 lines |
+| 6.1 | Update `Package.swift` to depend on Roost only | 06 §2.1 | 1 dependency instead of 4 |
+| 6.2 | Rewrite `App.swift` using `RoostApp` | 06 §2.2 | < 30 lines |
 | 6.3 | Remove `db: DB` from all route functions | 06 §2.3 | Use `conn.repo()` instead |
-| 6.4 | Replace `import Spectro` / `import Nexus` with `import Peregrine` | 06 §2.4 | Single import everywhere |
+| 6.4 | Replace `import Spectro` / `import Nexus` with `import Roost` | 06 §2.4 | Single import everywhere |
 | 6.5 | Delete `DB` struct, `Helpers.swift`, `setupDatabase()` | 06 §2.5 | Dead code removal |
-| 6.6 | Update tests to use `PeregrineTest` | 06 §2.6 | `TestApp`-based tests |
+| 6.6 | Update tests to use `RoostTest` | 06 §2.6 | `TestApp`-based tests |
 | 6.7 | Run `test.sh` — all endpoints return same responses | 06 §4 | Behavioral equivalence |
 | 6.8 | Measure before/after metrics | 06 §3 | Lines, imports, dependencies |
 
@@ -179,7 +179,7 @@
 | 9.3 | Path traversal prevention (`..` rejection) | 09 §2.4 | Security check |
 | 9.4 | Hidden file protection (no `.env` serving) | 09 §2.4 | Dot-file skip |
 | 9.5 | Environment-aware cache headers | 09 §2.5 | `no-cache` in dev, `max-age` in prod |
-| 9.6 | Update `peregrine new` to create `Public/` directory | 09 §2.6 | CLI update |
+| 9.6 | Update `roost new` to create `Public/` directory | 09 §2.6 | CLI update |
 | 9.7 | Tests: serves files, rejects traversal, correct MIME types | 09 §3 | Test suite |
 
 **Exit criteria:** CSS/JS/images in `Public/` are served with correct content types and cache headers.
@@ -188,7 +188,7 @@
 
 ## Sprint 10: Authentication Generator
 
-**Goal:** `peregrine gen.auth` generates a complete, working auth system.
+**Goal:** `roost gen.auth` generates a complete, working auth system.
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
@@ -200,26 +200,26 @@
 | 10.6 | Session token flow (create, verify, delete) | 10 §2.7 | Token lifecycle |
 | 10.7 | Login and register ESW templates | 10 §2.8 | Generated templates |
 | 10.8 | Validation: email uniqueness, password length | 10 §2.9 | Input validation |
-| 10.9 | `peregrine gen.auth` CLI command wiring | 10 §2 | CLI integration |
+| 10.9 | `roost gen.auth` CLI command wiring | 10 §2 | CLI integration |
 | 10.10 | Tests: register, login, logout, requireAuth | 10 §3 | Test suite |
 
-**Exit criteria:** `peregrine gen.auth && swift build` produces a working registration and login system.
+**Exit criteria:** `roost gen.auth && swift build` produces a working registration and login system.
 
 ---
 
 ## Sprint 11: Deployment Tooling & Token Signing
 
-**Goal:** Production-ready with `peregrine gen.dockerfile` and `PeregrineToken` for signed URLs.
+**Goal:** Production-ready with `roost gen.dockerfile` and `RoostToken` for signed URLs.
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
-| 11.1 | `peregrine gen.dockerfile` command | 11 §2.1 | Generates Dockerfile + .dockerignore |
+| 11.1 | `roost gen.dockerfile` command | 11 §2.1 | Generates Dockerfile + .dockerignore |
 | 11.2 | Multi-stage Dockerfile with layer caching | 11 §2.2 | Optimized build |
 | 11.3 | `.dockerignore` generation | 11 §2.3 | Exclude build artifacts |
-| 11.4 | `PeregrineToken.sign` with HMAC-SHA256 | 11 §2.5 | Token creation |
-| 11.5 | `PeregrineToken.verify` with expiry support | 11 §2.5 | Token validation |
+| 11.4 | `RoostToken.sign` with HMAC-SHA256 | 11 §2.5 | Token creation |
+| 11.5 | `RoostToken.verify` with expiry support | 11 §2.5 | Token validation |
 | 11.6 | URL-safe token format (base64url) | 11 §2.6 | Compact tokens |
-| 11.7 | `PEREGRINE_SECRET` convention | 11 §2.8 | Env var convention |
+| 11.7 | `ROOST_SECRET` convention | 11 §2.8 | Env var convention |
 | 11.8 | Tests: sign/verify, expiry, tamper detection | 11 §3 | Test suite |
 
 **Exit criteria:** `docker build -t myapp . && docker run -p 8080:8080 myapp` works. Tokens can be signed, verified, and expire correctly.
@@ -232,7 +232,7 @@
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
-| 12.1 | Download Pico CSS on `peregrine new` | 12 §2.2 | `Public/css/pico.min.css` |
+| 12.1 | Download Pico CSS on `roost new` | 12 §2.2 | `Public/css/pico.min.css` |
 | 12.2 | `--color` flag with all 19 Pico themes | 12 §2.1 | `pico.{color}.min.css` |
 | 12.3 | Generate styled `layout.esw` with Pico link | 12 §2.2 | Semantic HTML layout |
 | 12.4 | `Public/css/app.css` for custom overrides | 12 §2.2 | Override file |
@@ -240,31 +240,31 @@
 | 12.6 | Update `gen.auth` templates for Pico styling | 12 §2.3 | Styled forms |
 | 12.7 | `--tailwind` flag: download CLI binary | 12 §2.5-2.6 | Standalone binary |
 | 12.8 | `--tailwind`: generate config + input.css | 12 §2.7 | Tailwind setup |
-| 12.9 | `peregrine build` command (assets + Swift) | 12 §2.8 | Build pipeline |
+| 12.9 | `roost build` command (assets + Swift) | 12 §2.8 | Build pipeline |
 | 12.10 | Tests: color validation, file download, mutual exclusion | 12 §3 | Test suite |
 
-**Exit criteria:** `peregrine new MyApp && swift run` serves styled pages. `peregrine new MyApp --tailwind` sets up Tailwind with no Node dependency.
+**Exit criteria:** `roost new MyApp && swift run` serves styled pages. `roost new MyApp --tailwind` sets up Tailwind with no Node dependency.
 
 ---
 
 ## Sprint 13: Development Server with Watch Mode
 
-**Goal:** `peregrine build --watch` gives you edit-save-see in seconds.
+**Goal:** `roost build --watch` gives you edit-save-see in seconds.
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
-| 13.1 | `peregrine build` command (assets + Swift) | 13 §2.1 | Unified build |
+| 13.1 | `roost build` command (assets + Swift) | 13 §2.1 | Unified build |
 | 13.2 | File watcher for `.swift` and `.esw` changes | 13 §2.3 | OS-native or polling |
 | 13.3 | `--watch` mode: rebuild + restart on change | 13 §2.2 | Watch loop |
 | 13.4 | Debouncing (300ms) for rapid saves | 13 §2.2 | Debounce logic |
 | 13.5 | Process management: start, SIGTERM, restart | 13 §2.4 | Child process lifecycle |
 | 13.6 | Build failure handling (keep old server alive) | 13 §2.5 | Error resilience |
 | 13.7 | Tailwind watch integration (parallel process) | 13 §2.6 | CSS live rebuild |
-| 13.8 | `peregrine server` as alias for `build --watch` | 13 §2.7 | Alias command |
+| 13.8 | `roost server` as alias for `build --watch` | 13 §2.7 | Alias command |
 | 13.9 | Ignore temp files (`.swp`, `~`, `.tmp`) | 13 §3 | Editor compatibility |
 | 13.10 | Clean `Ctrl+C` shutdown of all child processes | 13 §2.4 | Signal handling |
 
-**Exit criteria:** `peregrine build --watch` starts the server and automatically rebuilds + restarts when source files change. Build errors don't kill the running server.
+**Exit criteria:** `roost build --watch` starts the server and automatically rebuilds + restarts when source files change. Build errors don't kill the running server.
 
 ---
 
@@ -275,7 +275,7 @@
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
 | 14.1 | Add `hummingbird-websocket` dependency | 14 §2.1 | Package resolves |
-| 14.2 | `PeregrineChannel` protocol | 14 §2.2 | `onJoin`, `onMessage`, `onData`, `onLeave` |
+| 14.2 | `RoostChannel` protocol | 14 §2.2 | `onJoin`, `onMessage`, `onData`, `onLeave` |
 | 14.3 | `WebSocket` wrapper with send/close API | 14 §2.4 | Clean send interface |
 | 14.4 | `ChannelRegistry` actor for topic-based tracking | 14 §2.5 | Thread-safe socket registry |
 | 14.5 | `Broadcast.send` and `Broadcast.sendOthers` | 14 §2.5 | Broadcast to topic |
@@ -332,7 +332,7 @@
 |---|------|------|-------------|
 | 17.1 | `ServerConfig` extension for TLS and HTTP/2 | 17 §2.1 | Certificate + key paths |
 | 17.2 | HTTP/2 via ALPN when TLS is set | 17 §2.2 | Multiplexed connections |
-| 17.3 | `peregrine server --tls` self-signed cert for dev | 17 §2.3 | Local HTTPS |
+| 17.3 | `roost server --tls` self-signed cert for dev | 17 §2.3 | Local HTTPS |
 | 17.4 | `httpsRedirect()` plug | 17 §2.4 | HTTP → HTTPS redirect |
 | 17.5 | `compress()` plug with gzip/deflate | 17 §2.5 | Response compression |
 | 17.6 | Accept-Encoding negotiation | 17 §2.6 | Prefer gzip, fallback deflate |
@@ -350,7 +350,7 @@
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
 | 18.1 | `metrics()` plug using swift-metrics | 18 §2.1 | Request counters, histograms, gauges |
-| 18.2 | Dev metrics endpoint `/_peregrine/metrics` | 18 §2.2 | JSON stats in dev mode |
+| 18.2 | Dev metrics endpoint `/_roost/metrics` | 18 §2.2 | JSON stats in dev mode |
 | 18.3 | Upgrade `requestLogger()` with swift-log + structured metadata | 18 §2.4 | Request ID, status, duration |
 | 18.4 | Log level by status (info/warning/error) | 18 §2.5 | Smart log levels |
 | 18.5 | `tracing()` plug using swift-distributed-tracing | 18 §2.6 | Spans per request |
@@ -373,7 +373,7 @@
 | 19.4 | `session(store:)` plug with cookie management | 19 §2.3 | Read/write session ID cookie |
 | 19.5 | `conn.getSession`, `putSession`, `deleteSession`, `clearSession` | 19 §2.4 | Session API |
 | 19.6 | `conn.renewSession` for fixation protection | 19 §2.5 | New ID, same data |
-| 19.7 | Auto-created `peregrine_sessions` table | 19 §2.7 | Zero-config setup |
+| 19.7 | Auto-created `roost_sessions` table | 19 §2.7 | Zero-config setup |
 | 19.8 | Expired session cleanup (probabilistic + CLI) | 19 §2.6 | Memory management |
 | 19.9 | Tests: write/read across requests, expiry, renewal | 19 §3 | Test suite |
 
@@ -387,14 +387,14 @@
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
-| 20.1 | `Email` struct and `PeregrineEmail` protocol | 20 §2.1-2.2 | Type-safe email definitions |
+| 20.1 | `Email` struct and `RoostEmail` protocol | 20 §2.1-2.2 | Type-safe email definitions |
 | 20.2 | `MailDelivery` protocol | 20 §2.3 | Pluggable backends |
 | 20.3 | `LoggerDelivery` for dev (prints to console) | 20 §2.3 | Dev default |
 | 20.4 | `SMTPDelivery` with STARTTLS | 20 §2.3 | Production delivery |
 | 20.5 | `TestDelivery` for assertions | 20 §2.3 | Collect sent emails |
 | 20.6 | `Mailer.deliver` facade with env-aware defaults | 20 §2.4 | Logger in dev, explicit in prod |
 | 20.7 | SMTP config from env vars | 20 §2.5 | `SMTP_HOST`, etc. |
-| 20.8 | `peregrine gen.email` generator | 20 §2.6 | Email struct + ESW templates |
+| 20.8 | `roost gen.email` generator | 20 §2.6 | Email struct + ESW templates |
 | 20.9 | Tests: delivery, SMTP handshake, test collector | 20 §3 | Test suite |
 
 **Exit criteria:** `Mailer.deliver(WelcomeEmail(user: user))` sends an email with an ESW-rendered body.
@@ -407,14 +407,14 @@
 
 | # | Task | Spec | Deliverable |
 |---|------|------|-------------|
-| 21.1 | `PeregrineJob` protocol (Codable, Sendable) | 21 §2.1 | Type-safe job definitions |
+| 21.1 | `RoostJob` protocol (Codable, Sendable) | 21 §2.1 | Type-safe job definitions |
 | 21.2 | `Jobs.enqueue` with immediate and delayed scheduling | 21 §2.2 | Enqueue API |
-| 21.3 | Postgres job store with auto-created table | 21 §2.3 | `peregrine_jobs` table |
+| 21.3 | Postgres job store with auto-created table | 21 §2.3 | `roost_jobs` table |
 | 21.4 | In-memory job store for dev/test | 21 §2.3 | No DB required in dev |
 | 21.5 | `JobWorker` actor with polling and row locking | 21 §2.4 | Concurrent job execution |
 | 21.6 | Exponential backoff retries | 21 §2.5 | 15s, 1m, 4m, 16m, 1h |
-| 21.7 | `PeregrineApp.jobs` registration | 21 §2.6 | Auto-start worker on boot |
-| 21.8 | `peregrine jobs:work`, `jobs:status`, `jobs:retry-failed` CLI | 21 §2.7 | Job management |
+| 21.7 | `RoostApp.jobs` registration | 21 §2.6 | Auto-start worker on boot |
+| 21.8 | `roost jobs:work`, `jobs:status`, `jobs:retry-failed` CLI | 21 §2.7 | Job management |
 | 21.9 | Test store with `drainAll()` | 21 §2.8 | Synchronous test execution |
 | 21.10 | Tests: enqueue, execute, retry, failure, scheduling | 21 §3 | Test suite |
 
@@ -496,18 +496,18 @@ Sprint 21 benefits from 18 (metrics for job monitoring).
 | 1 | Bootstrap | App boots a server with one protocol conformance |
 | 2 | DX polish | Error pages, env-aware defaults, response timer |
 | 3 | Testing | `TestApp` — test without a server |
-| 4 | CLI: new | `peregrine new` generates runnable project |
+| 4 | CLI: new | `roost new` generates runnable project |
 | 5 | CLI: gen | `gen.schema`, `gen.json`, `gen.html`, `migrate` |
 | 6 | Proof | DonutShop migrated, framework validated |
 | 7 | Flash messages | Write-once read-once messages across redirects |
 | 8 | CSRF protection | Automatic form token validation |
 | 9 | Static files | Serve CSS/JS/images from `Public/` |
-| 10 | Auth generator | `peregrine gen.auth` — register, login, logout |
+| 10 | Auth generator | `roost gen.auth` — register, login, logout |
 | 11 | Production | Dockerfile generation, signed tokens |
-| 12 | Asset pipeline | Pico CSS default, Tailwind opt-in, `peregrine build` |
-| 13 | Dev server | `peregrine build --watch` with auto-rebuild |
+| 12 | Asset pipeline | Pico CSS default, Tailwind opt-in, `roost build` |
+| 13 | Dev server | `roost build --watch` with auto-rebuild |
 | | | **── 1.0 ──** |
-| 14 | WebSockets | `PeregrineChannel` with broadcast and topics |
+| 14 | WebSockets | `RoostChannel` with broadcast and topics |
 | 15 | CORS | `cors()` plug with origin policies |
 | 16 | Rate limiting | `rateLimit()` plug with sliding window |
 | 17 | HTTP/2 + TLS + compression | HTTPS, multiplexing, gzip responses |

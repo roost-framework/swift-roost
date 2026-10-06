@@ -1,5 +1,5 @@
 // ChannelPatterns.swift
-// Design specification for Peregrine.Channel — inspired by Phoenix.Channel
+// Design specification for Roost.Channel — inspired by Phoenix.Channel
 //
 // Channels sit on top of WebSocket + PubSub and implement the Phoenix
 // Channel wire protocol so the official phoenix.js client works out of the box.
@@ -13,7 +13,7 @@
 
 // MARK: - 1. Declare a channel endpoint in your router
 
-struct ChatApp: PeregrineApp {
+struct ChatApp: RoostApp {
     var routes: [Route] {
         // Upgrades GET /socket/websocket to a WebSocket connection
         // All channel topics are multiplexed over this single endpoint.
@@ -123,10 +123,10 @@ extension RoomChannel {
 
 // Optionally authenticate the WebSocket handshake using a signed token:
 //
-//   struct ChatApp: PeregrineApp {
+//   struct ChatApp: RoostApp {
 //       func authenticateSocket(_ conn: Connection) async throws -> SocketAssigns {
 //           guard let token = conn.queryParams["token"],
-//                 let claims = try? PeregrineToken.verify(token, secret: secret) else {
+//                 let claims = try? RoostToken.verify(token, secret: secret) else {
 //               throw ChannelError.unauthorized("Invalid token")
 //           }
 //           return ["userID": claims.subject, "userName": claims.name]

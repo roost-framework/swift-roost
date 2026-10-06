@@ -1,14 +1,14 @@
-# Spec: Peregrine CLI
+# Spec: Roost CLI
 
 **Status:** Proposed
 **Date:** 2026-03-28
-**Depends on:** Peregrine core framework (spec 01)
+**Depends on:** Roost core framework (spec 01)
 
 ---
 
 ## 1. Goal
 
-A `peregrine` CLI that scaffolds new projects and generates code. This is what
+A `roost` CLI that scaffolds new projects and generates code. This is what
 makes the framework productive — `mix phx.new` is why people reach for Phoenix.
 The CLI embodies the "no boilerplate" promise: you type a command, you get a
 working app or a complete CRUD feature.
@@ -17,12 +17,12 @@ working app or a complete CRUD feature.
 
 ## 2. Commands
 
-### 2.1 `peregrine new <AppName>`
+### 2.1 `roost new <AppName>`
 
-Generates a new Peregrine project:
+Generates a new Roost project:
 
 ```bash
-$ peregrine new DonutShop
+$ roost new DonutShop
   Creating DonutShop...
     create  DonutShop/Package.swift
     create  DonutShop/Sources/DonutShop/App.swift
@@ -41,10 +41,10 @@ $ peregrine new DonutShop
 The generated `App.swift`:
 
 ```swift
-import Peregrine
+import Roost
 
 @main
-struct DonutShop: PeregrineApp {
+struct DonutShop: RoostApp {
     let database = Database.postgres(database: "donut_shop")
 
     @RouteBuilder var routes: [Route] {
@@ -59,12 +59,12 @@ Options:
 - `--no-db` — omit database configuration
 - `--no-esw` — omit Views directory and ESW plugin
 
-### 2.2 `peregrine gen.schema <Name> <field:type>...`
+### 2.2 `roost gen.schema <Name> <field:type>...`
 
 Generates a model, migration, and optionally routes:
 
 ```bash
-$ peregrine gen.schema Donut name:string price:double is_available:bool category_id:uuid:references
+$ roost gen.schema Donut name:string price:double is_available:bool category_id:uuid:references
   create  Sources/DonutShop/Models/Donut.swift
   create  Sources/Migrations/20260328190000_CreateDonuts.sql
 ```
@@ -72,7 +72,7 @@ $ peregrine gen.schema Donut name:string price:double is_available:bool category
 Generated model:
 
 ```swift
-import Peregrine
+import Roost
 
 @Schema("donuts")
 struct Donut {
@@ -117,12 +117,12 @@ Modifiers:
 - `:references` on a uuid field → adds `REFERENCES` FK constraint, generates `@ForeignKey` instead of `@Column`
 - `:optional` → makes the field `T?` and removes `NOT NULL`
 
-### 2.3 `peregrine gen.json <Name> <field:type>...`
+### 2.3 `roost gen.json <Name> <field:type>...`
 
 Same as `gen.schema` plus generates JSON API routes:
 
 ```bash
-$ peregrine gen.json Donut name:string price:double
+$ roost gen.json Donut name:string price:double
   create  Sources/DonutShop/Models/Donut.swift
   create  Sources/DonutShop/Routes/DonutRoutes.swift
   create  Sources/Migrations/20260328190000_CreateDonuts.sql
@@ -131,7 +131,7 @@ $ peregrine gen.json Donut name:string price:double
 Generated routes file:
 
 ```swift
-import Peregrine
+import Roost
 
 @RouteBuilder
 func donutRoutes() -> [Route] {
@@ -174,12 +174,12 @@ private struct CreateDonutInput: Decodable, Sendable {
 }
 ```
 
-### 2.4 `peregrine gen.html <Name> <field:type>...`
+### 2.4 `roost gen.html <Name> <field:type>...`
 
 Same as `gen.json` plus generates `.esw` templates:
 
 ```bash
-$ peregrine gen.html Donut name:string price:double
+$ roost gen.html Donut name:string price:double
   create  Sources/DonutShop/Models/Donut.swift
   create  Sources/DonutShop/Routes/DonutRoutes.swift
   create  Sources/DonutShop/Views/donut_list.esw
@@ -190,25 +190,25 @@ $ peregrine gen.html Donut name:string price:double
 
 Routes use `respondTo(html:json:)` for content negotiation.
 
-### 2.5 `peregrine migrate <up|down|status>`
+### 2.5 `roost migrate <up|down|status>`
 
 Delegates to Spectro's migration system:
 
 ```bash
-$ peregrine migrate up       # runs pending migrations
-$ peregrine migrate down     # rolls back last migration
-$ peregrine migrate status   # shows applied/pending
+$ roost migrate up       # runs pending migrations
+$ roost migrate down     # rolls back last migration
+$ roost migrate status   # shows applied/pending
 ```
 
 Reads database config from the same env vars as the app.
 
-### 2.6 `peregrine server`
+### 2.6 `roost server`
 
 Builds and runs the app:
 
 ```bash
-$ peregrine server            # swift run with defaults
-$ peregrine server --port 4000
+$ roost server            # swift run with defaults
+$ roost server --port 4000
 ```
 
 ---
@@ -216,16 +216,16 @@ $ peregrine server --port 4000
 ## 3. Terminal UI — Noora
 
 All CLI output uses [Noora](https://github.com/tuist/Noora) for polished
-terminal UI, consistent with Spectro's CLI. Define a `PeregrineUI` helper
+terminal UI, consistent with Spectro's CLI. Define a `RoostUI` helper
 (same pattern as Spectro's `SpectroUI`):
 
 ```swift
-// Sources/PeregrineCLI/Utils/PeregrineUI.swift
+// Sources/RoostCLI/Utils/RoostUI.swift
 @preconcurrency import Noora
 
-enum PeregrineUI {
+enum RoostUI {
     static let noora = Noora(theme: Theme(
-        primary: "F97316",    // peregrine orange
+        primary: "F97316",    // roost orange
         secondary: "FB923C",
         muted: "6B7280",
         accent: "F59E0B",
@@ -242,7 +242,7 @@ Usage in commands:
 
 ```swift
 // Success
-PeregrineUI.noora.success(.alert(
+RoostUI.noora.success(.alert(
     "Project \(.primary(appName)) created",
     takeaways: [
         "cd \(.command(appName))",
@@ -251,12 +251,12 @@ PeregrineUI.noora.success(.alert(
 ))
 
 // File creation
-PeregrineUI.noora.info(.alert(
+RoostUI.noora.info(.alert(
     "create \(.muted(filePath))"
 ))
 
 // Errors
-PeregrineUI.noora.error(.alert(
+RoostUI.noora.error(.alert(
     "Failed to generate \(.primary(name))",
     takeaways: ["\(.muted("\(error)"))"]
 ))
@@ -269,9 +269,9 @@ PeregrineUI.noora.error(.alert(
 ```swift
 // In Package.swift, add:
 .executableTarget(
-    name: "PeregrineCLI",
+    name: "RoostCLI",
     dependencies: [
-        "Peregrine",
+        "Roost",
         .product(name: "ArgumentParser", package: "swift-argument-parser"),
         .product(name: "Noora", package: "Noora"),
     ]
@@ -289,11 +289,11 @@ Distribute via Mint:
 
 ```
 # Mintfile
-Maartz/swift-peregrine
+Maartz/swift-roost
 ```
 
 ```bash
-mint install Maartz/swift-peregrine
+mint install Maartz/swift-roost
 ```
 
 ---
@@ -301,22 +301,22 @@ mint install Maartz/swift-peregrine
 ## 5. Acceptance Criteria
 
 - [ ] All CLI output uses Noora (no raw `print` statements)
-- [ ] `PeregrineUI` follows same pattern as Spectro's `SpectroUI`
-- [ ] `peregrine new AppName` generates a buildable project that runs on first `swift run`
-- [ ] Generated `App.swift` is <15 lines and uses `PeregrineApp` protocol
-- [ ] `peregrine gen.schema` generates `@Schema` model + SQL migration
+- [ ] `RoostUI` follows same pattern as Spectro's `SpectroUI`
+- [ ] `roost new AppName` generates a buildable project that runs on first `swift run`
+- [ ] Generated `App.swift` is <15 lines and uses `RoostApp` protocol
+- [ ] `roost gen.schema` generates `@Schema` model + SQL migration
 - [ ] All field types map correctly (string, int, double, bool, uuid, date)
 - [ ] `:references` modifier generates FK constraint and `@ForeignKey` wrapper
 - [ ] `:optional` modifier generates optional Swift type and drops `NOT NULL`
-- [ ] `peregrine gen.json` generates model + migration + CRUD routes
-- [ ] `peregrine gen.html` generates model + migration + routes + `.esw` templates
-- [ ] `peregrine migrate up/down/status` delegates to Spectro's migration system
-- [ ] `peregrine server` builds and runs the app
+- [ ] `roost gen.json` generates model + migration + CRUD routes
+- [ ] `roost gen.html` generates model + migration + routes + `.esw` templates
+- [ ] `roost migrate up/down/status` delegates to Spectro's migration system
+- [ ] `roost server` builds and runs the app
 - [ ] CLI uses ArgumentParser with `--help` on every command
 - [ ] CLI prints file paths as it creates them (like Rails generators)
 - [ ] Generated code compiles under Swift 6 strict concurrency
 - [ ] No hardcoded paths — CLI discovers project structure from `Package.swift`
-- [ ] `peregrine new --no-db` omits database config and SpectroKit dependency
+- [ ] `roost new --no-db` omits database config and SpectroKit dependency
 - [ ] Installable via Mint
 
 ---

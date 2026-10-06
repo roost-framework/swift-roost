@@ -1,5 +1,5 @@
 // PipelinePatterns.swift
-// Design specification for Peregrine Router Pipelines — inspired by Phoenix.Router pipelines
+// Design specification for Roost Router Pipelines — inspired by Phoenix.Router pipelines
 //
 // Pipelines are named, reusable plug stacks. Routes declare which pipeline(s) they belong to.
 // This replaces ad-hoc per-route middleware stacking with explicit, named composition.
@@ -8,13 +8,13 @@
 
 // MARK: - 1. Define pipelines and attach them to scopes
 
-struct MyApp: PeregrineApp {
+struct MyApp: RoostApp {
     var routes: [Route] {
         // :browser pipeline — full session, flash, CSRF (for HTML consumers)
         pipeline("browser") {
             sessionPlug()
             flashPlug()
-            peregrine_csrfProtection()
+            roost_csrfProtection()
             responseTimer()
         }
 
@@ -75,7 +75,7 @@ struct MyApp: PeregrineApp {
 //   let browserPipeline = Pipeline("browser") {
 //       sessionPlug()
 //       flashPlug()
-//       peregrine_csrfProtection()
+//       roost_csrfProtection()
 //   }
 //
 //   extension MyApp {
@@ -88,13 +88,13 @@ struct MyApp: PeregrineApp {
 // MARK: - 4. Difference from Phoenix
 
 // Phoenix uses `pipe_through :browser` as a call inside a scope block.
-// Peregrine makes the pipeline association explicit in the `scope` declaration,
+// Roost makes the pipeline association explicit in the `scope` declaration,
 // so the full middleware stack for a route is visible at the `scope` call site
 // rather than requiring you to look up where `pipe_through` is called.
 
 // MARK: - 5. Pipeline introspection in dev
 
-// In development, Peregrine's dev server prints a routing table at startup:
+// In development, Roost's dev server prints a routing table at startup:
 //
 //   GET  /                        [browser]           HomeController.index
 //   GET  /login                   [browser]           SessionController.new
@@ -103,11 +103,11 @@ struct MyApp: PeregrineApp {
 //   GET  /api/v1/products         [api]               ProductsAPI.index
 //   POST /api/v1/products         [api, authenticated]  ProductsAPI.create
 
-// MARK: - 6. Built-in pipeline plugs (provided by Peregrine)
+// MARK: - 6. Built-in pipeline plugs (provided by Roost)
 
 // sessionPlug()               — loads/saves session from cookie-backed store
 // flashPlug()                 — reads/writes one-time flash messages in session
-// peregrine_csrfProtection()  — validates CSRF token on state-changing requests
+// roost_csrfProtection()  — validates CSRF token on state-changing requests
 // responseTimer()             — adds X-Response-Time header
 // acceptJSON()                — sets Content-Type: application/json on responses
 // bearerAuthPlug()            — extracts Bearer token, sets conn.assigns["currentUser"]

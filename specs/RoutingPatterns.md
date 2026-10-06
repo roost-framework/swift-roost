@@ -1,8 +1,8 @@
-# Peregrine Routing Patterns
+# Roost Routing Patterns
 
 ## Philosophy
 
-Peregrine adopts the **Rails/Phoenix approach** to routing: declarative, composable, and immutable. Routes are data structures built at compile-time, not mutable objects modified at runtime.
+Roost adopts the **Rails/Phoenix approach** to routing: declarative, composable, and immutable. Routes are data structures built at compile-time, not mutable objects modified at runtime.
 
 ## Comparison with Other Frameworks
 
@@ -60,7 +60,7 @@ func routes(_ app: Application) throws {
 
 ---
 
-## Peregrine: The Rails/Phoenix Way
+## Roost: The Rails/Phoenix Way
 
 ### 1. Route Functions Return Data
 

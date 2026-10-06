@@ -1,4 +1,4 @@
-# Spec: Peregrine Core Framework
+# Spec: Roost Core Framework
 
 **Status:** Proposed
 **Date:** 2026-03-28
@@ -8,20 +8,20 @@
 
 ## 1. Goal
 
-Peregrine is the top-level Swift web framework that unifies Spectro (ORM),
+Roost is the top-level Swift web framework that unifies Spectro (ORM),
 Nexus (HTTP pipeline), and ESW (templates) into a single dependency with
-zero-boilerplate application bootstrap. Users write `import Peregrine`, conform
+zero-boilerplate application bootstrap. Users write `import Roost`, conform
 to a protocol, and have a running web app.
 
-The design principle is the peregrine falcon: **small, fast, no wasted motion.**
+The design principle is the roost falcon: **small, fast, no wasted motion.**
 
-DonutShop's `App.swift` today is 122 lines of ceremony. After Peregrine:
+DonutShop's `App.swift` today is 122 lines of ceremony. After Roost:
 
 ```swift
-import Peregrine
+import Roost
 
 @main
-struct DonutShop: PeregrineApp {
+struct DonutShop: RoostApp {
     let database = Database.postgres(env: .default)
 
     var plugs: some PlugPipeline {
@@ -53,16 +53,16 @@ struct DonutShop: PeregrineApp {
 ### 2.1 Package Structure
 
 ```
-swift-peregrine/
+swift-roost/
   Package.swift
   Sources/
-    Peregrine/              ← Main target, re-exports everything
-      PeregrineApp.swift    ← Application protocol + runner
+    Roost/              ← Main target, re-exports everything
+      RoostApp.swift    ← Application protocol + runner
       Database.swift        ← Database configuration helpers
       Defaults.swift        ← Default plug pipeline, env var conventions
       Exports.swift         ← @_exported import Nexus, Spectro, ESW, etc.
   Tests/
-    PeregrineTests/
+    RoostTests/
 ```
 
 ### 2.2 `Package.swift`
@@ -72,10 +72,10 @@ swift-peregrine/
 import PackageDescription
 
 let package = Package(
-    name: "swift-peregrine",
+    name: "swift-roost",
     platforms: [.macOS(.v14)],
     products: [
-        .library(name: "Peregrine", targets: ["Peregrine"]),
+        .library(name: "Roost", targets: ["Roost"]),
     ],
     dependencies: [
         .package(url: "https://github.com/Spectro-ORM/Spectro", from: "1.0.0"),
@@ -85,7 +85,7 @@ let package = Package(
     ],
     targets: [
         .target(
-            name: "Peregrine",
+            name: "Roost",
             dependencies: [
                 .product(name: "SpectroKit", package: "Spectro"),
                 .product(name: "Nexus", package: "swift-nexus"),
@@ -103,7 +103,7 @@ let package = Package(
 ### 2.3 Re-exports
 
 ```swift
-// Sources/Peregrine/Exports.swift
+// Sources/Roost/Exports.swift
 @_exported import Nexus
 @_exported import NexusRouter
 @_exported import NexusHummingbird
@@ -112,13 +112,13 @@ let package = Package(
 @_exported import HTTPTypes
 ```
 
-A consumer writes `import Peregrine` and gets everything. No more 7-import
+A consumer writes `import Roost` and gets everything. No more 7-import
 headers.
 
-### 2.4 `PeregrineApp` Protocol
+### 2.4 `RoostApp` Protocol
 
 ```swift
-public protocol PeregrineApp {
+public protocol RoostApp {
     /// Database configuration. Return `nil` for apps without a database.
     var database: Database? { get }
 
@@ -130,7 +130,7 @@ public protocol PeregrineApp {
     @RouteBuilder var routes: [Route] { get }
 
     /// Server configuration (host, port).
-    /// Default: reads from PEREGRINE_HOST / PEREGRINE_PORT env vars,
+    /// Default: reads from ROOST_HOST / ROOST_PORT env vars,
     /// falls back to 127.0.0.1:8080.
     var server: ServerConfig { get }
 
@@ -146,7 +146,7 @@ public protocol PeregrineApp {
 Default implementations for everything except `routes`:
 
 ```swift
-extension PeregrineApp {
+extension RoostApp {
     public var database: Database? { nil }
 
     public var plugs: [Plug] {
@@ -220,13 +220,13 @@ All of this is what DonutShop does manually today in 100+ lines.
 
 ### 2.8 Built-in `ResponseTimer` Plug
 
-Move DonutShop's `responseTimer()` into Nexus or Peregrine as a built-in plug.
+Move DonutShop's `responseTimer()` into Nexus or Roost as a built-in plug.
 It measures request duration and sets `X-Response-Time` header via
 `registerBeforeSend`. This is universally useful.
 
 ### 2.9 Typed Database Access
 
-Peregrine provides a typed assign key and convenience accessor:
+Roost provides a typed assign key and convenience accessor:
 
 ```swift
 public enum SpectroKey: AssignKey {
@@ -246,10 +246,10 @@ Route handlers use `conn.repo()` directly — no captured `db` parameter.
 ## 3. What DonutShop Becomes
 
 ```swift
-import Peregrine
+import Roost
 
 @main
-struct DonutShop: PeregrineApp {
+struct DonutShop: RoostApp {
     let database = Database.postgres(database: "donut_shop")
 
     var plugs: [Plug] {
@@ -307,28 +307,28 @@ func donutRoutes() -> [Route] {
 
 ## 4. Acceptance Criteria
 
-- [ ] `import Peregrine` gives access to Nexus, NexusRouter, Spectro, ESW, and HTTPTypes
-- [ ] `PeregrineApp` protocol compiles with only `routes` required
+- [ ] `import Roost` gives access to Nexus, NexusRouter, Spectro, ESW, and HTTPTypes
+- [ ] `RoostApp` protocol compiles with only `routes` required
 - [ ] Default `main()` boots Hummingbird server with the configured pipeline
 - [ ] `Database.postgres()` reads from env vars with sensible defaults
-- [ ] `ServerConfig.fromEnvironment()` reads `PEREGRINE_HOST` / `PEREGRINE_PORT`
+- [ ] `ServerConfig.fromEnvironment()` reads `ROOST_HOST` / `ROOST_PORT`
 - [ ] `conn.spectro` and `conn.repo()` are available in route handlers when database is configured
 - [ ] `willStart(spectro:)` is called before server accepts connections
 - [ ] `responseTimer()` plug is available as built-in
 - [ ] SpectroClient is shut down cleanly on server exit
-- [ ] Startup banner prints: `Peregrine running on http://{host}:{port}`
-- [ ] DonutShop can be migrated to use `PeregrineApp` with <30 lines in `App.swift`
+- [ ] Startup banner prints: `Roost running on http://{host}:{port}`
+- [ ] DonutShop can be migrated to use `RoostApp` with <30 lines in `App.swift`
 - [ ] `swift build` succeeds with zero warnings under Swift 6 strict concurrency
 - [ ] All types are `Sendable`
-- [ ] No `@unchecked Sendable` in the Peregrine target
+- [ ] No `@unchecked Sendable` in the Roost target
 
 ---
 
 ## 5. Non-goals (This Spec)
 
-- No CLI tool (`peregrine new`, `peregrine gen.*`) — that's spec 02.
+- No CLI tool (`roost new`, `roost gen.*`) — that's spec 02.
 - No project template generation — that's spec 02.
 - No custom server backends (only Hummingbird) — extensibility later.
-- No configuration file (`.peregrine.yml` or similar) — env vars are enough.
+- No configuration file (`.roost.yml` or similar) — env vars are enough.
 - No hot reload / live reload — future spec.
 - No authentication framework beyond what Nexus already provides.

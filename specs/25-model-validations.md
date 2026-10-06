@@ -2,13 +2,13 @@
 
 **Status:** Proposed
 **Date:** 2026-04-07
-**Depends on:** Peregrine core (spec 01), Spectro ORM, Auth & Scope System (spec 22)
+**Depends on:** Roost core (spec 01), Spectro ORM, Auth & Scope System (spec 22)
 
 ---
 
 ## 1. Goal
 
-Peregrine lacks a model validation system. Developers must manually validate data before saving to the database, which leads to inconsistent validation logic and potential data integrity issues. Phoenix solved this with changesets - a powerful validation system that:
+Roost lacks a model validation system. Developers must manually validate data before saving to the database, which leads to inconsistent validation logic and potential data integrity issues. Phoenix solved this with changesets - a powerful validation system that:
 
 1. **Separates validation from persistence** - Validate before saving
 2. **Supports complex rules** - Multi-field, async, and database-dependent validation
@@ -27,7 +27,7 @@ This spec implements a **Swift-native changeset validation system** inspired by 
 #### 2.1.1 Changeset Definition
 
 ```swift
-// In Sources/Peregrine/Validations/Changeset.swift
+// In Sources/Roost/Validations/Changeset.swift
 
 public protocol Changeset: Sendable {
     associatedtype Model: Schema
@@ -90,7 +90,7 @@ public struct ValidationError: Sendable {
 #### 2.1.2 Generic Changeset Implementation
 
 ```swift
-// In Sources/Peregrine/Validations/GenericChangeset.swift
+// In Sources/Roost/Validations/GenericChangeset.swift
 
 public struct GenericChangeset<M: Schema, V: Codable = M>: Changeset, Sendable {
     public let original: M?
@@ -162,7 +162,7 @@ public struct GenericChangeset<M: Schema, V: Codable = M>: Changeset, Sendable {
 #### 2.2.1 Validator Protocol
 
 ```swift
-// In Sources/Peregrine/Validations/Validator.swift
+// In Sources/Roost/Validations/Validator.swift
 
 public protocol ValidatorProtocol<Model: Schema>: Sendable {
     func validate(
@@ -175,7 +175,7 @@ public protocol ValidatorProtocol<Model: Schema>: Sendable {
 #### 2.2.2 Required Validator
 
 ```swift
-// In Sources/Peregrine/Validations/RequiredValidator.swift
+// In Sources/Roost/Validations/RequiredValidator.swift
 
 public struct RequiredValidator: ValidatorProtocol<any Schema>, Sendable {
     let fields: [String]
@@ -211,7 +211,7 @@ public struct RequiredValidator: ValidatorProtocol<any Schema>, Sendable {
 #### 2.2.3 Format Validator
 
 ```swift
-// In Sources/Peregrine/Validations/FormatValidator.swift
+// In Sources/Roost/Validations/FormatValidator.swift
 
 public struct FormatValidator: ValidatorProtocol<any Schema>, Sendable {
     let field: String
@@ -273,7 +273,7 @@ extension FormatValidator {
 #### 2.2.4 Length Validator
 
 ```swift
-// In Sources/Peregrine/Validations/LengthValidator.swift
+// In Sources/Roost/Validations/LengthValidator.swift
 
 public struct LengthValidator: ValidatorProtocol<any Schema>, Sendable {
     let field: String
@@ -316,7 +316,7 @@ public struct LengthValidator: ValidatorProtocol<any Schema>, Sendable {
 #### 2.2.5 Inclusion/Exclusion Validator
 
 ```swift
-// In Sources/Peregrine/Validations/InclusionValidator.swift
+// In Sources/Roost/Validations/InclusionValidator.swift
 
 public struct InclusionValidator<T: Equatable & Sendable>: ValidatorProtocol<any Schema>, Sendable {
     let field: String
@@ -378,7 +378,7 @@ public struct ExclusionValidator<T: Equatable & Sendable>: ValidatorProtocol<any
 #### 2.3.1 Custom Validator Protocol
 
 ```swift
-// In Sources/Peregrine/Validations/CustomValidator.swift
+// In Sources/Roost/Validations/CustomValidator.swift
 
 public struct CustomValidator<Model: Schema>: ValidatorProtocol<Model>, Sendable {
     let field: String?
@@ -451,7 +451,7 @@ extension CustomValidator where Model == User {
 #### 2.4.1 Confirmation Validator
 
 ```swift
-// In Sources/Peregrine/Validations/ConfirmationValidator.swift
+// In Sources/Roost/Validations/ConfirmationValidator.swift
 
 public struct ConfirmationValidator: ValidatorProtocol<any Schema>, Sendable {
     let field: String
@@ -489,7 +489,7 @@ public struct ConfirmationValidator: ValidatorProtocol<any Schema>, Sendable {
 #### 2.4.2 Comparison Validator
 
 ```swift
-// In Sources/Peregrine/Validations/ComparisonValidator.swift
+// In Sources/Roost/Validations/ComparisonValidator.swift
 
 public struct ComparisonValidator<T: Comparable & Sendable>: ValidatorProtocol<any Schema>, Sendable {
     let field: String
@@ -554,7 +554,7 @@ public struct ComparisonValidator<T: Comparable & Sendable>: ValidatorProtocol<a
 #### 2.5.1 Uniqueness Validator
 
 ```swift
-// In Sources/Peregrine/Validations/UniquenessValidator.swift
+// In Sources/Roost/Validations/UniquenessValidator.swift
 
 public struct UniquenessValidator<Model: Schema>: ValidatorProtocol<Model>, Sendable {
     let field: String
@@ -614,7 +614,7 @@ public struct UniquenessValidator<Model: Schema>: ValidatorProtocol<Model>, Send
 #### 2.5.2 Association Validator
 
 ```swift
-// In Sources/Peregrine/Validations/AssociationValidator.swift
+// In Sources/Roost/Validations/AssociationValidator.swift
 
 public struct AssociationValidator<Model: Schema>: ValidatorProtocol<Model>, Sendable {
     let field: String
@@ -655,7 +655,7 @@ public struct AssociationValidator<Model: Schema>: ValidatorProtocol<Model>, Sen
 #### 2.5.3 Constraint Validator
 
 ```swift
-// In Sources/Peregrine/Validations/ConstraintValidator.swift
+// In Sources/Roost/Validations/ConstraintValidator.swift
 
 public struct ConstraintValidator<Model: Schema>: ValidatorProtocol<Model>, Sendable {
     let constraints: [String]
@@ -683,7 +683,7 @@ public struct ConstraintValidator<Model: Schema>: ValidatorProtocol<Model>, Send
 
 ```swift
 // Models/User.swift
-import Peregrine
+import Roost
 import SpectroKit
 
 @Schema("users")
@@ -746,7 +746,7 @@ struct User {
 
 ```swift
 // Contexts/UsersContext.swift
-import Peregrine
+import Roost
 import SpectroKit
 
 extension UsersContext {
@@ -818,9 +818,9 @@ extension UsersContext {
 
 ```swift
 // Routes/UsersRoutes.swift
-import Peregrine
+import Roost
 
-extension PeregrineApp {
+extension RoostApp {
     var usersRoutes: [Route] {
         [
             POST("/users") { conn in

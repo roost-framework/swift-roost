@@ -1,5 +1,5 @@
 // SSEPatterns.swift
-// Design specification for Peregrine SSE (Server-Sent Events)
+// Design specification for Roost SSE (Server-Sent Events)
 //
 // Backed by sse-kit (hummingbird-project).
 // Converts any AsyncSequence<ServerSentEvent> into a streaming HTTP response
@@ -13,12 +13,12 @@
 import Foundation
 
 func counterSSE(_ conn: Connection) async throws -> Connection {
-    // SSEBroadcaster is a Peregrine actor that fans out to all connected listeners
+    // SSEBroadcaster is a Roost actor that fans out to all connected listeners
     let stream = conn.sseStream(from: conn.app.counterBroadcaster)
     return conn.sse(stream)  // sets Content-Type: text/event-stream, Cache-Control: no-cache
 }
 
-// MARK: - 2. SSEBroadcaster — a reusable fan-out actor (provided by Peregrine)
+// MARK: - 2. SSEBroadcaster — a reusable fan-out actor (provided by Roost)
 
 // actor SSEBroadcaster<T: Sendable>: Service {
 //     // Publish a value; all current subscribers receive it
@@ -33,8 +33,8 @@ func counterSSE(_ conn: Connection) async throws -> Connection {
 
 // MARK: - 3. App-level broadcaster registration
 
-struct DashboardApp: PeregrineApp {
-    // Broadcaster is a Service; Peregrine registers it in the ServiceGroup
+struct DashboardApp: RoostApp {
+    // Broadcaster is a Service; Roost registers it in the ServiceGroup
     var orderBroadcaster: SSEBroadcaster<OrderEvent>   = SSEBroadcaster()
     var metricsBroadcaster: SSEBroadcaster<MetricSnap> = SSEBroadcaster()
 
@@ -72,7 +72,7 @@ func orderStatusSSE(_ conn: Connection) async throws -> Connection {
 
 // MARK: - 5. Pushing to the broadcaster from a background job
 
-struct OrderShippedJob: PeregrineJob {
+struct OrderShippedJob: RoostJob {
     struct Parameters: Codable { let orderID: UUID; let userID: UUID }
 
     func execute(parameters: Parameters, context: JobContext) async throws {

@@ -1,0 +1,13 @@
+<section class="auth-layout">
+    <div class="auth-intro"><p class="eyebrow">Less tab collecting. More reading.</p><h1>Keep the good<br>ones close<span class="accent">.</span></h1><p>A place for the articles, ideas, and rabbit holes you want to find again.</p><div class="book-spines" aria-hidden="true"><span></span><span></span><span></span><span></span></div></div>
+    <div class="auth-form"><h2>Welcome back</h2><p>Your reading queue is right where you left it.</p>
+        <% if let error { %><p class="field-error" role="alert"><%= error %></p><% } %>
+        <.form action="/auth/login" method="post">
+            <label for="email">Email</label><input id="email" type="email" name="email" value="<%= email %>" autocomplete="username" required>
+            <label for="password">Password</label><input id="password" type="password" name="password" autocomplete="current-password" required>
+            <button type="submit">Log in</button>
+        </.form>
+        <p class="auth-switch">New here? <a href="/auth/register">Create an account</a></p>
+        <% if RoostExample.demoMode { %><aside class="demo-account"><strong>Try the local demo</strong><span>reader@roost.test</span><code>Read-with-Roost-2026</code></aside><% } %>
+    </div>
+</section>

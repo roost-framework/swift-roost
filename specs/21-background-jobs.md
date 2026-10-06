@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01), optionally Spectro (for Postgres backend)
+**Depends on:** Roost core (spec 01), optionally Spectro (for Postgres backend)
 
 ---
 
@@ -10,7 +10,7 @@
 
 Some work doesn't belong in a request cycle: sending emails, processing
 uploads, generating reports, calling external APIs. Phoenix has Oban,
-Rails has Sidekiq/GoodJob. Peregrine needs a job system that:
+Rails has Sidekiq/GoodJob. Roost needs a job system that:
 
 1. Runs jobs asynchronously outside the request/response cycle.
 2. Persists jobs so they survive server restarts (Postgres-backed).
@@ -22,7 +22,7 @@ Rails has Sidekiq/GoodJob. Peregrine needs a job system that:
 try await Jobs.enqueue(SendWelcomeEmailJob(userId: user.id))
 
 // Job definition:
-struct SendWelcomeEmailJob: PeregrineJob {
+struct SendWelcomeEmailJob: RoostJob {
     let userId: UUID
 
     func perform() async throws {
@@ -38,10 +38,10 @@ No Redis dependency. Postgres is the queue (same as GoodJob for Rails).
 
 ## 2. Scope
 
-### 2.1 PeregrineJob Protocol
+### 2.1 RoostJob Protocol
 
 ```swift
-public protocol PeregrineJob: Codable, Sendable {
+public protocol RoostJob: Codable, Sendable {
     /// The job's unique type identifier (defaults to the type name).
     static var jobName: String { get }
 
@@ -55,7 +55,7 @@ public protocol PeregrineJob: Codable, Sendable {
     func perform() async throws
 }
 
-extension PeregrineJob {
+extension RoostJob {
     public static var jobName: String { String(describing: Self.self) }
     public static var maxRetries: Int { 3 }
     public static var queue: String { "default" }
@@ -67,16 +67,16 @@ extension PeregrineJob {
 ```swift
 public enum Jobs {
     /// Enqueue a job for immediate processing.
-    public static func enqueue<J: PeregrineJob>(_ job: J) async throws
+    public static func enqueue<J: RoostJob>(_ job: J) async throws
 
     /// Enqueue a job to run after a delay.
-    public static func enqueue<J: PeregrineJob>(
+    public static func enqueue<J: RoostJob>(
         _ job: J,
         runAt: Date
     ) async throws
 
     /// Enqueue a job to run on a specific queue.
-    public static func enqueue<J: PeregrineJob>(
+    public static func enqueue<J: RoostJob>(
         _ job: J,
         on queue: String
     ) async throws
@@ -88,7 +88,7 @@ public enum Jobs {
 **Postgres-backed (production):**
 
 ```sql
-CREATE TABLE peregrine_jobs (
+CREATE TABLE roost_jobs (
     id          BIGSERIAL PRIMARY KEY,
     job_name    TEXT NOT NULL,
     queue       TEXT NOT NULL DEFAULT 'default',
@@ -104,7 +104,7 @@ CREATE TABLE peregrine_jobs (
 );
 
 CREATE INDEX idx_jobs_fetch
-    ON peregrine_jobs (queue, status, run_at)
+    ON roost_jobs (queue, status, run_at)
     WHERE status = 'pending';
 ```
 
@@ -154,16 +154,16 @@ Failed jobs (exceeded max retries) are kept in the table with
 `status = 'failed'` for inspection. A CLI command can retry or
 delete them.
 
-### 2.6 Integration with PeregrineApp
+### 2.6 Integration with RoostApp
 
 ```swift
-public protocol PeregrineApp {
+public protocol RoostApp {
     // Existing...
-    var jobs: [any PeregrineJob.Type] { get }  // Register job types
+    var jobs: [any RoostJob.Type] { get }  // Register job types
 }
 
-extension PeregrineApp {
-    public var jobs: [any PeregrineJob.Type] { [] }
+extension RoostApp {
+    public var jobs: [any RoostJob.Type] { [] }
 }
 ```
 
@@ -173,11 +173,11 @@ On boot, the job worker starts automatically if jobs are registered.
 ### 2.7 CLI Commands
 
 ```bash
-$ peregrine jobs:work                  # Start a standalone worker
-$ peregrine jobs:work --queue emails   # Process specific queue
-$ peregrine jobs:status                # Show pending/running/failed counts
-$ peregrine jobs:retry-failed          # Retry all failed jobs
-$ peregrine jobs:clear-failed          # Delete all failed jobs
+$ roost jobs:work                  # Start a standalone worker
+$ roost jobs:work --queue emails   # Process specific queue
+$ roost jobs:status                # Show pending/running/failed counts
+$ roost jobs:retry-failed          # Retry all failed jobs
+$ roost jobs:clear-failed          # Delete all failed jobs
 ```
 
 ### 2.8 Testing Support
@@ -199,7 +199,7 @@ try await testStore.drainAll()
 
 ## 3. Acceptance Criteria
 
-- [ ] `PeregrineJob` protocol with `perform`, `jobName`, `maxRetries`, `queue`
+- [ ] `RoostJob` protocol with `perform`, `jobName`, `maxRetries`, `queue`
 - [ ] `Jobs.enqueue` adds a job to the store
 - [ ] `Jobs.enqueue(_:runAt:)` schedules delayed jobs
 - [ ] `JobWorker` polls and executes pending jobs
@@ -211,9 +211,9 @@ try await testStore.drainAll()
 - [ ] Job payloads are Codable (JSON serialization)
 - [ ] Multiple queues with configurable concurrency
 - [ ] Worker starts automatically when jobs are registered in the app
-- [ ] `peregrine jobs:work` CLI for standalone workers
-- [ ] `peregrine jobs:status` shows queue state
-- [ ] `peregrine jobs:retry-failed` retries failed jobs
+- [ ] `roost jobs:work` CLI for standalone workers
+- [ ] `roost jobs:status` shows queue state
+- [ ] `roost jobs:retry-failed` retries failed jobs
 - [ ] Test store with `drainAll()` for synchronous testing
 - [ ] `swift test` passes
 

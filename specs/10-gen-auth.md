@@ -2,7 +2,7 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01), CLI (specs 02, 04-05), sessions, CSRF (spec 08)
+**Depends on:** Roost core (spec 01), CLI (specs 02, 04-05), sessions, CSRF (spec 08)
 
 ---
 
@@ -13,10 +13,10 @@ every developer gets wrong. Phoenix solved this with `mix phx.gen.auth` —
 a single command that generates a complete, production-ready auth system
 that you own and can customize.
 
-Peregrine should do the same.
+Roost should do the same.
 
 ```bash
-$ peregrine gen.auth
+$ roost gen.auth
   create  Sources/MyApp/Models/User.swift
   create  Sources/MyApp/Routes/AuthRoutes.swift
   create  Sources/MyApp/Plugs/RequireAuth.swift
@@ -28,7 +28,7 @@ $ peregrine gen.auth
 
 The generated code is not a library — it's scaffolding that lives in your
 project. You own it, you can modify it, and it serves as documentation
-for how Peregrine auth patterns work.
+for how Roost auth patterns work.
 
 ---
 
@@ -197,7 +197,7 @@ Login validates:
 
 ## 3. Acceptance Criteria
 
-- [ ] `peregrine gen.auth` generates all files listed in scope
+- [ ] `roost gen.auth` generates all files listed in scope
 - [ ] Generated code compiles without modifications
 - [ ] User model uses `@Schema` macro with proper column types
 - [ ] Passwords are hashed with bcrypt (never stored in plain text)
@@ -214,7 +214,7 @@ Login validates:
 - [ ] Old session tokens are cleaned up on logout
 - [ ] Generated migrations create proper indexes
 - [ ] Generated templates include CSRF tokens
-- [ ] Generated code follows Peregrine conventions (`conn.repo()`, `@RouteBuilder`, etc.)
+- [ ] Generated code follows Roost conventions (`conn.repo()`, `@RouteBuilder`, etc.)
 - [ ] All generated types are Sendable
 - [ ] `swift build` succeeds after generation
 - [ ] Command is idempotent — warns if files already exist rather than overwriting

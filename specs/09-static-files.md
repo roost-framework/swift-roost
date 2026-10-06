@@ -2,15 +2,15 @@
 
 **Status:** Proposed
 **Date:** 2026-03-29
-**Depends on:** Peregrine core (spec 01), Hummingbird
+**Depends on:** Roost core (spec 01), Hummingbird
 
 ---
 
 ## 1. Goal
 
-A Peregrine app that serves HTML needs to serve CSS, JavaScript, images, and
+A Roost app that serves HTML needs to serve CSS, JavaScript, images, and
 fonts. Today you'd need to manually configure Hummingbird's file middleware.
-Peregrine should handle this by convention.
+Roost should handle this by convention.
 
 Drop files in `Public/`, and they're served. No configuration.
 
@@ -43,7 +43,7 @@ public func staticFiles(
 
 ### 2.2 Convention
 
-When `peregrine new` generates a project, it creates a `Public/` directory
+When `roost new` generates a project, it creates a `Public/` directory
 with a `.gitkeep`. The default `plugs` pipeline includes `staticFiles()`
 when the `Public/` directory exists.
 
@@ -86,7 +86,7 @@ Set `Cache-Control` headers for static assets:
 
 ### 2.6 CLI Integration
 
-`peregrine new` generates:
+`roost new` generates:
 
 ```
 Public/
@@ -108,7 +108,7 @@ Public/
 - [ ] `Cache-Control` is `no-cache` in dev environment
 - [ ] `Cache-Control` includes `max-age` in prod environment
 - [ ] Static files are served before the router runs (early halt)
-- [ ] `peregrine new` generates `Public/` directory structure
+- [ ] `roost new` generates `Public/` directory structure
 - [ ] Plug is configurable: custom directory and URL prefix
 - [ ] `staticFiles(from: "Assets", at: "/static")` serves `Assets/foo.css` at `/static/foo.css`
 - [ ] Works with `sendFile` under the hood (leverages Nexus's existing file serving)
