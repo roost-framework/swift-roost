@@ -338,8 +338,8 @@ Create `website/index.html`:
             <article>
               <h3>Preloading without N+1.</h3>
               <p>
-                Batch-load HasMany, HasOne, BelongsTo, and ManyToMany with one
-                extra query per relationship, not one per row.
+                Batch-load HasMany, HasOne, BelongsTo, and ManyToMany with a fixed
+                number of queries per relationship, not one per row.
               </p>
             </article>
           </div>
@@ -418,7 +418,7 @@ Create `website/index.html`:
                 <h3>Queries are values.</h3>
                 <p>
                   Build a query once, then page it, sum it, or preload its
-                  relationships. Preloading costs one query per relationship,
+                  relationships. Preloading the posts costs one extra query,
                   not one per row.
                 </p>
                 <span class="source-label">Queries.swift</span>
@@ -1127,8 +1127,8 @@ Create `website/index.html`:
     #expect(result.response.status == .unauthorized)
 }
 
-@Test <span class="light-key">func</span> greetsByName() <span class="light-key">async throws</span> {
-    <span class="light-key">let</span> result = <span class="light-key">try await</span> app(TestConnection.build(path: <span class="light-string">"/hello/nexus"</span>))
+@Test <span class="light-key">func</span> findsUser() <span class="light-key">async throws</span> {
+    <span class="light-key">let</span> result = <span class="light-key">try await</span> app(TestConnection.build(path: <span class="light-string">"/users/42"</span>))
     #expect(result.response.status == .ok)
     #expect(result.requestId != <span class="light-key">nil</span>)
 }</code></pre>
