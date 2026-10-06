@@ -77,8 +77,10 @@ Each site is one `index.html` with these sections, in order.
    - Nexus: Plug → Router → Test.
    - ESW: Template → Components → Live.
 6. **Install.** SwiftPM dependency line at the current version; Spectro also
-   shows its Mint line for the CLI. Requirements line (Swift 6.3, macOS 14 or
-   Linux).
+   shows its Mint line for the CLI. A requirements line taken from each
+   library's `Package.swift` and README at its release tag (Spectro: Swift 6.0+,
+   macOS 13+ or Linux; Nexus: Swift 6.0+, macOS 14+, iOS 17+ or Linux; ESW:
+   Swift 6.3+, macOS 14+).
 7. **Closing and footer.** Links to documentation and GitHub; footer matching
    Roost's, crediting the Roost family.
 
