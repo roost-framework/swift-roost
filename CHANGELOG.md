@@ -32,6 +32,7 @@ workflow from authentication and database migrations through HTML, JSON, and tes
   method overrides, retained invalid input, and one-time flash messages.
 - Sessions make changes visible within the request and persist before the
   response is sent. Error handling preserves earlier middleware state.
+- Internal tracing header names coexist with current HTTPTypes releases.
 - Migration commands use the application's configuration and Spectro's migration
   manager, including the compiled executable's `migrate up`, `down`, and `status`.
 - The development server retains the previous running app when a rebuild fails.

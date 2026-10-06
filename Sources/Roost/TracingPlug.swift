@@ -43,11 +43,11 @@ public func tracing() -> Plug {
 
         return initial.registerBeforeSend { c in
             var result = c
-            result.response.headerFields[.xRequestID] = requestId
+            result.response.headerFields[RoostTracingHeaders.xRequestID] = requestId
 
             // Reflect incoming traceparent for correlation
-            if let traceparent = c.request.headerFields[.traceparent] {
-                result.response.headerFields[.traceparent] = traceparent
+            if let traceparent = c.request.headerFields[RoostTracingHeaders.traceparent] {
+                result.response.headerFields[RoostTracingHeaders.traceparent] = traceparent
             }
 
             span.attributes["http.status_code"] = c.response.status.code
@@ -59,8 +59,9 @@ public func tracing() -> Plug {
 
 // MARK: - HTTP header helpers
 
-extension HTTPField.Name {
-    static let traceparent = Self("traceparent")!
-    static let tracestate = Self("tracestate")!
-    static let xRequestID = Self("X-Request-ID")!
+// Keep our names out of HTTPTypes' namespace as it adds standard header names.
+enum RoostTracingHeaders {
+    static let traceparent = HTTPField.Name("traceparent")!
+    static let tracestate = HTTPField.Name("tracestate")!
+    static let xRequestID = HTTPField.Name("X-Request-ID")!
 }

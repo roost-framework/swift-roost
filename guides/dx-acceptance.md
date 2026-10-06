@@ -185,3 +185,29 @@ that a published Spectro 2.1.0 package resolves.
 This preflight used unpublished Spectro source. The final release instead uses
 `from: "2.0.0"`, accepting 2.1.0 when it is published while resolving 2.0.0
 today. Published-package validation is recorded below.
+
+## Roost 2.0.0 published-package verification
+
+Verified on 2026-10-06. The release uses Spectro `from: "2.0.0"`, Nexus
+`from: "2.0.0"`, and ESW `from: "1.5.0"`. With all `ROOST_*_PATH` dependency
+overrides unset, all 47 resolved framework dependencies were GitHub source-control
+packages; none were filesystem dependencies. Spectro resolved to 2.0.0 at
+`b13c41cdda2e73fb2a7000399c7d8f450ab05f0e`, Nexus to 2.0.0 at
+`1fc010e02ac912ceca1c31a3304fca115117fc89`, and ESW to 1.5.0 at
+`8ff401e6efdf20cfc52d27cbfaf0fd0686e38337`.
+
+- All 445 framework and CLI tests passed on macOS.
+- Both DocC catalogs converted with warnings treated as errors and merged into
+  the searchable Roost Libraries reference.
+- The eight browser playground tests and static-site link/asset checks passed.
+
+A fresh hosted resolution selected HTTPTypes 1.8.0 and exposed a collision with
+Roost's internal tracing-header extensions. Those constants now live in Roost's
+own namespace, preserving compatibility with earlier and current HTTPTypes
+versions. The response-header checks read the actual wire names, including the
+request ID's consistency with the connection assigns.
+
+The reading-list example now resolves Roost from its published GitHub version
+by default, as generated applications do. Explicit local overrides are available
+only for contributor workflows. The `--published-framework` acceptance mode
+clears these overrides and checks that the app resolves the CLI's release version.

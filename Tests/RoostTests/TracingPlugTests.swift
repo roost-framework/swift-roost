@@ -55,9 +55,9 @@ struct TracingPlugTests {
         )
 
         let result = try await runPlug(conn, plug: plug)
-        let final = try await result.runBeforeSend()
+        let final = result.runBeforeSend()
 
-        #expect(final.response.headerFields[.traceparent] == traceparent)
+        #expect(final.response.headerFields[HTTPField.Name("traceparent")!] == traceparent)
     }
 
     @Test("tracing plug sets X-Request-ID in response header")
@@ -66,43 +66,44 @@ struct TracingPlugTests {
         let conn = buildConn(method: .get, path: "/api/users")
 
         let result = try await runPlug(conn, plug: plug)
-        let final = try await result.runBeforeSend()
+        let final = result.runBeforeSend()
 
-        let responseRequestId = final.response.headerFields[.xRequestID]
+        let responseRequestId = final.response.headerFields[HTTPField.Name("X-Request-ID")!]
         #expect(responseRequestId != nil)
         #expect(responseRequestId?.isEmpty == false)
     }
 
-    @Test("tracing plug echoes original xRequestID when present")
-    func echoesOriginalRequestID() async throws {
+    @Test("tracing plug keeps the assigned request ID consistent with the response")
+    func requestIDMatchesAssigns() async throws {
         let plug = tracing()
         var conn = buildConn(method: .get, path: "/api/data")
         let originalId = "custom-request-123"
         conn.assigns["request_id"] = originalId
 
         let result = try await runPlug(conn, plug: plug)
-        _ = try await result.runBeforeSend()
+        let final = result.runBeforeSend()
 
-        // The plug sets requestId from assigns, so the echo should match the assigns value
-        #expect(true)
+        let requestID = try #require(final.assigns["request_id"] as? String)
+        #expect(!requestID.isEmpty)
+        #expect(final.response.headerFields[HTTPField.Name("X-Request-ID")!] == requestID)
     }
 }
 
-@Suite("HTTP Tracing Header Extensions")
+@Suite("HTTP Tracing Header Names")
 struct TracingHeaderExtensionsTests {
 
     @Test("traceparent header name is valid")
     func traceparentHeaderIsValid() {
-        #expect(HTTPField.Name.traceparent.description == "traceparent")
+        #expect(RoostTracingHeaders.traceparent.description == "traceparent")
     }
 
     @Test("tracestate header name is valid")
     func tracestateHeaderIsValid() {
-        #expect(HTTPField.Name.tracestate.description == "tracestate")
+        #expect(RoostTracingHeaders.tracestate.description == "tracestate")
     }
 
     @Test("xRequestID header name is valid")
     func xRequestIDHeaderIsValid() {
-        #expect(HTTPField.Name.xRequestID.description == "X-Request-ID")
+        #expect(RoostTracingHeaders.xRequestID.description == "X-Request-ID")
     }
 }
