@@ -44,7 +44,7 @@ struct Hello: RoostApp {
 ```
 
 **Roost 2.0.0** introduces the renamed framework and CLI, with published
-Nexus 2.0.0, Spectro 2.1.0, and ESW 1.5.0 dependencies. Generated apps resolve
+Nexus 2.0.0, Spectro 2.x (from 2.0.0), and ESW 1.5.0 dependencies. Generated apps resolve
 these packages directly. Moving from Peregrine? Follow the
 [upgrade guide](guides/renaming-to-roost.md).
 [See what has been verified and what remains.](guides/dx-acceptance.md)
@@ -143,8 +143,12 @@ export ROOST_CLI="$(swift build -c release --show-bin-path)/roost"
 "$ROOST_CLI" --version
 ```
 
-Generated apps download Roost 2.0.0, Spectro 2.1.0, Nexus 2.0.0, and ESW 1.5.0
-through SwiftPM. No companion source checkouts or dependency overrides are needed.
+Generated apps download Roost 2.0.0, Spectro 2.x (from 2.0.0), Nexus 2.0.0,
+and ESW 1.5.0 through SwiftPM. No companion source checkouts or dependency overrides are needed.
+Spectro's `from: "2.0.0"` requirement accepts `2.0.0..<3.0.0`, including 2.1.0
+when published. Existing apps retain their resolved version until you run
+`swift package update spectro`.
+
 Keep `ROOST_CLI` set for the commands below, or copy that executable to a directory
 on your `PATH` and use `roost` directly.
 

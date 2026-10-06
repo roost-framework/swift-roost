@@ -37,16 +37,19 @@ Your development data remains available for the next run.
 Prerequisites: Swift 6.3+, Python 3, a local PostgreSQL server, and `psql`,
 `createdb`, and `dropdb` on `PATH`. On Linux, Nexus also needs `zlib1g-dev`.
 
-`./dev` and `./check` locate the framework from this example and set
-`ROOST_FRAMEWORK_PATH`, so its directory can have any name. SwiftPM resolves
-**ESW 1.5.0, Spectro 2.1.0, and Nexus 2.0.0 from published packages**. No sibling
-source checkout is needed. If you previously used local dependencies, run
-`unset ROOST_ESW_PATH ROOST_ECOSYSTEM_PATH` before starting the helper.
+The app resolves **Roost 2.0.0, ESW 1.5.0, Spectro 2.x (from 2.0.0), and
+Nexus 2.0.0 from GitHub**. No local package dependency is required. If you
+previously used local dependencies, clear all overrides before starting:
 
-For work across all four source repositories, opt in with
-`ROOST_ECOSYSTEM_PATH`, or set `ROOST_ESW_PATH` to develop ESW alone.
-The example manifest also locates the containing framework itself, so opening it
-in an editor uses the same released dependencies without helper environment variables.
+```sh
+unset ROOST_FRAMEWORK_PATH ROOST_ESW_PATH ROOST_ECOSYSTEM_PATH
+```
+
+The helper builds the CLI from the containing release checkout. The application
+itself downloads the framework through SwiftPM, including when opened in an
+editor. Contributors can explicitly select a framework checkout with
+`ROOST_FRAMEWORK_PATH`, all companion sources with `ROOST_ECOSYSTEM_PATH`, or
+ESW alone with `ROOST_ESW_PATH`.
 
 Defaults match a local Postgres.app installation: the current OS user, an empty
 password, `localhost:5432`. Override them when needed:

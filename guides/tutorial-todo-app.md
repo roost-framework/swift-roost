@@ -5,10 +5,10 @@ run creates an app with two resources, applies its migrations to an isolated
 PostgreSQL database, runs its generated tests, and checks two users over HTTP.
 
 Use Swift 6.3 or later, PostgreSQL, and the `roost` CLI. ESW 1.5.0 includes the
-typed views and namespaced templates used below; Spectro 2.1.0 includes the
+typed views and namespaced templates used below; Spectro 2.x (from 2.0.0) includes the
 required database fixes. No companion source checkouts are needed.
 
-Roost requires Spectro 2.1.0 and Nexus 2.0.0. On Debian/Ubuntu, install `zlib1g-dev` before
+Roost requires Spectro 2.x (from 2.0.0) and Nexus 2.0.0. On Debian/Ubuntu, install `zlib1g-dev` before
 building. The generated Dockerfile installs the build headers and runtime zlib
 package, and CI installs the headers too.
 

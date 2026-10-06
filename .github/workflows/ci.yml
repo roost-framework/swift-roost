@@ -7,15 +7,10 @@ on:
     branches: [main]
   workflow_dispatch:
     inputs:
-      spectro_ref:
-        description: Spectro revision for ecosystem acceptance
-        default: "2.1.0"
-      nexus_ref:
-        description: Nexus revision for ecosystem acceptance
-        default: "2.0.0"
-      esw_ref:
-        description: ESW revision for ecosystem acceptance
-        default: "1.5.0"
+      published_framework:
+        description: Verify a tagged Roost release with every app dependency from GitHub
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -26,6 +21,7 @@ concurrency:
 
 jobs:
   published-dependencies:
+    if: ${{ !inputs.published_framework }}
     strategy:
       fail-fast: false
       matrix:
@@ -70,23 +66,6 @@ jobs:
       DB_PASSWORD: postgres
     steps:
       - uses: actions/checkout@v4
-        with:
-          path: Roost
-      - uses: actions/checkout@v4
-        with:
-          repository: Spectro-ORM/Spectro
-          ref: ${{ inputs.spectro_ref || '2.1.0' }}
-          path: Spectro
-      - uses: actions/checkout@v4
-        with:
-          repository: Spectro-ORM/Nexus
-          ref: ${{ inputs.nexus_ref || '2.0.0' }}
-          path: Nexus
-      - uses: actions/checkout@v4
-        with:
-          repository: Spectro-ORM/ESW
-          ref: ${{ inputs.esw_ref || '1.5.0' }}
-          path: esw
       - name: Import Swift signing keys
         run: curl --fail --silent --show-error --location --compressed --retry 3 https://www.swift.org/keys/all-keys.asc | gpg --batch --import
       - uses: swift-actions/setup-swift@364295d9c23900ce04d4e5cc708387921b4e50f9 # v3, Swiftly-backed installer
@@ -94,15 +73,12 @@ jobs:
           swift-version: "6.3.3"
       - name: Install PostgreSQL client tools and system dependencies
         run: sudo apt-get update && sudo apt-get install -y postgresql-client zlib1g-dev
-      - name: Record ecosystem revisions
-        run: |
-          git -C Roost rev-parse HEAD
-          git -C Spectro rev-parse HEAD
-          git -C Nexus rev-parse HEAD
-          git -C esw rev-parse HEAD
-      - name: Generate, migrate, test and exercise a Linux release
-        working-directory: Roost
-        run: python3 scripts/check_generated_app.py --ecosystem .. --release --work-dir "$RUNNER_TEMP/roost-acceptance"
+      - name: Exercise generated app with published companion packages
+        if: ${{ !inputs.published_framework }}
+        run: python3 scripts/check_generated_app.py --release --work-dir "$RUNNER_TEMP/roost-acceptance"
+      - name: Exercise released Roost with every dependency from GitHub
+        if: ${{ inputs.published_framework }}
+        run: python3 scripts/check_generated_app.py --published-framework --release --work-dir "$RUNNER_TEMP/roost-acceptance"
       - name: Keep acceptance diagnostics
         if: always()
         uses: actions/upload-artifact@v4

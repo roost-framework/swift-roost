@@ -44,9 +44,9 @@ export ROOST_CLI="$(swift build --show-bin-path)/roost"
 
 `ROOST_FRAMEWORK_PATH` allows an existing checkout to keep its directory name.
 When omitted, generated apps use `$ROOST_ECOSYSTEM_PATH/Roost` if that override
-is set, or the published Roost 2.0.0 package otherwise. The reading-list helpers
-infer the containing framework path automatically. ESW 1.5.0, Spectro 2.1.0,
-and Nexus 2.0.0 resolve from published packages. Set
+is set, or the published Roost 2.0.0 package otherwise. The reading-list app also
+uses published Roost by default; it no longer selects a local framework
+automatically. ESW 1.5.0, Spectro 2.x (from 2.0.0), and Nexus 2.0.0 resolve from published packages. Set
 `ROOST_ESW_PATH` only when you want to develop against a local ESW checkout.
 
 ## Runtime names

@@ -67,7 +67,7 @@ For a custom domain, update the canonical URL, social metadata, sitemap,
   `playground/app.mjs` manages the editor and safe DOM previews. The focused Node
   tests cover the boundary between editable values and fixed program structure.
 - Keep the status copy aligned with releases. The site describes Roost 2.0.0,
-  Spectro 2.1.0, Nexus 2.0.0, and ESW 1.5.0. The separate local Playground
+  Spectro 2.x (from 2.0.0), Nexus 2.0.0, and ESW 1.5.0. The separate local Playground
   has its own setup and release status.
 - Manrope and IBM Plex Mono are self-hosted from the [Google Fonts source repository](https://github.com/google/fonts).
   Their SIL Open Font License files are included in `assets/fonts/`.

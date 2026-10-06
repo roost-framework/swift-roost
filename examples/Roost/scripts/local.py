@@ -25,7 +25,6 @@ def main(mode):
             raise RuntimeError(f"Install {tool} and put it on PATH before running Roost.")
 
     env = dict(os.environ)
-    env["ROOST_FRAMEWORK_PATH"] = str(FRAMEWORK)
     ecosystem = env.get("ROOST_ECOSYSTEM_PATH")
     env.setdefault("DB_HOST", "localhost")
     env.setdefault("DB_PORT", "5432")

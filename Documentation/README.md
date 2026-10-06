@@ -11,7 +11,7 @@ combined **Roost Libraries** navigator includes both libraries.
   browser sessions, CSRF-protected workflows, and database test isolation.
 
 These catalogs document Roost 2.0.0, with published ESW 1.5.0,
-Spectro 2.1.0, and Nexus 2.0.0 dependencies.
+Spectro 2.x (from 2.0.0), and Nexus 2.0.0 dependencies.
 
 ## Build
 

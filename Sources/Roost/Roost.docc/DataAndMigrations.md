@@ -102,10 +102,10 @@ Create an empty migration with:
 Fill in both sections of the generated file. Spectro applies each migration
 transactionally and tracks its version in `schema_migrations`.
 
-Spectro 2.1 also offers Swift declarations through the optional
+The forthcoming Spectro 2.1 offers Swift declarations through the optional
 `SpectroMigrations` product. Roost's generators and `RoostMigrator` continue
 to use Spectro's SQL workflow. To opt into Swift declarations, add the separate
-migration executable described in [Spectro's migration guide](https://github.com/Spectro-ORM/Spectro/blob/2.1.0/docs/MIGRATIONS.md).
+migration executable described in [Spectro's migration guide](https://github.com/Spectro-ORM/Spectro/blob/4a75b08911b41cbbd3feb724c8527a32f98b16b6/docs/MIGRATIONS.md).
 Keep the IDs and SQL history of migrations already applied to your database.
 
 ### Run against the app's configuration

@@ -154,7 +154,7 @@ python3 scripts/build_docs.py
 
 ## Roost 2.0.0 / Spectro 2.1.0 release preflight
 
-The release candidate raises the Spectro minimum to 2.1.0, reports `roost
+The initial release candidate tested a Spectro 2.1.0 minimum, reports `roost
 --version` as 2.0.0, and generates applications requiring published Roost 2.0.0.
 The renamed source is merged with the published website and Linux fixes.
 
@@ -182,6 +182,6 @@ that a published Spectro 2.1.0 package resolves.
   conversion passed after the release guide updates; it does not exercise the
   database or network workflows.
 
-Publication still requires the remote Spectro 2.1.0 tag, followed by verification
-against published packages and the Roost release tag. Hosted Roost CI has not
-run for this candidate yet.
+This preflight used unpublished Spectro source. The final release instead uses
+`from: "2.0.0"`, accepting 2.1.0 when it is published while resolving 2.0.0
+today. Published-package validation is recorded below.

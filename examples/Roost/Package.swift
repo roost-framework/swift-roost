@@ -3,15 +3,13 @@
 import PackageDescription
 import Foundation
 
-// This in-repository example uses its containing framework checkout, including
-// when an editor evaluates the manifest without the helper's environment.
-let checkout = URL(fileURLWithPath: #filePath)
-    .deletingLastPathComponent().deletingLastPathComponent().deletingLastPathComponent()
+// Published packages are the default. Contributors can opt into local sources.
 let ecosystem = ProcessInfo.processInfo.environment["ROOST_ECOSYSTEM_PATH"]
 let frameworkPath = ProcessInfo.processInfo.environment["ROOST_FRAMEWORK_PATH"]
     ?? ecosystem.map { "\($0)/Roost" }
-    ?? checkout.path
-let frameworkDependency: Package.Dependency = .package(name: "swift-roost", path: frameworkPath)
+let frameworkDependency: Package.Dependency = frameworkPath.map {
+    .package(name: "swift-roost", path: $0)
+} ?? .package(url: "https://github.com/Maartz/swift-roost", from: "2.0.0")
 let eswPath = ProcessInfo.processInfo.environment["ROOST_ESW_PATH"]
     ?? ecosystem.map { "\($0)/esw" }
 let eswDependency: Package.Dependency = eswPath.map {

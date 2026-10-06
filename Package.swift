@@ -26,7 +26,7 @@ let package = Package(
         .executable(name: "roost", targets: ["RoostCLI"]),
     ],
     dependencies: [
-        ecosystem("Spectro", from: "2.1.0"),
+        ecosystem("Spectro", from: "2.0.0"),
         ecosystem("Nexus", from: "2.0.0"),
         ecosystem("ESW", from: "1.5.0"),
         .package(
