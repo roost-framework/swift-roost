@@ -1,0 +1,60 @@
+name: Roost website
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "website/**"
+      - ".github/workflows/pages.yml"
+  pull_request:
+    paths:
+      - "website/**"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - name: Check JavaScript and local links
+        run: |
+          node --check website/script.js
+          node --check website/playground/app.mjs
+          node --check website/playground/examples.mjs
+          node --test website/playground/examples.test.mjs
+          python3 website/check.py
+
+  deploy:
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    needs: check
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/configure-pages@v5
+      - name: Prepare static files
+        run: |
+          mkdir -p _site/playground
+          cp website/index.html website/404.html website/playground.html website/style.css website/playground.css website/script.js website/robots.txt website/sitemap.xml website/.nojekyll _site/
+          cp website/playground/app.mjs website/playground/examples.mjs _site/playground/
+          cp -R website/assets _site/assets
+      - uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+      - name: Deploy website
+        id: deployment
+        uses: actions/deploy-pages@v4

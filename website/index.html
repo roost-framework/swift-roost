@@ -1,0 +1,749 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f0f4fa" />
+    <meta
+      name="description"
+      content="Roost brings a little structure to server-side Swift. Phoenix-inspired conventions, typed contexts, and compiled HTML. Built on Nexus, Spectro, and ESW."
+    />
+    <title>Roost. — A good home for your Swift app.</title>
+    <link rel="canonical" href="https://maartz.github.io/swift-roost/" />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Roost. — A good home for your Swift app."
+    />
+    <meta
+      property="og:description"
+      content="Less wiring. More building. A web framework for Swift, inspired by Phoenix."
+    />
+    <meta property="og:url" content="https://maartz.github.io/swift-roost/" />
+    <meta
+      property="og:image"
+      content="https://maartz.github.io/swift-roost/assets/roost-mark.png"
+    />
+    <meta property="og:image:alt" content="The Roost falcon in warm orange" />
+    <meta name="twitter:card" content="summary" />
+    <link rel="icon" type="image/png" href="assets/roost-mark.png" />
+    <link
+      rel="preload"
+      href="assets/fonts/manrope.ttf"
+      as="font"
+      type="font/ttf"
+      crossorigin
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">Skip to content</a>
+    <header class="site-header wrap">
+      <a class="brand" href="./" aria-label="Roost home"
+        ><img src="assets/roost-mark.png" width="42" height="42" alt="" /><span
+          >roost<span class="orange">.</span></span
+        ></a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#framework">The framework</a>
+        <a href="#workflow">The workflow</a>
+        <a href="#example">The example</a>
+        <a class="nav-playground" href="playground.html">Playground</a>
+        <a class="nav-github" href="https://github.com/Maartz/swift-roost"
+          >GitHub <span aria-hidden="true">↗</span></a
+        >
+      </nav>
+    </header>
+
+    <main id="main">
+      <section class="hero wrap" aria-labelledby="hero-title">
+        <div class="hero-copy">
+          <a class="development" href="#status"
+            ><span class="status-dot" aria-hidden="true"></span> Taking shape,
+            out in the open <span aria-hidden="true">↗</span></a
+          >
+          <h1 id="hero-title">
+            Less wiring.<br />More building<span class="orange">.</span>
+          </h1>
+          <p class="hero-description">A good home for your next Swift app.</p>
+          <p class="hero-detail">
+            Phoenix-inspired structure. Swift from route to response. Roost
+            brings the pieces together, so you can get on with your idea.
+          </p>
+          <div class="hero-actions">
+            <a class="button" href="playground.html"
+              >Open the playground <span aria-hidden="true">↗</span></a
+            >
+            <a class="text-link" href="https://github.com/Maartz/swift-roost"
+              >Explore the source <span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <p class="hero-note">Built on Nexus, Spectro, and ESW.</p>
+        </div>
+
+        <div class="hello-window code-window">
+          <div class="window-bar">
+            <span
+              ><span class="file-dot" aria-hidden="true"></span> App.swift</span
+            ><button
+              class="copy-button"
+              data-copy="hello-code"
+              hidden
+              aria-label="Copy Hello Roost Swift example"
+            >
+              Copy <span aria-hidden="true">↗</span>
+            </button>
+          </div>
+          <pre
+            tabindex="0"
+            aria-label="A minimal Roost application"
+          ><code id="hello-code"><span class="syn-key">import</span> Roost
+
+<span class="syn-attribute">@main</span>
+<span class="syn-key">struct</span> <span class="syn-type">Hello</span>: <span class="syn-type">RoostApp</span> {
+    <span class="syn-attribute">@RouteBuilder</span>
+    <span class="syn-key">var</span> routes: [<span class="syn-type">Route</span>] {
+        <span class="syn-call">GET</span>(<span class="syn-string">"/"</span>) { conn <span class="syn-key">in</span>
+            conn.<span class="syn-call">text</span>(<span class="syn-string">"Hello, Roost."</span>)
+        }
+    }
+}</code></pre>
+          <div class="response-line">
+            <span>GET /</span><span class="response-status">200 OK</span>
+          </div>
+          <div class="hello-result">
+            <img
+              src="assets/roost-mark.png"
+              width="42"
+              height="42"
+              alt=""
+            /><span>Hello, Roost<span class="orange">.</span></span>
+          </div>
+          <p class="window-caption">One route. A place to begin.</p>
+        </div>
+      </section>
+
+      <section class="stack-strip wrap" aria-label="The Roost stack">
+        <p class="stack-intro">
+          Good company.<br /><strong>One Swift stack.</strong>
+        </p>
+        <a href="https://github.com/Spectro-ORM/Nexus"
+          ><span class="stack-name"
+            >Nexus <span aria-hidden="true">↗</span></span
+          ><span class="stack-detail"
+            >HTTP &amp; routing <span class="version">2.0</span></span
+          ></a
+        >
+        <a href="https://github.com/Spectro-ORM/Spectro"
+          ><span class="stack-name"
+            >Spectro <span aria-hidden="true">↗</span></span
+          ><span class="stack-detail"
+            >PostgreSQL &amp; migrations <span class="version">2.0</span></span
+          ></a
+        >
+        <a href="https://github.com/Spectro-ORM/ESW"
+          ><span class="stack-name">ESW <span aria-hidden="true">↗</span></span
+          ><span class="stack-detail">HTML, compiled to Swift</span></a
+        >
+      </section>
+
+      <section
+        id="framework"
+        class="framework-section wrap section-space"
+        aria-labelledby="framework-title"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">A LITTLE STRUCTURE GOES A LONG WAY</p>
+          <h2 id="framework-title">
+            Everything has<br />a place<span class="orange">.</span>
+          </h2>
+        </div>
+        <div class="framework-content">
+          <div class="principles">
+            <article>
+              <h3>Your logic, in a context.</h3>
+              <p>
+                Keep business operations together. Typed models and
+                repository-backed contexts give your HTML pages and JSON API the
+                same source of truth.
+              </p>
+            </article>
+            <article>
+              <h3>The browser belongs here.</h3>
+              <p>
+                Sessions, forms, CSRF protection, and flash messages. Validation
+                that keeps what someone typed. The details a web app needs,
+                connected.
+              </p>
+            </article>
+            <article>
+              <h3>A shorter path to confidence.</h3>
+              <p>
+                Test the application pipeline in process. Keep cookies between
+                requests and inject a transaction repository to isolate database
+                tests.
+              </p>
+            </article>
+          </div>
+          <div
+            class="project-tree"
+            aria-label="Generated application structure"
+          >
+            <div class="tree-root">
+              <span aria-hidden="true">⌁</span> YourApp<span class="orange"
+                >/</span
+              >
+            </div>
+            <div class="tree-branch">
+              <span>Sources/YourApp/</span>
+              <dl>
+                <div>
+                  <dt>App.swift</dt>
+                  <dd>The way in</dd>
+                </div>
+                <div>
+                  <dt>Contexts/</dt>
+                  <dd>Your domain</dd>
+                </div>
+                <div>
+                  <dt>Models/</dt>
+                  <dd>Typed data</dd>
+                </div>
+                <div>
+                  <dt>Routes/</dt>
+                  <dd>HTML &amp; JSON</dd>
+                </div>
+                <div>
+                  <dt>Views/</dt>
+                  <dd>Compiled templates</dd>
+                </div>
+              </dl>
+            </div>
+            <div class="tree-last">
+              <span>Migrations/</span><span>Schema, with history</span>
+            </div>
+            <div class="tree-last">
+              <span>Tests/</span><span>Room to experiment</span>
+            </div>
+            <p class="tree-caption">
+              Familiar if you know Phoenix.<br />Native to the way you write
+              Swift.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="workflow"
+        class="workflow-section section-space"
+        aria-labelledby="workflow-title"
+      >
+        <div class="wrap">
+          <div class="section-heading heading-row">
+            <div>
+              <p class="eyebrow">FROM THE FIRST ROUTE TO THE REAL THING</p>
+              <h2 id="workflow-title">
+                Start small.<br />Keep going<span class="orange">.</span>
+              </h2>
+            </div>
+            <p>Generate the connections. Write the parts that make it yours.</p>
+          </div>
+          <div class="workflow-grid">
+            <div class="workflow-copy">
+              <h3>A reading list, in a few commands.</h3>
+              <p>
+                An app, authentication, then an owner-scoped resource. The
+                generators create models, contexts, migrations, routes,
+                templates, and input tests together.
+              </p>
+              <p>
+                The reading-list example adds its own design, filters, and a
+                “mark as read” action.
+              </p>
+              <a class="text-link" href="#example"
+                >Meet the example <span aria-hidden="true">↓</span></a
+              >
+            </div>
+            <div class="code-window terminal-window">
+              <div class="window-bar">
+                <span
+                  ><span class="file-dot" aria-hidden="true"></span>
+                  Terminal</span
+                ><button
+                  class="copy-button"
+                  data-copy="generator-code"
+                  hidden
+                  aria-label="Copy generator commands"
+                >
+                  Copy <span aria-hidden="true">↗</span>
+                </button>
+              </div>
+              <pre
+                tabindex="0"
+                aria-label="Generate a reading-list app"
+              ><code id="generator-code"><span class="syn-comment"># Give your idea a home</span>
+roost new RoostExample
+cd RoostExample
+
+<span class="syn-comment"># Add sign up, sign in, and sign out</span>
+roost gen auth
+
+<span class="syn-comment"># One context. HTML and JSON.</span>
+roost gen resource Bookmark \
+  title:string url:string \
+  note:text read:bool \
+  --both --scope user_id</code></pre>
+            </div>
+          </div>
+          <p class="api-note">
+            Development API preview. The renamed Roost release and ESW template
+            updates are still being prepared.
+            <a href="#status"
+              >Current status <span aria-hidden="true">↗</span></a
+            >
+          </p>
+          <div class="code-tour">
+            <div class="tour-tabs" aria-label="Explore the application code">
+              <a
+                class="tour-tab"
+                href="#context-panel"
+                data-panel="context-panel"
+                ><span>01</span> The context</a
+              >
+              <a
+                class="tour-tab"
+                href="#response-panel"
+                data-panel="response-panel"
+                ><span>02</span> The response</a
+              >
+              <a class="tour-tab" href="#test-panel" data-panel="test-panel"
+                ><span>03</span> The test</a
+              >
+            </div>
+            <section id="context-panel" class="tour-panel">
+              <div class="tour-explanation">
+                <h3>Ownership travels with the query.</h3>
+                <p>
+                  The context takes a repository and an authenticated scope.
+                  Reads stay inside the current user’s collection.
+                </p>
+                <span class="source-label"
+                  >BookmarksContext.swift · excerpt</span
+                >
+              </div>
+              <div class="tour-code">
+                <button
+                  class="copy-button light-copy"
+                  data-copy="context-code"
+                  hidden
+                  aria-label="Copy context example"
+                >
+                  Copy
+                </button>
+                <pre
+                  tabindex="0"
+                ><code id="context-code"><span class="light-key">func</span> listBookmarks(scopeId: UUID) <span class="light-key">async throws</span> -&gt; [Bookmark] {
+    <span class="light-key">try await</span> repo.query(Bookmark.self)
+        .where({ $0.userId == scopeId })
+        .orderBy(\.createdAt, .asc)
+        .all()
+}</code></pre>
+              </div>
+            </section>
+            <section id="response-panel" class="tour-panel">
+              <div class="tour-explanation">
+                <h3>A change, a message, a redirect.</h3>
+                <p>
+                  Update the reading state, leave a one-time flash message, and
+                  send the reader back to their queue.
+                </p>
+                <span class="source-label"
+                  >BookmarksRoutes.swift · excerpt</span
+                >
+              </div>
+              <div class="tour-code">
+                <button
+                  class="copy-button light-copy"
+                  data-copy="response-code"
+                  hidden
+                  aria-label="Copy response example"
+                >
+                  Copy
+                </button>
+                <pre
+                  tabindex="0"
+                ><code id="response-code"><span class="light-key">try await</span> BookmarksContext(repo: conn.repo())
+    .setRead(id: id, read: read, scopeId: scopeId)
+
+<span class="light-key">return</span> conn
+    .putFlash(.info, <span class="light-string">"Moved to finished"</span>)
+    .redirect(to: <span class="light-string">"/bookmarks"</span>)</code></pre>
+              </div>
+            </section>
+            <section id="test-panel" class="tour-panel">
+              <div class="tour-explanation">
+                <h3>The same pipeline. A smaller loop.</h3>
+                <p>
+                  Exercise your app without opening a port. Swift Testing and
+                  RoostTest keep a simple route test simple.
+                </p>
+                <span class="source-label">HelloTests.swift</span>
+              </div>
+              <div class="tour-code">
+                <button
+                  class="copy-button light-copy"
+                  data-copy="test-code"
+                  hidden
+                  aria-label="Copy test example"
+                >
+                  Copy
+                </button>
+                <pre
+                  tabindex="0"
+                ><code id="test-code"><span class="light-key">import</span> Testing
+<span class="light-key">import</span> RoostTest
+
+@Test <span class="light-key">func</span> saysHello() <span class="light-key">async throws</span> {
+    <span class="light-key">let</span> app = <span class="light-key">try await</span> TestApp(Hello.self)
+    <span class="light-key">let</span> response = <span class="light-key">try await</span> app.get(<span class="light-string">"/"</span>)
+
+    #expect(response.status == .ok)
+    #expect(response.text == <span class="light-string">"Hello, Roost."</span>)
+}</code></pre>
+              </div>
+            </section>
+          </div>
+        </div>
+      </section>
+
+      <section
+        id="example"
+        class="example-section wrap section-space"
+        aria-labelledby="example-title"
+      >
+        <div class="section-heading heading-row">
+          <div>
+            <p class="eyebrow">A SMALL APP WITH A LOT CONNECTED</p>
+            <h2 id="example-title">
+              Made with Roost<span class="orange">.</span>
+            </h2>
+          </div>
+          <p>A quiet place for things you want to come back to.</p>
+        </div>
+        <div class="example-grid">
+          <div class="demo-browser">
+            <div class="demo-browser-bar">
+              <span class="browser-lights" aria-hidden="true"
+                ><i></i><i></i><i></i></span
+              ><span>roost / reading queue</span
+              ><span class="preview-label">Interactive preview</span>
+            </div>
+            <div class="demo-app">
+              <div class="demo-nav">
+                <span class="brand demo-brand"
+                  ><img
+                    src="assets/roost-mark.png"
+                    width="31"
+                    height="31"
+                    alt=""
+                  /><span>roost<span class="orange">.</span></span></span
+                ><span class="demo-reader">A little space to read.</span>
+              </div>
+              <div class="demo-heading">
+                <div>
+                  <p class="eyebrow">COLLECT YOUR CURIOSITY</p>
+                  <h3>The reading queue<span class="orange">.</span></h3>
+                </div>
+                <button id="add-link" class="button small-button" hidden>
+                  + Save a link
+                </button>
+              </div>
+              <div class="demo-filters" aria-label="Filter reading list">
+                <button
+                  type="button"
+                  data-filter="unread"
+                  aria-pressed="true"
+                  disabled
+                >
+                  To read <span data-count="unread">3</span></button
+                ><button
+                  type="button"
+                  data-filter="read"
+                  aria-pressed="false"
+                  disabled
+                >
+                  Finished <span data-count="read">1</span></button
+                ><button
+                  type="button"
+                  data-filter="all"
+                  aria-pressed="false"
+                  disabled
+                >
+                  All <span data-count="all">4</span>
+                </button>
+              </div>
+              <ul id="reading-list" class="reading-list">
+                <li>
+                  <span class="reading-circle" aria-hidden="true"></span>
+                  <div>
+                    <span class="reading-title">A tour of Swift</span
+                    ><span class="reading-domain">docs.swift.org</span>
+                  </div>
+                  <span class="reading-arrow" aria-hidden="true">↗</span>
+                </li>
+                <li>
+                  <span class="reading-circle" aria-hidden="true"></span>
+                  <div>
+                    <span class="reading-title">Designing with contexts</span
+                    ><span class="reading-domain">hexdocs.pm</span>
+                  </div>
+                  <span class="reading-arrow" aria-hidden="true">↗</span>
+                </li>
+                <li>
+                  <span class="reading-circle" aria-hidden="true"></span>
+                  <div>
+                    <span class="reading-title">The ESW template compiler</span
+                    ><span class="reading-domain">github.com</span>
+                  </div>
+                  <span class="reading-arrow" aria-hidden="true">↗</span>
+                </li>
+              </ul>
+              <p
+                id="queue-status"
+                class="queue-status"
+                role="status"
+                aria-live="polite"
+              >
+                Three good things for later.
+              </p>
+              <noscript
+                ><p class="demo-disclosure">
+                  Enable JavaScript to try the reading-list preview.
+                </p></noscript
+              >
+            </div>
+          </div>
+          <div class="example-notes">
+            <h3>
+              A real application.<br />
+              Small enough to follow.
+            </h3>
+            <p>
+              The Swift example connects authentication, owner-scoped bookmarks,
+              ESW pages, a JSON API, and Spectro migrations.
+            </p>
+            <dl>
+              <div>
+                <dt>One action</dt>
+                <dd>
+                  Follow a form through its route, context, database, and
+                  response.
+                </dd>
+              </div>
+              <div>
+                <dt>One source of truth</dt>
+                <dd>
+                  Browser pages and API endpoints share the same domain
+                  operations.
+                </dd>
+              </div>
+              <div>
+                <dt>Your own design</dt>
+                <dd>Generated structure leaves the look and feel to you.</dd>
+              </div>
+            </dl>
+            <p class="demo-disclosure">
+              This browser-only preview lets you save and finish links. It
+              resets on reload. The Swift app itself runs on PostgreSQL.
+            </p>
+            <button id="reset-demo" class="reset-button" hidden>
+              Reset preview <span aria-hidden="true">↺</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section
+        class="playground-invitation wrap"
+        aria-labelledby="playground-invitation-title"
+      >
+        <div>
+          <p class="eyebrow">ROOST PLAYGROUND / BROWSER EDITION</p>
+          <h2 id="playground-invitation-title">
+            A little Swift, live<span class="orange">.</span>
+          </h2>
+          <p>
+            A counter, a greeting, a change of state. Edit a guided example and
+            see the result, right in your browser.
+          </p>
+        </div>
+        <div>
+          <a class="button" href="playground.html"
+            >Make a small change <span aria-hidden="true">↗</span></a
+          >
+          <p>Runs locally in your browser. No Swift compiler.</p>
+        </div>
+      </section>
+
+      <section
+        id="status"
+        class="status-section wrap section-space"
+        aria-labelledby="status-title"
+      >
+        <div class="section-heading">
+          <p class="eyebrow">BUILT IN THE OPEN</p>
+          <h2 id="status-title">
+            A clear starting point<span class="orange">.</span>
+          </h2>
+          <p class="status-intro">
+            Roost is in active development. Here’s where things stand.
+          </p>
+        </div>
+        <div class="status-grid">
+          <div class="status-lead">
+            <img
+              src="assets/roost-mark.png"
+              width="96"
+              height="96"
+              alt="The Roost falcon"
+              loading="lazy"
+            />
+            <h3>A Phoenix-inspired framework.<br />A Swift-shaped future.</h3>
+            <p>
+              The goal is a connected development experience for server-side
+              Swift: from the first route to an app you can understand and keep
+              growing.
+            </p>
+            <a class="text-link" href="https://github.com/Maartz/swift-roost"
+              >Follow development on GitHub
+              <span aria-hidden="true">↗</span></a
+            >
+          </div>
+          <div class="status-questions">
+            <details open>
+              <summary>
+                What works today?<span aria-hidden="true">+</span>
+              </summary>
+              <p>
+                The current development checkout supports generated
+                authentication, scoped CRUD, HTML and JSON routes, form
+                validation, Spectro migrations, and in-process tests. The
+                reading-list workflow has been exercised against real
+                PostgreSQL.
+              </p>
+            </details>
+            <details>
+              <summary>
+                How do I get started?<span aria-hidden="true">+</span>
+              </summary>
+              <p>
+                Follow the repository for the renamed Roost release. The
+                examples on this site reflect the current development API; the
+                public release still uses the earlier Peregrine name. The full
+                generator workflow also needs ESW template fixes that are not
+                yet released.
+              </p>
+              <p>
+                Development prerequisites are Swift 6.3+, macOS 14+ or Linux,
+                and PostgreSQL for database-backed apps. Nexus and Spectro 2.0.0
+                are supported in the development checkout.
+              </p>
+              <a
+                class="text-link"
+                href="https://github.com/Maartz/swift-roost/releases"
+                >View releases <span aria-hidden="true">↗</span></a
+              >
+            </details>
+            <details>
+              <summary>
+                How close is it to Phoenix?<span aria-hidden="true">+</span>
+              </summary>
+              <p>
+                Phoenix inspires the application structure, contexts,
+                generators, and browser conventions. Roost uses Swift’s type
+                system and package tooling. The local Roost Playground explores
+                interactive apps through ESW Live. It is a development
+                integration, and Roost does not claim feature parity with
+                Phoenix.
+              </p>
+            </details>
+            <details>
+              <summary>
+                What’s still taking shape?<span aria-hidden="true">+</span>
+              </summary>
+              <p>
+                Channels, SMTP delivery, and the PostgreSQL job store still have
+                unfinished integration. TLS and HTTP/2 settings are not fully
+                connected to application startup. The example uses in-memory
+                sessions; persistent deployments need a shared session store.
+              </p>
+            </details>
+          </div>
+        </div>
+      </section>
+
+      <section class="closing wrap" aria-label="Explore Roost on GitHub">
+        <p>Give your next idea<br />a good home<span class="orange">.</span></p>
+        <a class="button" href="https://github.com/Maartz/swift-roost"
+          >Come build with Roost <span aria-hidden="true">↗</span></a
+        >
+      </section>
+    </main>
+    <footer class="site-footer wrap">
+      <a class="brand" href="./" aria-label="Roost home"
+        ><span>roost<span class="orange">.</span></span></a
+      >
+      <p>Thoughtfully connected. Written in Swift.</p>
+      <div>
+        <a href="https://github.com/Maartz/swift-roost">GitHub ↗</a
+        ><a href="playground.html">Playground</a
+        ><a href="#status">Project status</a><a href="#main">Back to top ↑</a>
+      </div>
+    </footer>
+
+    <dialog id="link-dialog" aria-labelledby="dialog-title">
+      <form id="link-form">
+        <div class="dialog-top">
+          <p class="eyebrow">A GOOD THING FOR LATER</p>
+          <button
+            type="button"
+            class="dialog-close"
+            aria-label="Close save link dialog"
+          >
+            ×
+          </button>
+        </div>
+        <h2 id="dialog-title">Save a link<span class="orange">.</span></h2>
+        <p>This preview keeps links only until you reload.</p>
+        <label for="link-title">Title</label
+        ><input
+          id="link-title"
+          name="title"
+          required
+          maxlength="100"
+          placeholder="Something worth coming back to"
+          autocomplete="off"
+        /><label for="link-url">URL</label
+        ><input
+          id="link-url"
+          name="url"
+          type="url"
+          required
+          placeholder="https://"
+          autocomplete="off"
+        />
+        <p id="form-error" class="form-error" role="alert"></p>
+        <button class="button" type="submit">
+          Save to reading queue <span aria-hidden="true">↗</span>
+        </button>
+      </form>
+    </dialog>
+    <p
+      id="site-announcement"
+      class="sr-only"
+      role="status"
+      aria-live="polite"
+    ></p>
+  </body>
+</html>

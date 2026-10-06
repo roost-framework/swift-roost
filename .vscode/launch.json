@@ -1,0 +1,24 @@
+{
+    "configurations": [
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:swift-peregrine}",
+            "name": "Debug peregrine",
+            "target": "peregrine",
+            "configuration": "debug",
+            "preLaunchTask": "swift: Build Debug peregrine"
+        },
+        {
+            "type": "swift",
+            "request": "launch",
+            "args": [],
+            "cwd": "${workspaceFolder:swift-peregrine}",
+            "name": "Release peregrine",
+            "target": "peregrine",
+            "configuration": "release",
+            "preLaunchTask": "swift: Build Release peregrine"
+        }
+    ]
+}
