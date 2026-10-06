@@ -4,18 +4,17 @@ Create connected application files, then make the domain code your own.
 
 ## Overview
 
-Build the CLI as shown in <doc:GettingStarted>. The commands below use `"$ROOST_CLI"` so no global
-installation is required. If the binary is on your `PATH`, use `roost` directly.
+Install the CLI as shown in <doc:GettingStarted>.
 
 ### Generate a reading room
 
-From the directory beside the framework:
+From any directory:
 
 ```sh
-"$ROOST_CLI" new ReadingRoom
+roost new ReadingRoom
 cd ReadingRoom
-"$ROOST_CLI" gen auth
-"$ROOST_CLI" gen resource Bookmark title:string url:string read:bool --both --scope user_id
+roost gen auth
+roost gen resource Bookmark title:string url:string read:bool --both --scope user_id
 ```
 
 Use an app name distinct from `Roost`, `RoostTest`, and `RoostCLI`. Those names
@@ -40,10 +39,10 @@ unset DB_NAME
 PGUSER="$DB_USER" PGPASSWORD="$DB_PASSWORD" PGHOST="$DB_HOST" PGPORT="$DB_PORT" createdb reading_room_dev
 PGUSER="$DB_USER" PGPASSWORD="$DB_PASSWORD" PGHOST="$DB_HOST" PGPORT="$DB_PORT" createdb reading_room_test
 
-"$ROOST_CLI" migrate up
-ROOST_ENV=test "$ROOST_CLI" migrate up
+roost migrate up
+ROOST_ENV=test roost migrate up
 swift test
-"$ROOST_CLI" server --port 8080
+roost server --port 8080
 ```
 
 Use your own local credentials if they differ. The `DB_NAME` override is unset
@@ -96,6 +95,6 @@ Its `./dev` and `./check` helpers own local setup and disposable test databases.
 | `build` | Build the app and its configured CSS assets. |
 | `gen dockerfile` | Generate the Linux container build and runtime recipe. |
 
-Run `"$ROOST_CLI" <command> --help` for the command's supported options.
+Run `roost <command> --help` for the command's supported options.
 There are no database-create, database-drop, or seed CLI commands in this
 version; create databases with PostgreSQL tools or an application helper.

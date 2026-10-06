@@ -35,7 +35,7 @@ persistence model.
 After the CLI setup in <doc:GettingStarted>, run this from an app root:
 
 ```sh
-"$ROOST_CLI" gen auth
+roost gen auth
 ```
 
 The generator adds user and token models, migrations, credential handling,

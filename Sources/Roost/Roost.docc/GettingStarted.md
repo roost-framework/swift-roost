@@ -12,32 +12,40 @@ at build time and `zlib1g` at runtime.
 Generated apps resolve released packages directly. No companion source
 checkouts or dependency overrides are required.
 
-### Build the CLI
+### Install the CLI
 
-Clone the release and build its CLI:
+Install the CLI with [Mint](https://github.com/yonaskolb/Mint):
 
 ```sh
-git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git Roost
-cd Roost
-unset ROOST_FRAMEWORK_PATH ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
-swift build -c release --product roost
-export ROOST_CLI="$(swift build -c release --show-bin-path)/roost"
-"$ROOST_CLI" --version
+brew install mint
+mint install roost-framework/swift-roost@2.0.1
+roost --version
 ```
 
-Keep `ROOST_CLI` set in this shell. To use `roost` directly, copy the executable
-to a directory on your `PATH`. Leave the dependency overrides unset to select
-published versions of Roost and its companion packages.
+Mint builds the release from source and links `roost` into `~/.mint/bin`; add
+that directory to your `PATH`. The first install resolves the framework's full
+package graph, so it takes a few minutes. Leave `ROOST_FRAMEWORK_PATH`,
+`ROOST_ECOSYSTEM_PATH`, and `ROOST_ESW_PATH` unset to select published versions
+of Roost and its companion packages.
+
+Without Mint, for example on Linux, build from a checkout:
+
+```sh
+git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git
+cd swift-roost
+swift build -c release --product roost
+```
+
+Then copy `.build/release/roost` to a directory on your `PATH`.
 
 ### Create an application
 
-Create the app beside the framework checkout:
+Create the app:
 
 ```sh
-cd ..
-"$ROOST_CLI" new HelloApp --no-db --no-esw
+roost new HelloApp --no-db --no-esw
 cd HelloApp
-"$ROOST_CLI" server --port 8080
+roost server --port 8080
 ```
 
 Open [localhost:8080](http://localhost:8080). The generated app returns a JSON

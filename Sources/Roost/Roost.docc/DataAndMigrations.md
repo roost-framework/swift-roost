@@ -96,7 +96,7 @@ DROP TABLE "reading_tags";
 Create an empty migration with:
 
 ```sh
-"$ROOST_CLI" gen migration create_reading_tags
+roost gen migration create_reading_tags
 ```
 
 Fill in both sections of the generated file. Spectro applies each migration
@@ -113,16 +113,16 @@ Keep the IDs and SQL history of migrations already applied to your database.
 From the generated app root:
 
 ```sh
-"$ROOST_CLI" migrate up
-"$ROOST_CLI" migrate status
-ROOST_ENV=test "$ROOST_CLI" migrate up
+roost migrate up
+roost migrate status
+ROOST_ENV=test roost migrate up
 ```
 
 The CLI invokes the app's migration command, so the CLI and server use the same
 database configuration. Create the development and test databases first.
 Starting a server does not apply migrations automatically.
 
-For a disposable development database, `"$ROOST_CLI" migrate down` rolls back
+For a disposable development database, `roost migrate down` rolls back
 the latest migration. It executes the file's down section, which may remove
 data; inspect that SQL before using it.
 

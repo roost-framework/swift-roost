@@ -126,22 +126,33 @@ cd examples/Roost
 
 Its README walks through the generated code and the application-specific additions.
 
-### 1. Build the CLI
+### 1. Install the CLI
 
 You need Swift **6.3 or later**, macOS 14+ or Linux, and PostgreSQL with its client
 tools for the database-backed example. On Debian/Ubuntu, install `zlib1g-dev` for
 Nexus. No Node.js toolchain is needed for the default Pico CSS setup.
 
-Clone the release and build its CLI:
+Install the CLI with [Mint](https://github.com/yonaskolb/Mint):
 
 ```sh
-git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git Roost
-cd Roost
-unset ROOST_FRAMEWORK_PATH ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
-swift build -c release --product roost
-export ROOST_CLI="$(swift build -c release --show-bin-path)/roost"
-"$ROOST_CLI" --version
+brew install mint
+mint install roost-framework/swift-roost@2.0.1
+roost --version
 ```
+
+Mint builds the release from source and links `roost` into `~/.mint/bin`; add
+that directory to your `PATH`. The first install resolves the framework's full
+package graph, so it takes a few minutes.
+
+Without Mint, for example on Linux, build from a checkout:
+
+```sh
+git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git
+cd swift-roost
+swift build -c release --product roost
+```
+
+Then copy `.build/release/roost` to a directory on your `PATH`.
 
 Generated apps download Roost 2.0.1, Spectro 2.x (from 2.0.0), Nexus 2.0.0,
 and ESW 1.5.0 through SwiftPM. No companion source checkouts or dependency overrides are needed.
@@ -149,22 +160,18 @@ Spectro's `from: "2.0.0"` requirement accepts `2.0.0..<3.0.0`, including 2.1.0
 when published. Existing apps retain their resolved version until you run
 `swift package update spectro`.
 
-Keep `ROOST_CLI` set for the commands below, or copy that executable to a directory
-on your `PATH` and use `roost` directly.
-
 Framework contributors can optionally set `ROOST_FRAMEWORK_PATH` to a checkout.
 `ROOST_ECOSYSTEM_PATH` selects the parent of all four repositories; `ROOST_ESW_PATH`
-overrides ESW alone. Leave these unset when trying the published release.
+overrides ESW alone. Leave these unset when installing or trying the published release.
 
 ### 2. Start with one route
 
 For a first app that needs no database or templates:
 
 ```sh
-cd ..
-"$ROOST_CLI" new HelloApp --no-db --no-esw
+roost new HelloApp --no-db --no-esw
 cd HelloApp
-"$ROOST_CLI" server --port 8080
+roost server --port 8080
 ```
 
 Open [localhost:8080](http://localhost:8080). Edit
@@ -173,16 +180,15 @@ to run with `swift test`. Stop the server with Ctrl-C.
 
 ### 3. Generate an authenticated app
 
-For an app with data, return to the directory beside the framework checkouts
-and generate a separate project. From `HelloApp/`:
+For an app with data, generate a separate project. From `HelloApp/`:
 
 ```sh
 cd ..
-"$ROOST_CLI" new TodoApp
+roost new TodoApp
 cd TodoApp
 
-"$ROOST_CLI" gen auth
-"$ROOST_CLI" gen resource Todo title:string done:bool --both --scope user_id
+roost gen auth
+roost gen resource Todo title:string done:bool --both --scope user_id
 ```
 
 This creates HTML pages and a JSON API backed by one context. Ownership comes
@@ -203,10 +209,10 @@ export DB_PORT=5432
 PGUSER="$DB_USER" PGPASSWORD="$DB_PASSWORD" PGHOST="$DB_HOST" PGPORT="$DB_PORT" createdb todo_app_dev
 PGUSER="$DB_USER" PGPASSWORD="$DB_PASSWORD" PGHOST="$DB_HOST" PGPORT="$DB_PORT" createdb todo_app_test
 
-"$ROOST_CLI" migrate
-ROOST_ENV=test "$ROOST_CLI" migrate
+roost migrate
+ROOST_ENV=test roost migrate
 swift test
-"$ROOST_CLI" server --port 8080
+roost server --port 8080
 ```
 
 Open [localhost:8080/auth/register](http://localhost:8080/auth/register), create an
@@ -351,8 +357,7 @@ for lifecycle and storage semantics.
 
 ## CLI reference
 
-Use `"$ROOST_CLI"` in place of `roost` below if you have not added the
-binary to your `PATH`. Run `roost <command> --help` for options.
+Run `roost <command> --help` for options.
 
 | Command                                                       | Purpose                                                                         |
 | ------------------------------------------------------------- | ------------------------------------------------------------------------------- |

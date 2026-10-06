@@ -12,17 +12,18 @@ Roost requires Spectro 2.x (from 2.0.0) and Nexus 2.0.0. On Debian/Ubuntu, insta
 building. The generated Dockerfile installs the build headers and runtime zlib
 package, and CI installs the headers too.
 
-## Build the CLI
+## Install the CLI
 
-Clone Roost 2.0.1 and build the CLI:
+Install Roost 2.0.1 with [Mint](https://github.com/yonaskolb/Mint) and add
+`~/.mint/bin` to your `PATH`:
 
 ```sh
-git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git Roost
-cd Roost
-unset ROOST_FRAMEWORK_PATH ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
-swift build -c release --product roost
-export ROOST_CLI="$(swift build -c release --show-bin-path)/roost"
+brew install mint
+mint install roost-framework/swift-roost@2.0.1
 ```
+
+Without Mint, build from a checkout as described in the
+[README](../README.md#1-install-the-cli).
 
 The generated application resolves Roost and its companions from their releases.
 Framework contributors can opt into local sources with `ROOST_FRAMEWORK_PATH`,
@@ -31,12 +32,11 @@ Framework contributors can opt into local sources with `ROOST_FRAMEWORK_PATH`,
 ## Generate and start
 
 ```sh
-cd ..
-"$ROOST_CLI" new TodoApp
+roost new TodoApp
 cd TodoApp
-"$ROOST_CLI" gen auth
-"$ROOST_CLI" gen resource Todo title:string done:bool --both --scope user_id
-"$ROOST_CLI" gen resource Note body:text
+roost gen auth
+roost gen resource Todo title:string done:bool --both --scope user_id
+roost gen resource Note body:text
 ```
 
 The generators register their routes and middleware in `App.swift`. They refuse
@@ -52,10 +52,10 @@ export DB_USER="$USER"
 export DB_PASSWORD=""
 createdb todo_app_dev
 createdb todo_app_test
-"$ROOST_CLI" migrate
-ROOST_ENV=test "$ROOST_CLI" migrate
+roost migrate
+ROOST_ENV=test roost migrate
 swift test
-"$ROOST_CLI" server --port 8080
+roost server --port 8080
 ```
 
 Visit `/auth/register`, then `/todos`. Register a second user in another browser
@@ -131,7 +131,7 @@ server and migrations therefore use the same `Database` configuration, including
 starting the server does not migrate a database automatically.
 
 ```sh
-"$ROOST_CLI" gen dockerfile
+roost gen dockerfile
 # After building a release, the compiled executable also supports:
 .build/release/TodoApp migrate status
 ```

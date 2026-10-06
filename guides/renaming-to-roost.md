@@ -39,7 +39,7 @@ For local development, from the framework checkout:
 unset ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
 export ROOST_FRAMEWORK_PATH="$PWD"
 swift build --product roost
-export ROOST_CLI="$(swift build --show-bin-path)/roost"
+export PATH="$(swift build --show-bin-path):$PATH"
 ```
 
 `ROOST_FRAMEWORK_PATH` allows an existing checkout to keep its directory name.
