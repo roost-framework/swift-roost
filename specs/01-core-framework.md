@@ -78,7 +78,7 @@ let package = Package(
         .library(name: "Roost", targets: ["Roost"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Spectro-ORM/Spectro", from: "1.0.0"),
+        .package(url: "https://github.com/roost-framework/Spectro", from: "1.0.0"),
         .package(url: "https://github.com/alembic-labs/swift-nexus", from: "0.1.0"),
         .package(url: "https://github.com/alembic-labs/swift-esw", from: "0.1.0"),
         .package(url: "https://github.com/hummingbird-project/hummingbird.git", from: "2.0.0"),

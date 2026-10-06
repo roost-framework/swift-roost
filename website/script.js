@@ -88,12 +88,12 @@ const initialLinks = [
   },
   {
     title: "The ESW template compiler",
-    url: "https://github.com/Spectro-ORM/ESW",
+    url: "https://github.com/roost-framework/ESW",
     read: false,
   },
   {
     title: "Meet Roost",
-    url: "https://github.com/Maartz/swift-roost",
+    url: "https://github.com/roost-framework/swift-roost",
     read: true,
   },
 ];

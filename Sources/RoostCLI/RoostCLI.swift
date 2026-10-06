@@ -2,7 +2,7 @@ import ArgumentParser
 
 @main
 struct RoostCLI: AsyncParsableCommand {
-    static let version = "2.0.0"
+    static let version = "2.0.1"
 
     static let configuration = CommandConfiguration(
         commandName: "roost",

@@ -14,10 +14,10 @@ package, and CI installs the headers too.
 
 ## Build the CLI
 
-Clone Roost 2.0.0 and build the CLI:
+Clone Roost 2.0.1 and build the CLI:
 
 ```sh
-git clone --branch 2.0.0 --depth 1 https://github.com/Maartz/swift-roost.git Roost
+git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git Roost
 cd Roost
 unset ROOST_FRAMEWORK_PATH ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
 swift build -c release --product roost

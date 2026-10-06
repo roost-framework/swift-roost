@@ -13,9 +13,9 @@ func seedDemo(repo: any Repo) async throws {
          "Revisit the language, one small example at a time.", false),
         ("Designing with contexts", "https://hexdocs.pm/phoenix/contexts.html",
          "A useful reference for keeping domain work out of route handlers.", false),
-        ("The ESW template compiler", "https://github.com/Spectro-ORM/ESW",
+        ("The ESW template compiler", "https://github.com/roost-framework/ESW",
          "HTML templates that become Swift functions at build time.", false),
-        ("Meet Roost", "https://github.com/Maartz/swift-roost",
+        ("Meet Roost", "https://github.com/roost-framework/swift-roost",
          "The framework underneath this little reading list.", true),
     ]
     for (title, url, note, read) in links {

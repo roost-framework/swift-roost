@@ -64,7 +64,7 @@ them. Preserve any additional SwiftPM resource bundles your application uses.
 
 `roost gen dockerfile` creates a Swift 6.3.3 build stage and matching slim
 runtime, installs Linux zlib dependencies, and copies the public assets and
-migrations. The default recipe resolves published Roost 2.0.0 and its companion
+migrations. The default recipe resolves published Roost 2.0.1 and its companion
 packages without additional framework checkouts in the build context.
 
 ### Understand server and storage boundaries

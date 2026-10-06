@@ -12,7 +12,7 @@ func ecosystem(_ name: String, from version: Version) -> Package.Dependency {
     if let root = ProcessInfo.processInfo.environment["ROOST_ECOSYSTEM_PATH"] {
         return .package(name: name.lowercased(), path: "\(root)/\(name == "ESW" ? "esw" : name)")
     }
-    return .package(url: "https://github.com/Spectro-ORM/\(name).git", from: version)
+    return .package(url: "https://github.com/roost-framework/\(name).git", from: version)
 }
 
 let package = Package(

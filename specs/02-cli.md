@@ -289,11 +289,11 @@ Distribute via Mint:
 
 ```
 # Mintfile
-Maartz/swift-roost
+roost-framework/swift-roost
 ```
 
 ```bash
-mint install Maartz/swift-roost
+mint install roost-framework/swift-roost
 ```
 
 ---

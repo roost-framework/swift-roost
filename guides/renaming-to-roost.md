@@ -21,7 +21,7 @@ APIs; the 1.x release tags keep their original Peregrine API.
 
 Update the SwiftPM dependency identity from `swift-peregrine` to `swift-roost`
 and product names to `Roost` and `RoostTest`. The repository is
-[`Maartz/swift-roost`](https://github.com/Maartz/swift-roost).
+[`roost-framework/swift-roost`](https://github.com/roost-framework/swift-roost).
 
 Do not name an application target `Roost`, `RoostTest`, or `RoostCLI`: those names
 belong to framework modules. The reading-list example still displays **roost.**,
@@ -44,7 +44,7 @@ export ROOST_CLI="$(swift build --show-bin-path)/roost"
 
 `ROOST_FRAMEWORK_PATH` allows an existing checkout to keep its directory name.
 When omitted, generated apps use `$ROOST_ECOSYSTEM_PATH/Roost` if that override
-is set, or the published Roost 2.0.0 package otherwise. The reading-list app also
+is set, or the published Roost 2.0.1 package otherwise. The reading-list app also
 uses published Roost by default; it no longer selects a local framework
 automatically. ESW 1.5.0, Spectro 2.x (from 2.0.0), and Nexus 2.0.0 resolve from published packages. Set
 `ROOST_ESW_PATH` only when you want to develop against a local ESW checkout.

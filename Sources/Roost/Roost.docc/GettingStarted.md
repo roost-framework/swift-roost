@@ -17,7 +17,7 @@ checkouts or dependency overrides are required.
 Clone the release and build its CLI:
 
 ```sh
-git clone --branch 2.0.0 --depth 1 https://github.com/Maartz/swift-roost.git Roost
+git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git Roost
 cd Roost
 unset ROOST_FRAMEWORK_PATH ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
 swift build -c release --product roost
@@ -102,6 +102,6 @@ in-process; it does not bind a network port.
 - Add JSON handlers and middleware with <doc:RoutingAndMiddleware>.
 - Add compiled HTML and request-aware forms with <doc:ViewsAndForms>.
 - Generate an authenticated app with <doc:CLIAndGenerators>.
-- Try [the browser playground](https://maartz.github.io/swift-roost/playground.html)
+- Try [the browser playground](https://roost-framework.github.io/swift-roost/playground.html)
   for a guided preview without installing Swift. That preview simulates its
   supported examples in JavaScript; it does not execute arbitrary Swift.

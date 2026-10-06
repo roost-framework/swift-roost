@@ -1,6 +1,6 @@
 # Roost website
 
-The public site at **https://maartz.github.io/swift-roost/**. Plain HTML, CSS,
+The public site at **https://roost-framework.github.io/swift-roost/**. Plain HTML, CSS,
 and JavaScript; no build step, package install, analytics, or external font service.
 
 ## Preview

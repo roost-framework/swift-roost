@@ -31,6 +31,6 @@
         <% } %>
         <%== content %>
     </main>
-    <footer class="site-footer"><span>Save something worth coming back to.</span><span>Made with <a href="https://github.com/Maartz/swift-roost">Roost</a></span></footer>
+    <footer class="site-footer"><span>Save something worth coming back to.</span><span>Made with <a href="https://github.com/roost-framework/swift-roost">Roost</a></span></footer>
 </body>
 </html>

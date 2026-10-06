@@ -4,8 +4,8 @@
   <p><strong>A good home for your Swift app.</strong></p>
   <p>A web framework inspired by Phoenix.<br>Built with Nexus, Spectro, and ESW.</p>
   <p>
-    <a href="https://maartz.github.io/swift-roost/">Website</a> ·
-    <a href="https://maartz.github.io/swift-roost/playground.html">Playground</a> ·
+    <a href="https://roost-framework.github.io/swift-roost/">Website</a> ·
+    <a href="https://roost-framework.github.io/swift-roost/playground.html">Playground</a> ·
     <a href="Documentation/README.md">Documentation</a> ·
     <a href="#quickstart">Quickstart</a> ·
     <a href="examples/Roost">Try the reading-list example</a> ·
@@ -87,7 +87,7 @@ these packages directly. Moving from Peregrine? Follow the
 
 ## Try it in the browser
 
-[Open the Roost Playground →](https://maartz.github.io/swift-roost/playground.html)
+[Open the Roost Playground →](https://roost-framework.github.io/swift-roost/playground.html)
 
 Start with Counter, Greeting, or Toggle. Jump to a supported value, edit the
 Swift source, and run the example. The previous preview stays available if an
@@ -135,7 +135,7 @@ Nexus. No Node.js toolchain is needed for the default Pico CSS setup.
 Clone the release and build its CLI:
 
 ```sh
-git clone --branch 2.0.0 --depth 1 https://github.com/Maartz/swift-roost.git Roost
+git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git Roost
 cd Roost
 unset ROOST_FRAMEWORK_PATH ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
 swift build -c release --product roost
@@ -143,7 +143,7 @@ export ROOST_CLI="$(swift build -c release --show-bin-path)/roost"
 "$ROOST_CLI" --version
 ```
 
-Generated apps download Roost 2.0.0, Spectro 2.x (from 2.0.0), Nexus 2.0.0,
+Generated apps download Roost 2.0.1, Spectro 2.x (from 2.0.0), Nexus 2.0.0,
 and ESW 1.5.0 through SwiftPM. No companion source checkouts or dependency overrides are needed.
 Spectro's `from: "2.0.0"` requirement accepts `2.0.0..<3.0.0`, including 2.1.0
 when published. Existing apps retain their resolved version until you run
@@ -229,9 +229,9 @@ same path.
 
 | Layer                                             | Responsibility                                                                             |
 | ------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| [Nexus](https://github.com/Spectro-ORM/Nexus)     | Connections, routing, middleware, and the Hummingbird HTTP adapter.                        |
-| [Spectro](https://github.com/Spectro-ORM/Spectro) | Typed PostgreSQL models, queries, repositories, transactions, and migrations.              |
-| [ESW](https://github.com/Spectro-ORM/ESW)         | HTML templates compiled into Swift render functions.                                       |
+| [Nexus](https://github.com/roost-framework/Nexus)     | Connections, routing, middleware, and the Hummingbird HTTP adapter.                        |
+| [Spectro](https://github.com/roost-framework/Spectro) | Typed PostgreSQL models, queries, repositories, transactions, and migrations.              |
+| [ESW](https://github.com/roost-framework/ESW)         | HTML templates compiled into Swift render functions.                                       |
 | Roost                                             | Application lifecycle, conventions, generators, browser integration, and the test harness. |
 
 An HTTP request passes through service injection, session loading, application

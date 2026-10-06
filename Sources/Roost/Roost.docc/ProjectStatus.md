@@ -41,7 +41,7 @@ transport or storage adapter is complete.
 
 ### Browser and local playgrounds
 
-The [website playground](https://maartz.github.io/swift-roost/playground.html)
+The [website playground](https://roost-framework.github.io/swift-roost/playground.html)
 runs three guided JavaScript previews of Swift examples. It does not compile or
 execute arbitrary Swift.
 
