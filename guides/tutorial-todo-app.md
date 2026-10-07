@@ -1,10 +1,10 @@
 # Build an authenticated Todo app
 
-This tutorial is exercised by `scripts/check_generated_app.py`. The acceptance
+This tutorial is exercised by roost-cli's `scripts/check_generated_app.py`. The acceptance
 run creates an app with two resources, applies its migrations to an isolated
 PostgreSQL database, runs its generated tests, and checks two users over HTTP.
 
-Use Swift 6.3 or later, PostgreSQL, and the `roost` CLI. ESW 1.5.0 includes the
+Use Swift 6.3 or later, PostgreSQL, and the `roost` CLI. ESW 1.6.0 includes the
 typed views and namespaced templates used below; Spectro 2.x (from 2.0.0) includes the
 required database fixes. No companion source checkouts are needed.
 
@@ -14,12 +14,12 @@ package, and CI installs the headers too.
 
 ## Install the CLI
 
-Install Roost 2.0.1 with [Mint](https://github.com/yonaskolb/Mint) and add
+Install the Roost CLI with [Mint](https://github.com/yonaskolb/Mint) and add
 `~/.mint/bin` to your `PATH`:
 
 ```sh
 brew install mint
-mint install roost-framework/swift-roost@2.0.1
+mint install roost-framework/roost-cli@2.1.0
 ```
 
 Without Mint, build from a checkout as described in the
@@ -39,9 +39,26 @@ roost gen resource Todo title:string done:bool --both --scope user_id
 roost gen resource Note body:text
 ```
 
-The generators register their routes and middleware in `App.swift`. They refuse
-to overwrite existing files. `--scope user_id` takes ownership from the identity
-loaded by authentication middleware; submitted `user_id` values are ignored.
+The generators register their routes and middleware in `App.swift`:
+
+```swift
+@RouteBuilder var routes: [Route] {
+    scope("/auth") { authRoutes() }
+    resources("/todos", TodoController.self)
+    scope("/api") { resources("/todos", TodoAPIController.self) }
+    resources("/notes", NoteController.self)
+    // roost:routes
+    GET("/", PageController.self, .home)
+}
+```
+
+Each route names a controller action in `Controllers/`. `authRoutes()` lives in
+`Routes/AuthRoutes.swift`, routing to `RegistrationController` and
+`SessionController`. The generators refuse to overwrite existing files.
+`--scope user_id` takes ownership from the identity loaded by authentication
+middleware: `TodoController` runs `requireAuth()` before every action and passes
+the signed-in user's ID to the context. Actions decode input with
+`conn.permit(CreateTodoInput.self)`, so submitted `user_id` values are ignored.
 For other scope types, generate `--model-only` and write the scope resolution for
 your domain explicitly.
 
@@ -70,8 +87,8 @@ API can use a separate pipeline; JSON content type alone does not disable CSRF.
 
 ## Where to put application logic
 
-`TodosContext` accepts `any Repo`, so the same operations work from HTTP handlers,
-a script, or a transaction-owned test repository:
+`TodosContext` accepts `any Repo`, so the same operations work from controller
+actions, a script, or a transaction-owned test repository:
 
 ```swift
 let todos = TodosContext(repo: conn.repo())
@@ -85,8 +102,13 @@ let updated = try await todos.updateTodo(
 
 The generated ownership column cannot be changed through these operations.
 Every read, update and delete checks ownership; missing and foreign-owned IDs
-return 404. Input types are declared once in the context and shared by HTML and
-JSON routes. Changeset validation also runs when a caller uses the context directly.
+return 404. Input types are declared once in the context and permitted by both
+the HTML and JSON controllers. Changeset validation also runs when a caller uses
+the context directly.
+
+The server logs one line per request with the action that handled it, such as
+`POST /todos → TodoController.create → 303 in 4.2ms`. Its parameters are
+attached as metadata, with `password` and `_csrf_token` shown as `[FILTERED]`.
 
 `AccountsContext` uses Roost's salted password hashing. Registration creates
 both user and token in one transaction. Only a hash of the login token is kept
@@ -140,13 +162,14 @@ The Dockerfile uses matching Swift 6.3.3 build and runtime images, includes publ
 assets and migrations, and sets the runtime working directory. See the official
 [Swift container images](https://hub.docker.com/_/swift/) for the image variants.
 
-Run the executable acceptance workflow from the Roost checkout:
+Run the executable acceptance workflow from a roost-cli checkout beside the
+framework checkout:
 
 ```sh
 unset ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
-python3 scripts/check_generated_app.py
+python3 scripts/check_generated_app.py --framework ../swift-roost
 # Also build and exercise an optimized executable:
-python3 scripts/check_generated_app.py --release
+python3 scripts/check_generated_app.py --framework ../swift-roost --release
 ```
 
 It uses a unique local database and drops it on success or failure. The printed

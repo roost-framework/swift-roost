@@ -8,8 +8,8 @@ Roost re-exports ESW, but file templates need a direct ESW package dependency an
 `ESWBuildPlugin` on the application target. `roost new MyApp` configures both.
 An app generated with `--no-esw` does not have that setup.
 
-The typed-view APIs below are available in ESW 1.5.0, the minimum version used
-by Roost and its generated applications.
+The typed-view APIs below are available in ESW 1.6.0, the minimum version used
+by Roost.
 
 ### Define a typed view
 
@@ -54,19 +54,36 @@ struct WelcomeApp: RoostApp {
     let sessionStore: (any SessionStore)? = MemorySessionStore()
 
     var plugs: [Plug] {
-        [requestId(), requestLogger()] + browserPlugs()
+        [requestId(), roost_requestLogger()] + browserPlugs()
     }
 
     @RouteBuilder var routes: [Route] {
-        GET("/") { conn in
-            try conn.render(WelcomeView(name: "Ada"), title: "Welcome")
-        }
+        GET("/", GreetingController.self, .new)
+        POST("/greetings", GreetingController.self, .create)
+    }
+}
 
-        POST("/greetings") { conn in
-            let name = try FormValues(conn.bodyParams)
-                .decode("name", as: String.self)
-            return try conn.render(WelcomeView(name: name), title: "Hello")
+struct GreetingParams: Codable, Sendable {
+    let name: String
+}
+
+struct GreetingController: Controller {
+    enum Action: String, ControllerAction { case new, create }
+
+    static func action(_ action: Action) -> Plug {
+        switch action {
+        case .new: new
+        case .create: create
         }
+    }
+
+    static func new(_ conn: Connection) async throws -> Connection {
+        try conn.render(WelcomeView(name: "Ada"), title: "Welcome")
+    }
+
+    static func create(_ conn: Connection) async throws -> Connection {
+        let params = try conn.permit(GreetingParams.self)
+        return try conn.render(WelcomeView(name: params.name), title: "Hello")
     }
 }
 ```
@@ -102,10 +119,11 @@ escaping the HTML a second time.
 
 ### Retain invalid input
 
-Keep `conn.bodyParams` when handling a form error. ``FormValues`` decodes values
-without discarding their original text. An omitted nonoptional Boolean decodes
-to `false`; an optional empty value can decode to `nil`. Decoding failures throw
-``ValidationErrors``.
+Keep `conn.bodyParams` when handling a form error. `conn.permit(_:)` decodes
+form values with ``FormValues``, which keeps their original text. An omitted
+nonoptional Boolean decodes to `false`; an optional empty value can decode to
+`nil`. Decoding failures throw ``ValidationErrors``. Fields the input type
+doesn't declare are ignored.
 
 The generated resource catches those errors and renders the form again with
 the submitted values, field errors, and status `.unprocessableContent` (422).

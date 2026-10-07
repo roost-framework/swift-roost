@@ -18,7 +18,7 @@ import Nexus
 ///
 /// ```swift
 /// var plugs: [Plug] {
-///     [httpsRedirect(), requestLogger()]
+///     [httpsRedirect(), roost_requestLogger()]
 /// }
 /// ```
 ///

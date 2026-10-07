@@ -11,9 +11,22 @@ product. The 1.x tags contain the earlier Peregrine names. Unset stale
 `ROOST_FRAMEWORK_PATH` and `ROOST_ECOSYSTEM_PATH` overrides, then run
 `swift package resolve`. An app itself cannot be named `Roost`.
 
+### A route or controller doesn't compile
+
+`type 'RecipeController.Action' has no member 'publish'` means a route names an
+action the controller's `Action` enum doesn't declare. `switch must be
+exhaustive` in `action(_:)` means an action has no function. Add the case and
+its function together.
+
+If the app stops at startup with `resources(...) can't route`, its `only:` list
+names an action that isn't one of the seven REST actions. Route that action with
+`GET`, `POST`, `PUT`, `PATCH`, or `DELETE` instead. `uses pipeline "…", which
+was not declared` means a deprecated string pipeline was used before its
+`pipeline(_:)` declaration; declare it as a `NamedPipeline` value instead.
+
 ### Templates collide or typed views are missing
 
-Require ESW 1.5.0 or later in the app's direct dependency and run
+Require ESW 1.6.0 or later in the app's direct dependency and run
 `swift package resolve`. Unset `ROOST_ESW_PATH` and `ROOST_ECOSYSTEM_PATH` if
 they select an older source checkout. File templates also require
 `ESWBuildPlugin` on the app target.

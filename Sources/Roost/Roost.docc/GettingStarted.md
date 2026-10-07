@@ -4,7 +4,7 @@ Generate a small app, run its first route, and test it without a database.
 
 ## Overview
 
-This guide uses Roost 2.0.0 with published ESW 1.5.0,
+This guide uses Roost 2.1.0 with published ESW 1.6.0,
 Spectro 2.x (from 2.0.0), and Nexus 2.0.0. You need Swift 6.3 or later and macOS 14+ or a
 supported Linux environment. On Debian/Ubuntu, Nexus also needs `zlib1g-dev`
 at build time and `zlib1g` at runtime.
@@ -18,21 +18,20 @@ Install the CLI with [Mint](https://github.com/yonaskolb/Mint):
 
 ```sh
 brew install mint
-mint install roost-framework/swift-roost@2.0.1
+mint install roost-framework/roost-cli@2.1.0
 roost --version
 ```
 
-Mint builds the release from source and links `roost` into `~/.mint/bin`; add
-that directory to your `PATH`. The first install resolves the framework's full
-package graph, so it takes a few minutes. Leave `ROOST_FRAMEWORK_PATH`,
+Mint builds the CLI from source and links `roost` into `~/.mint/bin`; add that
+directory to your `PATH`. Leave `ROOST_FRAMEWORK_PATH`,
 `ROOST_ECOSYSTEM_PATH`, and `ROOST_ESW_PATH` unset to select published versions
 of Roost and its companion packages.
 
 Without Mint, for example on Linux, build from a checkout:
 
 ```sh
-git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git
-cd swift-roost
+git clone --branch 2.1.0 --depth 1 https://github.com/roost-framework/roost-cli.git
+cd roost-cli
 swift build -c release --product roost
 ```
 
@@ -56,9 +55,40 @@ restarts the app. A failed build prints diagnostics and leaves the previous
 server available. Refresh the browser after a successful restart; this command
 does not provide live state preservation.
 
-### Write a route
+### Write a controller
 
-Replace `Sources/HelloApp/App.swift` with this complete application:
+The generated app routes `/` to the `home` action of `PageController`. Replace
+`Sources/HelloApp/Controllers/PageController.swift` with a controller that has
+a second action:
+
+```swift
+import Roost
+
+struct PageController: Controller {
+    enum Action: String, ControllerAction {
+        case home, hello
+    }
+
+    static func action(_ action: Action) -> Plug {
+        switch action {
+        case .home: home
+        case .hello: hello
+        }
+    }
+
+    static func home(_ conn: Connection) async throws -> Connection {
+        conn.text("Hello, Roost.")
+    }
+
+    static func hello(_ conn: Connection) async throws -> Connection {
+        try conn.json(value: [
+            "hello": conn.params["name"] ?? "world"
+        ])
+    }
+}
+```
+
+Then replace `Sources/HelloApp/App.swift` with this complete application:
 
 ```swift
 import Roost
@@ -66,22 +96,17 @@ import Roost
 @main
 struct HelloApp: RoostApp {
     @RouteBuilder var routes: [Route] {
-        GET("/") { conn in
-            conn.text("Hello, Roost.")
-        }
-
-        GET("/hello/:name") { conn in
-            try conn.json(value: [
-                "hello": conn.params["name"] ?? "world"
-            ])
-        }
+        GET("/", PageController.self, .home)
+        GET("/hello/:name", PageController.self, .hello)
     }
 }
 ```
 
 Only the routes are required here. The default application has no database or
-sessions and binds to `127.0.0.1:8080`. Nexus provides the connection and route
-types re-exported by Roost.
+sessions and binds to `127.0.0.1:8080`. Its default middleware logs each request
+with the action that handled it, such as `GET /hello/ada → PageController.hello`.
+The compiler checks that every route names an action the controller declares,
+and that every action has a function. See <doc:Controllers>.
 
 ### Test the application
 
@@ -107,7 +132,8 @@ in-process; it does not bind a network port.
 
 ### Choose the next step
 
-- Add JSON handlers and middleware with <doc:RoutingAndMiddleware>.
+- Add controllers, resources, and permitted parameters with <doc:Controllers>.
+- Add middleware and route groups with <doc:RoutingAndMiddleware>.
 - Add compiled HTML and request-aware forms with <doc:ViewsAndForms>.
 - Generate an authenticated app with <doc:CLIAndGenerators>.
 - Try [the browser playground](https://roost-framework.github.io/swift-roost/playground.html)

@@ -16,12 +16,15 @@ import Nexus
 ///
 /// ```swift
 /// // Typical pipeline: session → fetchUser → router
-/// // Protected scope:
-/// scope("/dashboard", plugs: [requireAuth()]) {
-///     GET("/dashboard") { conn in
-///         let user = conn.currentUser(User.self)!
-///         // ...
-///     }
+/// // Before every action of one controller:
+/// struct DashboardController: Controller {
+///     static let plugs: [ActionPlug<Action>] = [.plug(requireAuth())]
+///     // ...
+/// }
+///
+/// // Or for a group of routes:
+/// scope("/account", plugs: [requireAuth()]) {
+///     GET("/", AccountController.self, .show)
 /// }
 /// ```
 ///
@@ -56,13 +59,9 @@ public func requireAuth(
 ///
 /// ```swift
 /// scope("/", plugs: [optionalAuth()]) {
-///     GET("/") { conn in
-///         if let user = conn.currentUser(User.self) {
-///             // Show personalized content
-///         } else {
-///             // Show public content
-///         }
-///     }
+///     // HomeController.home checks conn.currentUser(User.self) and shows
+///     // personalized or public content.
+///     GET("/", HomeController.self, .home)
 /// }
 /// ```
 public func optionalAuth() -> Plug {
@@ -83,10 +82,7 @@ public func optionalAuth() -> Plug {
 /// ```swift
 /// // API pipeline: bearerAuth → requireApiAuth → router
 /// scope("/api/v1", plugs: [bearerAuthPlug(), requireApiAuth()]) {
-///     GET("/api/v1/me") { conn in
-///         let user = conn.currentUser(User.self)!
-///         return conn.json(["id": user.authID])
-///     }
+///     GET("/me", ProfileAPIController.self, .show)
 /// }
 /// ```
 ///

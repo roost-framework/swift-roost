@@ -113,7 +113,7 @@ private let rateLimitCleanup = RateLimitCleanup.shared
 /// ```swift
 /// // Global rate limit
 /// var plugs: [Plug] {
-///     [rateLimit(max: 100, windowSeconds: 60), requestLogger()]
+///     [rateLimit(max: 100, windowSeconds: 60), roost_requestLogger()]
 /// }
 /// ```
 ///

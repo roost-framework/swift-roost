@@ -1,5 +1,71 @@
 # Changelog
 
+## 2.1.0
+
+Roost adds Phoenix-style controllers. Routes name a controller action the
+compiler checks, actions decode only the parameters they permit, and every
+request is logged and traced by action.
+
+### Upgrade
+
+- Closure routes keep working; adopting controllers is optional. See the
+  Controllers guide (`Sources/Roost/Roost.docc/Controllers.md`).
+- The `roost` CLI moved to [roost-cli](https://github.com/roost-framework/roost-cli)
+  and swift-roost no longer has a `roost` executable product. Install it with
+  `mint install roost-framework/roost-cli@2.1.0`.
+- `pipeline(_:_:)` and `scope(_:pipelines:)` with string names are deprecated.
+  An undeclared name now stops the app at startup. Previously it was ignored, so
+  its routes were served without the pipeline's plugs, which could include CSRF
+  protection or authentication. Declare `NamedPipeline` values and pass them to
+  `scope(_:pipelines:)` instead.
+- The default `plugs` use `roost_requestLogger()` instead of Nexus's
+  `requestLogger()`. It logs through swift-log with the `roost.request` label
+  instead of printing. Apps that override `plugs` keep the loggers they list.
+- `tracing()` names spans after the matched route (`GET /recipes/:id`) instead of
+  the raw path, and reuses the ID from `requestId()` when that plug runs first.
+  Update dashboards or alerts that match the old span names.
+- Roost requires swift-distributed-tracing 1.3.0 or later.
+
+### Controllers
+
+- `Controller` groups actions. Its `Action` enum names them, and an exhaustive
+  `switch` in `action(_:)` maps each one to its function, so a missing function
+  or a route to an undeclared action is a compile error.
+- `GET`, `POST`, `PUT`, `PATCH`, and `DELETE` take a controller and an action.
+- `resources(_:_:only:except:)` routes the REST actions a controller declares:
+  `index`, `new`, `create`, `show`, `edit`, `update` (PATCH and PUT), and
+  `delete`.
+- Controller `plugs` run after routing and before the action, each optionally
+  limited with `only:` or `except:`.
+- `conn.matchedRoute` reports the route pattern, controller, and action, and is
+  kept on error responses.
+
+### Parameters
+
+- `conn.permit(T.self)` decodes a request into a `Decodable` type: the JSON body,
+  or query, form, and path parameters with path parameters taking precedence.
+  Undeclared fields are dropped. A missing or invalid field throws
+  `ValidationErrors` naming it; a malformed JSON body is a 400 response.
+- `FormValues.decode(as:)` decodes a whole form into a type with the same rules.
+
+### Logging, tracing, and metrics
+
+- `roost_requestLogger(filterParameters:logger:)` writes one line per request when
+  the response is ready, with the action, route, status, duration, request ID,
+  and parameters as metadata. Parameters such as passwords, tokens, and keys are
+  logged as `[FILTERED]`, including inside JSON bodies. Failed requests are
+  logged with their action too.
+- `tracing(tracer:)` continues an incoming trace when the tracer understands its
+  headers, records `http.route`, `roost.controller`, and `roost.action`, wraps
+  each action in a child span named `Controller.action`, and marks server
+  errors. Spans started inside an action nest under it.
+- The development metrics endpoint groups durations by route pattern.
+
+### Routing
+
+- `scope(_:pipelines:)` accepts `NamedPipeline` values, and a pipeline builder
+  accepts a list of plugs such as `browserPlugs()`.
+
 ## 2.0.1
 
 Roost, ESW, Spectro, Nexus, and the Roost Playground moved to the

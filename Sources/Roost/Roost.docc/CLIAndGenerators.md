@@ -21,8 +21,19 @@ Use an app name distinct from `Roost`, `RoostTest`, and `RoostCLI`. Those names
 belong to framework modules.
 
 The resource command creates a Spectro model, repository-backed context, input
-type, SQL migration, ESW views, HTML and JSON handlers, and input tests. It also
-registers routes in the generated application. Authentication is generated
+type, SQL migration, ESW views, an HTML `BookmarkController` and a JSON
+`BookmarkAPIController`, and input tests. It also registers the routes in the
+generated application:
+
+```swift
+resources("/bookmarks", BookmarkController.self)
+scope("/api") { resources("/bookmarks", BookmarkAPIController.self) }
+```
+
+With `--scope user_id`, the HTML controller runs `requireAuth()` before every
+action, and both controllers pass the signed-in user's ID to the context. The
+controllers decode input with `conn.permit`, so the input type is the list of
+fields a request can set. Authentication is generated
 first so the ownership foreign key can reference the users table.
 
 ### Configure the local database
@@ -62,6 +73,7 @@ ReadingRoom/
 │   │   ├── App.swift
 │   │   ├── Models/
 │   │   ├── Contexts/
+│   │   ├── Controllers/
 │   │   ├── Routes/
 │   │   ├── Plugs/
 │   │   └── Views/
@@ -71,7 +83,7 @@ ReadingRoom/
 ```
 
 Add business rules to the context or shared input type. Add transport behavior
-to routes. Change the typed view and template together when their inputs change.
+to controllers, and keep routes as the table of endpoints. Change the typed view and template together when their inputs change.
 Generators refuse file overwrites; after generation, the files are yours to edit.
 
 The local `examples/Roost` reading-list app demonstrates this structure with
@@ -91,10 +103,12 @@ Its `./dev` and `./check` helpers own local setup and disposable test databases.
 | `gen resource Post title:string --model-only` | Model, context, migration, and input tests. |
 | `gen migration add_post_index` | Empty SQL migration to fill in. |
 | `migrate up / down / status` | App-configured migration operations. |
+| `spectro database create my_app_dev` | Any `spectro` command, run with the app's resolved Spectro version. |
 | `server --port 8080` | Build, serve, and watch for edits. |
 | `build` | Build the app and its configured CSS assets. |
 | `gen dockerfile` | Generate the Linux container build and runtime recipe. |
 
 Run `roost <command> --help` for the command's supported options.
-There are no database-create, database-drop, or seed CLI commands in this
-version; create databases with PostgreSQL tools or an application helper.
+`roost spectro` runs the `spectro` executable from the app's own dependencies,
+so its version always matches `Package.resolved`. Use it to create or drop
+databases. There is no seed command.

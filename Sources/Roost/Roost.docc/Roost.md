@@ -11,7 +11,7 @@ repository-backed contexts, and expose them through HTML pages or JSON routes.
 Start with <doc:GettingStarted>. For a complete workflow, follow
 <doc:CLIAndGenerators> through authentication and an ownership-scoped resource.
 
-These pages document Roost 2.0.0 with Nexus 2.0.0, Spectro 2.x (from 2.0.0), and ESW 1.5.0.
+These pages document Roost 2.1.0 with Nexus 2.0.0, Spectro 2.x (from 2.0.0), and ESW 1.6.0.
 Generated apps resolve published packages directly. See <doc:ProjectStatus>
 for the current implementation boundaries.
 
@@ -20,6 +20,7 @@ for the current implementation boundaries.
 ### Build an application
 
 - <doc:GettingStarted>
+- <doc:Controllers>
 - <doc:RoutingAndMiddleware>
 - <doc:ViewsAndForms>
 - <doc:DataAndMigrations>
@@ -41,6 +42,13 @@ for the current implementation boundaries.
 - ``ServerConfig``
 - ``Database``
 - ``HTMLLayout``
+
+### Controllers and requests
+
+- ``Controller``
+- ``ControllerAction``
+- ``ActionPlug``
+- ``MatchedRoute``
 
 ### Browser requests and validation
 

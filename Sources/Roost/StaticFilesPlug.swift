@@ -54,7 +54,7 @@ private let mimeTypes: [String: String] = [
 /// ```swift
 /// // In your RoostApp:
 /// var plugs: [Plug] {
-///     [roost_staticFiles(), requestId(), requestLogger()]
+///     [roost_staticFiles(), requestId(), roost_requestLogger()]
 /// }
 /// ```
 ///

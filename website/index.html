@@ -104,9 +104,19 @@
 <span class="syn-key">struct</span> <span class="syn-type">Hello</span>: <span class="syn-type">RoostApp</span> {
     <span class="syn-attribute">@RouteBuilder</span>
     <span class="syn-key">var</span> routes: [<span class="syn-type">Route</span>] {
-        <span class="syn-call">GET</span>(<span class="syn-string">"/"</span>) { conn <span class="syn-key">in</span>
-            conn.<span class="syn-call">text</span>(<span class="syn-string">"Hello, Roost."</span>)
-        }
+        <span class="syn-call">GET</span>(<span class="syn-string">"/"</span>, <span class="syn-type">PageController</span>.<span class="syn-key">self</span>, .home)
+    }
+}
+
+<span class="syn-key">struct</span> <span class="syn-type">PageController</span>: <span class="syn-type">Controller</span> {
+    <span class="syn-key">enum</span> <span class="syn-type">Action</span>: <span class="syn-type">String</span>, <span class="syn-type">ControllerAction</span> { <span class="syn-key">case</span> home }
+
+    <span class="syn-key">static func</span> <span class="syn-call">action</span>(_ action: <span class="syn-type">Action</span>) -&gt; <span class="syn-type">Plug</span> {
+        <span class="syn-key">switch</span> action { <span class="syn-key">case</span> .home: home }
+    }
+
+    <span class="syn-key">static func</span> <span class="syn-call">home</span>(_ conn: <span class="syn-type">Connection</span>) <span class="syn-key">async throws</span> -&gt; <span class="syn-type">Connection</span> {
+        conn.<span class="syn-call">text</span>(<span class="syn-string">"Hello, Roost."</span>)
     }
 }</code></pre>
           <div class="response-line">
@@ -120,7 +130,7 @@
               alt=""
             /><span>Hello, Roost<span class="orange">.</span></span>
           </div>
-          <p class="window-caption">One route. A place to begin.</p>
+          <p class="window-caption">One route, one action. A place to begin.</p>
         </div>
       </section>
 
@@ -144,7 +154,7 @@
         >
         <a href="https://roost-framework.github.io/ESW/"
           ><span class="stack-name">ESW <span aria-hidden="true">↗</span></span
-          ><span class="stack-detail">HTML, compiled to Swift <span class="version">1.5</span></span></a
+          ><span class="stack-detail">HTML, compiled to Swift <span class="version">1.6</span></span></a
         >
       </section>
 
@@ -211,8 +221,12 @@
                   <dd>Typed data</dd>
                 </div>
                 <div>
+                  <dt>Controllers/</dt>
+                  <dd>HTML &amp; JSON actions</dd>
+                </div>
+                <div>
                   <dt>Routes/</dt>
-                  <dd>HTML &amp; JSON</dd>
+                  <dd>Route tables</dd>
                 </div>
                 <div>
                   <dt>Views/</dt>
@@ -254,7 +268,7 @@
               <h3>A reading list, in a few commands.</h3>
               <p>
                 An app, authentication, then an owner-scoped resource. The
-                generators create models, contexts, migrations, routes,
+                generators create models, contexts, migrations, controllers,
                 templates, and input tests together.
               </p>
               <p>
@@ -359,7 +373,7 @@ roost gen resource Bookmark \
                   send the reader back to their queue.
                 </p>
                 <span class="source-label"
-                  >BookmarksRoutes.swift · excerpt</span
+                  >BookmarkController.swift · excerpt</span
                 >
               </div>
               <div class="tour-code">
@@ -373,8 +387,9 @@ roost gen resource Bookmark \
                 </button>
                 <pre
                   tabindex="0"
-                ><code id="response-code"><span class="light-key">try await</span> BookmarksContext(repo: conn.repo())
-    .setRead(id: id, read: read, scopeId: scopeId)
+                ><code id="response-code"><span class="light-key">let</span> params = <span class="light-key">try</span> conn.permit(ReadParams.self)
+<span class="light-key">try await</span> BookmarksContext(repo: conn.repo())
+    .setRead(id: id, read: params.read, scopeId: readerID(conn))
 
 <span class="light-key">return</span> conn
     .putFlash(.info, <span class="light-string">"Moved to finished"</span>)
@@ -626,9 +641,10 @@ roost gen resource Bookmark \
                 What works today?<span aria-hidden="true">+</span>
               </summary>
               <p>
-                Roost 2.0.0 supports generated
-                authentication, scoped CRUD, HTML and JSON routes, form
-                validation, Spectro migrations, and in-process tests. The
+                Roost 2.1.0 supports generated
+                authentication, scoped CRUD, HTML and JSON controllers,
+                permitted parameters, form validation, per-action logs and
+                traces, Spectro migrations, and in-process tests. The
                 reading-list workflow has been exercised against real
                 PostgreSQL.
               </p>
@@ -638,14 +654,14 @@ roost gen resource Bookmark \
                 How do I get started?<span aria-hidden="true">+</span>
               </summary>
               <p>
-                Start with Roost 2.0.0 and follow the README quickstart to
+                Start with Roost 2.1.0 and follow the README quickstart to
                 generate your first app. The CLI connects routes, templates,
                 data, and tests, with published dependencies resolved by SwiftPM.
               </p>
               <p>
                 Development prerequisites are Swift 6.3+, macOS 14+ or Linux,
                 and PostgreSQL for database-backed apps. Roost uses Nexus 2.0.0,
-                Spectro 2.x (from 2.0.0), and ESW 1.5.0; no companion checkouts are required.
+                Spectro 2.x (from 2.0.0), and ESW 1.6.0; no companion checkouts are required.
               </p>
               <a
                 class="text-link"
@@ -659,7 +675,10 @@ roost gen resource Bookmark \
               </summary>
               <p>
                 Phoenix inspires the application structure, contexts,
-                generators, and browser conventions. Roost uses Swift’s type
+                controllers, generators, and browser conventions. Routes name
+                controller actions the compiler checks, and
+                <code>resources</code>, controller plugs, and permitted
+                parameters work as they do in Phoenix. Roost uses Swift’s type
                 system and package tooling. The local Roost Playground explores
                 interactive apps through ESW Live. It is a development
                 integration, and Roost does not claim feature parity with

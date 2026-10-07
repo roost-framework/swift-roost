@@ -67,13 +67,8 @@ func routes(_ app: Application) throws {
 ```swift
 @RouteBuilder
 func donutRoutes() -> [Route] {
-    GET("/") { conn in
-        // handler
-    }
-
-    POST("/") { conn in
-        // handler
-    }
+    GET("/", DonutController.self, .index)
+    POST("/", DonutController.self, .create)
 }
 ```
 
@@ -133,33 +128,72 @@ scope module: :frontend do
 end
 ```
 
-### 3. Controller-Free (or Optional)
+### 3. Controllers
 
-No need for controller classes. Route handlers are closures:
-
-```swift
-GET("/:id") { conn in
-    let id = conn.params["id"]
-    let donut = try await conn.repo().get(Donut.self, id: id)
-    return try conn.json(value: donut)
-}
-```
-
-When you need shared logic, use functions:
+Routes name controller actions. The route table stays declarative data, and
+handlers live in controllers, as in Phoenix:
 
 ```swift
-func requireAdmin(_ conn: Connection) async throws -> Connection {
-    guard conn.isAdmin else {
-        throw NexusHTTPError(.forbidden)
+struct DonutController: Controller {
+    enum Action: String, ControllerAction { case index, show, create, feature }
+
+    // plug :require_admin when action in [:feature]
+    static let plugs: [ActionPlug<Action>] = [.plug(requireAdmin, only: [.feature])]
+
+    static func action(_ action: Action) -> Plug {
+        switch action {
+        case .index: index
+        case .show: show
+        case .create: create
+        case .feature: feature
+        }
     }
-    return conn
+
+    static func show(_ conn: Connection) async throws -> Connection {
+        let id: UUID = try conn.requireParam("id")
+        let donut = try await conn.repo().get(Donut.self, id: id)
+        return try conn.json(value: donut)
+    }
+
+    static func create(_ conn: Connection) async throws -> Connection {
+        let params = try conn.permit(DonutParams.self)   // strong params
+        ...
+    }
 }
 
 @RouteBuilder
+func donutRoutes() -> [Route] {
+    resources("/donuts", DonutController.self)          // index, show, create
+    POST("/donuts/:id/feature", DonutController.self, .feature)
+}
+```
+
+The earlier design was controller-free: routes held closures. Its reasons were
+about Vapor's mutable registration, not controllers, and it cost the router its
+role as a table of endpoints, per-action plugs, and action names in logs and
+traces. Controllers keep routes immutable and add:
+
+- **Checked names.** `.feature` must be a case of `DonutController.Action`, and
+  the exhaustive `switch` rejects an action without a function. Phoenix only
+  warns about an unknown action.
+- **`resources`** with `only:` and `except:`, routing only the REST actions the
+  controller declares.
+- **Controller plugs** limited to actions, like `plug ... when action in [...]`.
+- **Permitted params.** `conn.permit(T.self)` decodes form, query, path, or JSON
+  parameters into `T`; undeclared fields are dropped.
+- **Per-action logs and traces.** The request logger and tracing plug report
+  `DonutController.show`, the route pattern, and filtered parameters.
+
+Shared logic between controllers is still plain functions and plugs:
+
+```swift
+let admin = NamedPipeline { requireAdmin }
+
+@RouteBuilder
 func adminRoutes() -> [Route] {
-    scope("/admin", through: [requireAdmin]) {
-        GET("/stats") { conn in ... }
-        POST("/seed") { conn in ... }
+    scope("/admin", pipelines: [admin]) {
+        GET("/stats", StatsController.self, .index)
+        POST("/seed", SeedController.self, .create)
     }
 }
 ```
@@ -252,40 +286,19 @@ Sources/DonutShop/
 // MARK: - API Routes (JSON)
 @RouteBuilder
 func donutApiRoutes() -> [Route] {
-    GET("/") { conn in
-        let donuts = try await conn.repo().all(Donut.self)
-        return try conn.json(value: donuts)
-    }
-
-    GET("/:id") { conn in
-        // JSON response
-    }
-
-    POST("/") { conn in
-        // JSON create
-    }
+    resources("/", DonutAPIController.self, only: [.index, .show, .create])
 }
 
 // MARK: - Frontend Routes (HTML)
 @RouteBuilder
 func donutFrontendRoutes() -> [Route] {
-    GET("/") { conn in
-        let donuts = try await conn.repo().all(Donut.self)
-        return conn.html(#render("donut_list.esw"))
-    }
-
-    GET("/:id") { conn in
-        // HTML detail page
-    }
-
-    POST("/") { conn in
-        // Form submission → redirect with flash
-        return conn
-            .putFlash(.info, "Donut created!")
-            .redirect(to: "/donuts")
-    }
+    resources("/", DonutController.self)
 }
 ```
+
+`DonutAPIController` responds with JSON; `DonutController` renders HTML and
+redirects with a flash after a form submission. Both permit the same
+`DonutParams` input and call the same context.
 
 ---
 
@@ -296,4 +309,6 @@ func donutFrontendRoutes() -> [Route] {
 3. **Testable**: `TestApp` runs routes without starting a server
 4. **Rails-like**: File organization matches URL structure
 5. **Phoenix-like**: Pipeline/scope pattern for middleware
-6. **Type-Safe**: `@RouteBuilder` ensures valid route construction
+6. **Type-Safe**: `@RouteBuilder` ensures valid route construction, and routes
+   can only name actions their controller declares
+7. **Observable**: every request is logged and traced by controller action

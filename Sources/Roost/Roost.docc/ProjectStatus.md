@@ -4,7 +4,7 @@ Distinguish the implemented application workflow from development integrations.
 
 ## Overview
 
-This catalog documents Roost 2.0.0 and its generators. Releases before 2.0.0
+This catalog documents Roost 2.1.0 and its generators. Releases before 2.0.0
 use the earlier Peregrine module and executable names.
 
 The core development path is a PostgreSQL-backed app with authentication,
@@ -14,7 +14,7 @@ and in-process tests.
 ### Dependency and release boundaries
 
 The framework and generated applications use published Nexus 2.0.0, Spectro
-2.x starting at 2.0.0, and ESW 1.5.0. ESW's release includes typed views and namespaced generated
+2.x starting at 2.0.0, and ESW 1.6.0. ESW's release includes typed views and namespaced generated
 output. Roost 2.0.0 is the first release with the renamed modules and CLI;
 follow <doc:GettingStarted> to create an app using released dependencies.
 

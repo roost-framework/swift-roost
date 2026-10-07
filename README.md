@@ -24,7 +24,7 @@ the files around them.
 
 **Less wiring. More building.**
 
-Start with an application and its routes:
+Start with an application, its routes, and a controller:
 
 ```swift
 import Roost
@@ -32,21 +32,37 @@ import Roost
 @main
 struct Hello: RoostApp {
     @RouteBuilder var routes: [Route] {
-        GET("/") { conn in
-            conn.text("Hello, Roost.")
-        }
+        GET("/", PageController.self, .home)
+        GET("/hello/:name", PageController.self, .hello)
+    }
+}
 
-        GET("/hello/:name") { conn in
-            try conn.json(value: ["hello": conn.params["name"] ?? "world"])
+struct PageController: Controller {
+    enum Action: String, ControllerAction { case home, hello }
+
+    static func action(_ action: Action) -> Plug {
+        switch action {
+        case .home: home
+        case .hello: hello
         }
+    }
+
+    static func home(_ conn: Connection) async throws -> Connection {
+        conn.text("Hello, Roost.")
+    }
+
+    static func hello(_ conn: Connection) async throws -> Connection {
+        try conn.json(value: ["hello": conn.params["name"] ?? "world"])
     }
 }
 ```
 
-**Roost 2.0.0** introduces the renamed framework and CLI, with published
-Nexus 2.0.0, Spectro 2.x (from 2.0.0), and ESW 1.5.0 dependencies. Generated apps resolve
-these packages directly. Moving from Peregrine? Follow the
-[upgrade guide](guides/renaming-to-roost.md).
+**Roost 2.1.0** adds Phoenix-style controllers: routes name an action the
+compiler checks, `resources` routes REST actions, controller plugs run before
+chosen actions, `conn.permit` decodes only the fields an input type declares, and
+every request is logged and traced by action with secrets filtered. It uses
+published Nexus 2.0.0, Spectro 2.x (from 2.0.0), and ESW 1.6.0. Moving from
+Peregrine? Follow the [upgrade guide](guides/renaming-to-roost.md).
 [See what has been verified and what remains.](guides/dx-acceptance.md)
 
 <details>
@@ -72,7 +88,17 @@ these packages directly. Moving from Peregrine? Follow the
 
 - **Swift throughout.** An application protocol, a route builder, composable
   middleware, typed models, and HTML templates compiled by SwiftPM.
-- **Connected generators.** Create models, contexts, migrations, routes, views,
+- **Controllers with checked routes.** Routes name controller actions, and the
+  compiler rejects a route to an undeclared action or an action without a
+  function. `resources` routes REST actions with `only:` and `except:`, and
+  controller plugs run before the actions you choose.
+- **Permitted parameters.** `conn.permit(RecipeParams.self)` decodes form, query,
+  path, or JSON parameters into a type, so undeclared fields can't be
+  mass-assigned and invalid values become 422 responses.
+- **Logs and traces per action.** One log line per request names the action,
+  route, and parameters, with passwords and tokens filtered. Tracing spans are
+  named after routes, with a child span per action.
+- **Connected generators.** Create models, contexts, migrations, controllers, views,
   and input tests together. Routes are registered in your app, existing files
   are protected, and migration filenames preserve dependency order.
 - **A browser workflow.** Form decoding, method overrides, CSRF protection,
@@ -107,7 +133,7 @@ checkouts and has not been published as a standalone release.
 Roost includes native DocC guides and API references for **Roost** and
 **RoostTest**, with the same searchable navigator used by ESW's documentation.
 Start with [Getting started](Sources/Roost/Roost.docc/GettingStarted.md), then
-follow the guides for routes, views and forms, authentication, Spectro migrations,
+follow the guides for controllers, routes, views and forms, authentication, Spectro migrations,
 testing, and deployment.
 
 See [building and browsing the documentation](Documentation/README.md) to generate
@@ -136,26 +162,27 @@ Install the CLI with [Mint](https://github.com/yonaskolb/Mint):
 
 ```sh
 brew install mint
-mint install roost-framework/swift-roost@2.0.1
+mint install roost-framework/roost-cli@2.1.0
 roost --version
 ```
 
-Mint builds the release from source and links `roost` into `~/.mint/bin`; add
-that directory to your `PATH`. The first install resolves the framework's full
-package graph, so it takes a few minutes.
+Mint builds the CLI from source and links `roost` into `~/.mint/bin`; add that
+directory to your `PATH`. The CLI lives in its own small
+[roost-cli](https://github.com/roost-framework/roost-cli) package, so it does
+not resolve the framework's dependencies.
 
 Without Mint, for example on Linux, build from a checkout:
 
 ```sh
-git clone --branch 2.0.1 --depth 1 https://github.com/roost-framework/swift-roost.git
-cd swift-roost
+git clone --branch 2.1.0 --depth 1 https://github.com/roost-framework/roost-cli.git
+cd roost-cli
 swift build -c release --product roost
 ```
 
 Then copy `.build/release/roost` to a directory on your `PATH`.
 
-Generated apps download Roost 2.0.1, Spectro 2.x (from 2.0.0), Nexus 2.0.0,
-and ESW 1.5.0 through SwiftPM. No companion source checkouts or dependency overrides are needed.
+Generated apps download Roost 2.1.0, Spectro 2.x (from 2.0.0), Nexus 2.0.0,
+and ESW 1.6.0 through SwiftPM. No companion source checkouts or dependency overrides are needed.
 Spectro's `from: "2.0.0"` requirement accepts `2.0.0..<3.0.0`, including 2.1.0
 when published. Existing apps retain their resolved version until you run
 `swift package update spectro`.
@@ -175,7 +202,7 @@ roost server --port 8080
 ```
 
 Open [localhost:8080](http://localhost:8080). Edit
-`Sources/HelloApp/App.swift` and save to rebuild. The generated test is ready
+`Sources/HelloApp/Controllers/PageController.swift` and save to rebuild. The generated test is ready
 to run with `swift test`. Stop the server with Ctrl-C.
 
 ### 3. Generate an authenticated app
@@ -241,7 +268,7 @@ same path.
 | Roost                                             | Application lifecycle, conventions, generators, browser integration, and the test harness. |
 
 An HTTP request passes through service injection, session loading, application
-middleware, and routing. The handler calls a context through `conn.repo()`.
+middleware, and routing. The controller action calls a context through `conn.repo()`.
 Session persistence is awaited before response hooks run. `TestApp` uses the same
 pipeline and finalization path as the server.
 
@@ -257,7 +284,8 @@ TodoApp/
 │   │   ├── App.swift             # Configuration, middleware, and routes
 │   │   ├── Models/              # Spectro schemas
 │   │   ├── Contexts/            # Repository-backed domain operations
-│   │   ├── Routes/              # HTML and JSON handlers
+│   │   ├── Controllers/         # HTML and JSON actions
+│   │   ├── Routes/              # Route tables split out of App.swift
 │   │   ├── Plugs/               # Application middleware
 │   │   └── Views/               # ESW layouts and resource templates
 │   └── Migrations/              # Ordered SQL migrations
@@ -265,9 +293,9 @@ TodoApp/
 └── Tests/TodoAppTests/
 ```
 
-Contexts accept `any Repo`. HTTP handlers use the application's repository;
-tests can inject a transaction repository. Generated HTML and JSON handlers share
-the same input type, and validation runs in the context too.
+Contexts accept `any Repo`. Controller actions use the application's repository;
+tests can inject a transaction repository. Generated HTML and JSON controllers
+permit the same input type, and validation runs in the context too.
 
 ## Views and forms
 
@@ -365,10 +393,11 @@ Run `roost <command> --help` for options.
 | `roost gen auth`                                              | Add and register browser authentication.                                        |
 | `roost gen resource Post title:string body:text`              | Generate a complete HTML resource.                                              |
 | `roost gen resource Post title:string --json`                 | Generate a JSON resource.                                                       |
-| `roost gen resource Post title:string --both --scope user_id` | Generate authenticated HTML and JSON routes with ownership checks.              |
+| `roost gen resource Post title:string --both --scope user_id` | Generate authenticated HTML and JSON controllers with ownership checks.         |
 | `roost gen resource Post title:string --model-only`           | Generate model, context, migration, and input tests.                            |
 | `roost gen migration add_post_index`                          | Create an empty SQL migration.                                                  |
 | `roost migrate up\|down\|status`                              | Apply, roll back, or inspect migrations using the app's database configuration. |
+| `roost spectro database create my_app_dev`                    | Run any `spectro` command with the Spectro version in the app's `Package.resolved`. |
 | `roost server --port 8080`                                    | Build, serve, and watch for changes.                                            |
 | `roost build`                                                 | Build the app and configured CSS assets.                                        |
 | `roost gen dockerfile`                                        | Generate a multi-stage Linux Dockerfile.                                        |
@@ -402,17 +431,17 @@ its contexts. Workflows that start their own transactions, such as registration,
 need an independently owned test database because nested transactions are not
 supported.
 
-The executable acceptance check generates an app, migrates an isolated database,
+The executable acceptance check in [roost-cli](https://github.com/roost-framework/roost-cli) generates an app, migrates an isolated database,
 runs its tests, and exercises authentication, HTML, JSON, and two-user ownership
 over HTTP:
 
 ```sh
-# From the Roost checkout, with a local PostgreSQL server running:
+# From a roost-cli checkout beside this one, with a local PostgreSQL server running:
 unset ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
-python3 scripts/check_generated_app.py
+python3 scripts/check_generated_app.py --framework ../swift-roost
 
 # Also test an optimized executable from its release directory:
-python3 scripts/check_generated_app.py --release
+python3 scripts/check_generated_app.py --framework ../swift-roost --release
 ```
 
 The script creates and removes its own database, retaining diagnostic logs in
@@ -441,7 +470,7 @@ and `Sources/Migrations/`. Starting the server does not apply migrations.
 `roost gen dockerfile` generates a Swift 6.3.3 build stage and matching slim
 runtime, installs zlib, and includes public assets and migrations. Supply the
 `DB_*` variables to the container. Generated Dockerfiles resolve published
-dependencies, including Roost 2.0.0; no framework source checkout is required
+dependencies, including Roost 2.1.0; no framework source checkout is required
 in the container build context.
 
 ## Troubleshooting
@@ -449,7 +478,7 @@ in the container build context.
 - **The compiler cannot find `Roost`.** Require `swift-roost` 2.0.0 or later
   and use the `Roost` product. The 1.x tags contain the earlier Peregrine names.
   Unset stale dependency overrides and run `swift package resolve`.
-- **Templates collide or typed views are missing.** Require ESW 1.5.0 or later
+- **Templates collide or typed views are missing.** Require ESW 1.6.0 or later
   in the app's direct dependency, and run `swift package resolve`. Remove an
   outdated `ROOST_ESW_PATH` or `ROOST_ECOSYSTEM_PATH` override. File templates
   also need `ESWBuildPlugin` on the application target.

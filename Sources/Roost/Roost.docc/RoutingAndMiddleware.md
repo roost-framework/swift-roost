@@ -4,22 +4,35 @@ Describe HTTP behavior in Swift and keep request processing explicit.
 
 ## Overview
 
-``RoostApp`` uses the route builder and connection types from Nexus. A handler
-accepts a connection and returns the connection containing its response.
-Asynchronous handlers can call a context, and throwing handlers can report an
-HTTP error.
+``RoostApp`` uses the route builder and connection types from Nexus. Routes
+name a controller action, which accepts a connection and returns the connection
+containing its response. Asynchronous actions can call a context, and throwing
+actions can report an HTTP error. <doc:Controllers> covers controllers,
+`resources`, and permitted parameters in full.
 
 ### Return a response
 
 ```swift
 import Roost
 
-@RouteBuilder
-func greetingRoutes() -> [Route] {
-    GET("/greeting/:name") { conn in
+struct GreetingController: Controller {
+    enum Action: String, ControllerAction { case show }
+
+    static func action(_ action: Action) -> Plug {
+        switch action {
+        case .show: show
+        }
+    }
+
+    static func show(_ conn: Connection) async throws -> Connection {
         let name = conn.params["name"] ?? "world"
         return try conn.json(value: ["greeting": "Hello, \(name)!"])
     }
+}
+
+@RouteBuilder
+func greetingRoutes() -> [Route] {
+    GET("/greeting/:name", GreetingController.self, .show)
 
     GET("/health") { conn in
         conn.text("ok")
@@ -30,7 +43,9 @@ func greetingRoutes() -> [Route] {
 Include `greetingRoutes()` in your application's `routes` builder. Route
 parameters come from `conn.params`; query parameters come from
 `conn.queryParams`. `conn.text` and `conn.html` return text responses, while
-`conn.json(value:)` encodes an `Encodable & Sendable` value.
+`conn.json(value:)` encodes an `Encodable & Sendable` value. A closure route,
+like `/health` here, suits a small endpoint; application endpoints use
+controllers so requests are logged and traced by action.
 
 For a UUID path parameter, use `try conn.requireParam("id")`. An invalid
 identifier becomes a 400 response before you query the repository.
@@ -41,12 +56,15 @@ Override `plugs` on the application to choose middleware and its order:
 
 ```swift
 var plugs: [Plug] {
-    [requestId(), requestLogger(), roost_staticFiles()] + browserPlugs()
+    [requestId(), roost_requestLogger(), roost_staticFiles()] + browserPlugs()
 }
 ```
 
 This replaces the default request-ID and logging list, so include those helpers
-when you still want them. Configure a session store as shown in
+when you still want them. `roost_requestLogger()` logs each request once, with
+its controller action and parameters, hiding secrets such as passwords and
+tokens. Add `tracing()` for distributed tracing spans. See
+<doc:Controllers#Log-and-trace-each-action>. Configure a session store as shown in
 <doc:AuthenticationAndSessions> before using the browser pipeline.
 
 ``browserPlugs()`` installs:
@@ -66,16 +84,33 @@ request exempt from CSRF.
 @RouteBuilder
 func applicationRoutes() -> [Route] {
     scope("/api") {
-        GET("/health") { conn in
-            try conn.json(value: ["status": "ok"])
-        }
+        resources("/recipes", RecipeAPIController.self, only: [.index, .show])
     }
 }
 ```
 
-The endpoint is `/api/health`. A scoped route can also carry middleware, for
-example `scope("/", plugs: [requireAuth()]) { privateRoutes() }` after the
-application has loaded the current user.
+The endpoints are `/api/recipes` and `/api/recipes/:id`. A scope can also carry
+middleware. Declare a reusable pipeline as a `NamedPipeline` value, so routers in
+different files share it and a misspelled name is a compile error:
+
+```swift
+let authenticated = NamedPipeline { requireAuth() }
+
+@RouteBuilder
+func privateRoutes() -> [Route] {
+    scope("/account", pipelines: [authenticated]) {
+        GET("/", AccountController.self, .show)
+    }
+}
+```
+
+`requireAuth()` runs after the application has loaded the current user. For a
+plug that applies to some of one controller's actions, use the controller's
+``Controller/plugs`` instead.
+
+The string-named `pipeline("browser") { ... }` and `scope(_:pipelines:)` with
+names are deprecated. An undeclared name now stops the app at startup instead
+of serving routes without the pipeline's plugs.
 
 ### Follow the request lifecycle
 
@@ -89,6 +124,7 @@ writes finish before response hooks run, including on redirects and halted
 responses. A failed session write produces an error without advertising an
 unsaved session cookie.
 
-Business operations belong in contexts that accept a repository. A route should
-decode input, obtain trusted identity, call the context, and render or redirect.
+Business operations belong in contexts that accept a repository. An action
+should permit its input, obtain trusted identity, call the context, and render
+or redirect.
 See <doc:DataAndMigrations> and <doc:AuthenticationAndSessions>.

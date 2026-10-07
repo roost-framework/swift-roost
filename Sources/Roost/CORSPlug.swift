@@ -32,7 +32,7 @@ public enum CORSOrigin: Sendable {
 ///
 /// ```swift
 /// var plugs: [Plug] {
-///     [cors(allowOrigin: .exact("https://myapp.com")), requestLogger()]
+///     [cors(allowOrigin: .exact("https://myapp.com")), roost_requestLogger()]
 /// }
 /// ```
 ///

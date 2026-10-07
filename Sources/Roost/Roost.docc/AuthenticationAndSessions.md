@@ -14,7 +14,7 @@ session store; they do not replace credential validation in your application.
 let sessionStore: (any SessionStore)? = MemorySessionStore()
 
 var plugs: [Plug] {
-    [requestId(), requestLogger()] + browserPlugs()
+    [requestId(), roost_requestLogger()] + browserPlugs()
 }
 ```
 
@@ -39,7 +39,8 @@ roost gen auth
 ```
 
 The generator adds user and token models, migrations, credential handling,
-routes, templates, and current-user loading. After migrations, registration and
+`RegistrationController` and `SessionController` with their routes in
+`Routes/AuthRoutes.swift`, templates, and current-user loading. After migrations, registration and
 login are at `/auth/register` and `/auth/login`.
 
 Password hashing uses the framework's ``Auth`` helpers. Successful login stores

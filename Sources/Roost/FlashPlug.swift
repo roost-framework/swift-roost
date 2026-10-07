@@ -110,7 +110,7 @@ extension Connection {
 ///     [
 ///         sessionPlug(sessionConfig),
 ///         flashPlug(),
-///         requestLogger(),
+///         roost_requestLogger(),
 ///     ]
 /// }
 /// ```
