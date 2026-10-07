@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.2
+
+Roost apps no longer download Noora: an app built on Roost resolves 39 packages
+and 448 MB of sources, down from 42 and 536 MB with 2.1.1.
+
+- Roost depends on Spectro 2.3.0 or later with only its `CLI` trait. `roost
+  spectro` still builds and runs the app's own `spectro` command, now without
+  Noora: it prints plain text instead of colors, spinners, and styled tables.
+  An app that depends on Spectro directly keeps its default traits and the
+  richer output.
+
 ## 2.1.1
 
 Roost apps download about 75 MB less.

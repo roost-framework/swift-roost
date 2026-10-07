@@ -14,7 +14,7 @@ and in-process tests.
 ### Dependency and release boundaries
 
 The framework and generated applications use published Nexus 2.x starting at 2.1.0,
-Spectro 2.x starting at 2.0.0, and ESW 1.6.0. ESW's release includes typed views and namespaced generated
+Spectro 2.x starting at 2.3.0, and ESW 1.6.0. ESW's release includes typed views and namespaced generated
 output. Roost 2.0.0 is the first release with the renamed modules and CLI;
 follow <doc:GettingStarted> to create an app using released dependencies.
 
