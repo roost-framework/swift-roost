@@ -9,7 +9,6 @@ import sys
 import uuid
 
 APP = Path(__file__).resolve().parents[1]
-FRAMEWORK = APP.parents[1]
 
 
 def run(args, env, *, cwd=APP, capture=False, input=None):
@@ -23,6 +22,8 @@ def main(mode):
     for tool in ("swift", "psql", "createdb", "dropdb"):
         if not shutil.which(tool):
             raise RuntimeError(f"Install {tool} and put it on PATH before running Roost.")
+    if mode != "test" and not shutil.which("roost"):
+        raise RuntimeError("Install the roost CLI first: mint install roost-framework/roost-cli")
 
     env = dict(os.environ)
     ecosystem = env.get("ROOST_ECOSYSTEM_PATH")
@@ -62,14 +63,12 @@ def main(mode):
             run(["swift", "test"], env)
             print("Roost tests passed; the owned test database will now be removed.", flush=True)
         else:
-            run(["swift", "build", "--product", "roost"], env, cwd=FRAMEWORK)
-            cli_dir = run(["swift", "build", "--show-bin-path"], env, cwd=FRAMEWORK, capture=True).strip().splitlines()[-1]
             print(f"\nRoost → http://127.0.0.1:{env['ROOST_PORT']}", flush=True)
             if env["ROOST_DEMO"] == "1":
                 print("Demo login: reader@roost.test / Read-with-Roost-2026", flush=True)
             print("Swift and ESW changes rebuild automatically. Ctrl-C stops the server.\n", flush=True)
             os.chdir(APP)
-            os.execve(str(Path(cli_dir) / "roost"), ["roost", "server", "--port", env["ROOST_PORT"]], env)
+            os.execve(shutil.which("roost"), ["roost", "server", "--port", env["ROOST_PORT"]], env)
     finally:
         if mode == "test" and created:
             run(["dropdb", env["DB_NAME"]], env)

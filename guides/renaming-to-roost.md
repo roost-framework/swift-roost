@@ -29,7 +29,7 @@ but its package, target, executable, and application type are `RoostExample`.
 
 ## Development commands
 
-Build the CLI with `swift build --product roost`. Replace `peregrine` with `roost`
+Install the CLI with `mint install roost-framework/roost-cli`. Replace `peregrine` with `roost`
 in scripts and shell aliases. All `PEREGRINE_*` configuration variables are now
 `ROOST_*`, including `ENV`, `HOST`, `PORT`, and `ECOSYSTEM_PATH`.
 
@@ -38,8 +38,6 @@ For local development, from the framework checkout:
 ```sh
 unset ROOST_ECOSYSTEM_PATH ROOST_ESW_PATH
 export ROOST_FRAMEWORK_PATH="$PWD"
-swift build --product roost
-export PATH="$(swift build --show-bin-path):$PATH"
 ```
 
 `ROOST_FRAMEWORK_PATH` allows an existing checkout to keep its directory name.
@@ -65,5 +63,5 @@ the former names. The generated Docker environment uses `ROOST_ENV`,
 
 Run `swift test`, then exercise sign-in, a form submission, and the app's JSON API.
 For the included reading list, use `examples/Roost/check`; for the complete
-generator workflow, use `scripts/check_generated_app.py`. Leave the ESW and
+generator workflow, use roost-cli's `scripts/check_generated_app.py`. Leave the ESW and
 ecosystem overrides unset to verify the published companion dependencies.

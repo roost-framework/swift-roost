@@ -23,7 +23,6 @@ let package = Package(
     products: [
         .library(name: "Roost", targets: ["Roost"]),
         .library(name: "RoostTest", targets: ["RoostTest"]),
-        .executable(name: "roost", targets: ["RoostCLI"]),
     ],
     dependencies: [
         ecosystem("Spectro", from: "2.0.0"),
@@ -32,14 +31,6 @@ let package = Package(
         .package(
             url: "https://github.com/hummingbird-project/hummingbird.git",
             from: "2.0.0"
-        ),
-        .package(
-            url: "https://github.com/apple/swift-argument-parser",
-            from: "1.2.0"
-        ),
-        .package(
-            url: "https://github.com/tuist/Noora",
-            .upToNextMajor(from: "0.15.0")
         ),
         .package(
             url: "https://github.com/apple/swift-crypto.git",
@@ -81,13 +72,6 @@ let package = Package(
                 .product(name: "NexusTest", package: "Nexus"),
             ]
         ),
-        .executableTarget(
-            name: "RoostCLI",
-            dependencies: [
-                .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "Noora", package: "Noora"),
-            ]
-        ),
         .testTarget(
             name: "RoostTests",
             dependencies: [
@@ -97,6 +81,5 @@ let package = Package(
                 .product(name: "Crypto", package: "swift-crypto"),
             ]
         ),
-        .testTarget(name: "RoostCLITests", dependencies: ["RoostCLI"]),
     ]
 )

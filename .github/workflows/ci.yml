@@ -66,6 +66,11 @@ jobs:
       DB_PASSWORD: postgres
     steps:
       - uses: actions/checkout@v4
+      - name: Check out the roost CLI
+        uses: actions/checkout@v4
+        with:
+          repository: roost-framework/roost-cli
+          path: roost-cli
       - name: Import Swift signing keys
         run: curl --fail --silent --show-error --location --compressed --retry 3 https://www.swift.org/keys/all-keys.asc | gpg --batch --import
       - uses: swift-actions/setup-swift@364295d9c23900ce04d4e5cc708387921b4e50f9 # v3, Swiftly-backed installer
@@ -75,10 +80,10 @@ jobs:
         run: sudo apt-get update && sudo apt-get install -y postgresql-client zlib1g-dev
       - name: Exercise generated app with published companion packages
         if: ${{ !inputs.published_framework }}
-        run: python3 scripts/check_generated_app.py --release --work-dir "$RUNNER_TEMP/roost-acceptance"
+        run: python3 roost-cli/scripts/check_generated_app.py --framework "$GITHUB_WORKSPACE" --release --work-dir "$RUNNER_TEMP/roost-acceptance"
       - name: Exercise released Roost with every dependency from GitHub
         if: ${{ inputs.published_framework }}
-        run: python3 scripts/check_generated_app.py --published-framework --release --work-dir "$RUNNER_TEMP/roost-acceptance"
+        run: python3 roost-cli/scripts/check_generated_app.py --published-framework --release --work-dir "$RUNNER_TEMP/roost-acceptance"
       - name: Keep acceptance diagnostics
         if: always()
         uses: actions/upload-artifact@v4
