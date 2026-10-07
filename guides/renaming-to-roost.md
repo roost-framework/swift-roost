@@ -18,6 +18,7 @@ APIs; the 1.x release tags keep their original Peregrine API.
 | `PeregrineToken`, `PeregrineMigrator`, etc. | `RoostToken`, `RoostMigrator`, etc. |
 | `peregrine_staticFiles()`, `peregrine_csrfProtection()`, etc. | `roost_staticFiles()`, `roost_csrfProtection()`, etc. |
 | `// peregrine:routes`, `// peregrine:plugs` | `// roost:routes`, `// roost:plugs` |
+| `requestLogger()` | `roost_requestLogger()` (logs the controller action and filtered params) |
 
 Update the SwiftPM dependency identity from `swift-peregrine` to `swift-roost`
 and product names to `Roost` and `RoostTest`. The repository is
@@ -26,6 +27,12 @@ and product names to `Roost` and `RoostTest`. The repository is
 Do not name an application target `Roost`, `RoostTest`, or `RoostCLI`: those names
 belong to framework modules. The reading-list example still displays **roost.**,
 but its package, target, executable, and application type are `RoostExample`.
+
+Closure routes still work after the rename. To adopt Roost 2.1's controllers,
+move each handler into a controller action and name it from the route, for
+example `GET("/todos", TodoController.self, .index)` or
+`resources("/todos", TodoController.self)`. Decode input with `conn.permit`.
+See the Controllers guide in the documentation.
 
 ## Development commands
 
@@ -42,9 +49,9 @@ export ROOST_FRAMEWORK_PATH="$PWD"
 
 `ROOST_FRAMEWORK_PATH` allows an existing checkout to keep its directory name.
 When omitted, generated apps use `$ROOST_ECOSYSTEM_PATH/Roost` if that override
-is set, or the published Roost 2.0.1 package otherwise. The reading-list app also
+is set, or the published Roost 2.1 package otherwise. The reading-list app also
 uses published Roost by default; it no longer selects a local framework
-automatically. ESW 1.5.0, Spectro 2.x (from 2.0.0), and Nexus 2.0.0 resolve from published packages. Set
+automatically. ESW 1.6.0, Spectro 2.x (from 2.0.0), and Nexus 2.0.0 or later resolve from published packages. Set
 `ROOST_ESW_PATH` only when you want to develop against a local ESW checkout.
 
 ## Runtime names
