@@ -37,9 +37,10 @@ public func roost_requestLogger(
     let filters = (roost_filteredParameters + filterParameters).map { $0.lowercased() }
     return { conn in
         let start = ContinuousClock.now
-        let method = conn.request.method.rawValue
-        let path = (conn.request.path ?? "/").split(separator: "?", maxSplits: 1).first.map(String.init) ?? "/"
         return conn.roost_recordingMatchedRoute().registerBeforeSend { c in
+            // Read the request when the response is ready, after `methodOverride()` applied `_method`.
+            let method = c.request.method.rawValue
+            let path = (c.request.path ?? "/").split(separator: "?", maxSplits: 1).first.map(String.init) ?? "/"
             let milliseconds = (ContinuousClock.now - start) / .milliseconds(1)
             let duration = String(format: "%.1f", milliseconds)
             let status = c.response.status.code
@@ -100,8 +101,8 @@ private func roost_filteredJSON(_ value: Any, hidden: (String) -> Bool) -> Strin
     }
     let filtered = filter(value)
     if let string = filtered as? String { return string }
-    guard JSONSerialization.isValidJSONObject(filtered),
-          let data = try? JSONSerialization.data(withJSONObject: filtered, options: [.sortedKeys]) else {
+    // Serialize numbers and Booleans too, so `true` is not logged as `1`.
+    guard let data = try? JSONSerialization.data(withJSONObject: filtered, options: [.sortedKeys, .fragmentsAllowed]) else {
         return "\(filtered)"
     }
     return String(decoding: data, as: UTF8.self)

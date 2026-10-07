@@ -318,6 +318,16 @@ private struct LoggedApp: RoostApp {
     }
 }
 
+private struct OverrideApp: RoostApp {
+    var plugs: [Plug] {
+        [roost_requestLogger(logger: Logger(label: "test") { _ in CaptureHandler(capture: logs) }), bodyParser(), methodOverride()]
+    }
+
+    @RouteBuilder var routes: [Route] {
+        resources("/recipes", RecipeController.self)
+    }
+}
+
 @Suite("Request logging", .serialized)
 struct RequestLoggerTests {
     @Test("one line names the action, route, and parameters, with secrets filtered")
@@ -361,6 +371,17 @@ struct RequestLoggerTests {
             return
         }
         #expect(params["card"] == #"{"cvv":"[FILTERED]","number":"4242"}"#)
+        #expect(params["vegetarian"] == "false")
+        #expect(params["servings"] == "1")
+    }
+
+    @Test("a form's _method override is logged as the method that was routed")
+    func methodOverride() async throws {
+        _ = logs.take()
+        let app = try await TestApp(OverrideApp.self)
+        _ = try await app.post("/recipes/3", form: ["_method": "DELETE"])
+        let entry = try #require(logs.take().first)
+        #expect(entry.message.hasPrefix("DELETE /recipes/3 → RecipeController.delete → 200 in "))
     }
 
     @Test("an action that throws is still logged by name")
