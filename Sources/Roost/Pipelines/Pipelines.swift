@@ -2,72 +2,45 @@ import Foundation
 import Nexus
 import NexusRouter
 
-// MARK: - Named pipeline registry
-
-/// Thread-unsafe storage used exclusively during synchronous `routes` property evaluation.
-///
-/// `pipeline(_:_:)` writes here; `scope(_:pipelines:_:)` reads here.
-/// Safe because `routes` is always evaluated on one thread at startup.
-nonisolated(unsafe) private var _pipelineRegistry: [String: [Plug]] = [:]
-
-// MARK: - DSL: pipeline(name:) { plugs }
-
-/// Declares a named pipeline inside a `@RouteBuilder` closure.
-///
-/// A pipeline is a reusable, ordered list of plugs. Declare it before any
-/// `scope(pipelines:)` that references it — declarations are processed in order.
-///
-/// ```swift
-/// @RouteBuilder var routes: [Route] {
-///     pipeline("browser") {
-///         bodyParser()
-///         flashPlug()
-///         roost_csrfProtection()
-///     }
-///
-///     scope("/", pipelines: ["browser"]) {
-///         GET("/",      HomeController.index)
-///         GET("/login", SessionController.new)
-///     }
-/// }
-/// ```
-///
-/// - Parameters:
-///   - name: A unique identifier for this pipeline (e.g. `"browser"`, `"api"`).
-///   - build: A `@PlugPipeline` builder that returns the ordered list of plugs.
-/// - Returns: An empty route array (used by `@RouteBuilder` for composition).
-@discardableResult
-public func pipeline(_ name: String, @PlugPipeline _ build: () -> [Plug]) -> [Route] {
-    _pipelineRegistry[name] = build()
-    return []
-}
-
 // MARK: - DSL: scope(prefix:pipelines:) { routes }
 
-/// Creates a group of routes sharing a path prefix and one or more named pipelines.
+/// Creates a group of routes sharing a path prefix and one or more pipelines.
 ///
-/// Pipelines are composed left-to-right: the first name in the array runs first.
-/// Named pipelines must be declared with `pipeline(_:_:)` before this call.
+/// A pipeline is a plain value, so routers split across files share it by
+/// name in Swift, and a typo is a compile error:
 ///
 /// ```swift
-/// scope("/", pipelines: ["browser", "authenticated"]) {
-///     GET("/dashboard", DashboardController.index)
-///     GET("/profile",   UserController.show)
+/// let browser = NamedPipeline { browserPlugs() }
+/// let authenticated = NamedPipeline { requireAuth() }
+///
+/// @RouteBuilder func accountRoutes() -> [Route] {
+///     scope("/", pipelines: [browser, authenticated]) {
+///         GET("/dashboard", DashboardController.self, .index)
+///         resources("/recipes", RecipeController.self)
+///     }
 /// }
 /// ```
+///
+/// Pipelines run left to right: the first one in the array runs first.
 ///
 /// - Parameters:
 ///   - prefix: Path prefix to prepend to all nested routes.
-///   - names: Names of previously declared pipelines to apply, in order.
+///   - pipelines: The pipelines to apply, in order.
 ///   - build: A `@RouteBuilder` closure that declares the routes in this scope.
 /// - Returns: Routes with the prefix and pipeline plugs applied.
 public func scope(
     _ prefix: String,
-    pipelines names: [String],
+    pipelines: [NamedPipeline],
     @RouteBuilder _ build: () -> [Route]
 ) -> [Route] {
-    let plugs = names.flatMap { _pipelineRegistry[$0] ?? [] }
-    return scope(prefix, through: plugs, build)
+    scope(prefix, through: pipelines.map { $0.asPlug() }, build)
+}
+
+extension PlugPipeline {
+    /// Accepts a list of plugs, such as `browserPlugs()`, inside a pipeline builder.
+    public static func buildExpression(_ plugs: [Plug]) -> [Plug] {
+        plugs
+    }
 }
 
 // MARK: - DSL: scope(prefix:plugs:) { routes } — inline anonymous pipeline
@@ -78,7 +51,7 @@ public func scope(
 ///
 /// ```swift
 /// scope("/admin", plugs: [requireRole("admin")]) {
-///     GET("/users", AdminController.users)
+///     GET("/users", AdminController.self, .users)
 /// }
 /// ```
 ///
@@ -93,4 +66,44 @@ public func scope(
     @RouteBuilder _ build: () -> [Route]
 ) -> [Route] {
     scope(prefix, through: plugs, build)
+}
+
+// MARK: - Deprecated string pipelines
+
+/// Storage for the deprecated string pipelines, written while `routes` is evaluated.
+nonisolated(unsafe) private var _pipelineRegistry: [String: [Plug]] = [:]
+
+/// Declares a pipeline by name inside a `@RouteBuilder` closure.
+///
+/// Deprecated: names live in global state, so a scope works only when the
+/// declaration was evaluated first, which breaks when routers are split across
+/// files. Declare a `NamedPipeline` value and pass it to `scope(_:pipelines:)`.
+@available(*, deprecated, message: "Declare a NamedPipeline value and pass it to scope(_:pipelines:) instead.")
+@discardableResult
+public func pipeline(_ name: String, @PlugPipeline _ build: () -> [Plug]) -> [Route] {
+    _pipelineRegistry[name] = build()
+    return []
+}
+
+/// Applies pipelines declared with the deprecated `pipeline(_:_:)` by name.
+///
+/// - Precondition: Every name was declared before this scope is evaluated.
+///   An unknown name stops the app at startup instead of serving the routes
+///   without the pipeline's plugs, such as CSRF protection or authentication.
+@available(*, deprecated, message: "Declare a NamedPipeline value and pass it to scope(_:pipelines:) instead.")
+public func scope(
+    _ prefix: String,
+    pipelines names: [String],
+    @RouteBuilder _ build: () -> [Route]
+) -> [Route] {
+    let plugs = names.flatMap { name -> [Plug] in
+        guard let plugs = _pipelineRegistry[name] else {
+            preconditionFailure("""
+                scope(\"\(prefix)\") uses pipeline \"\(name)\", which was not declared before it. \
+                Declare it with pipeline(\"\(name)\") earlier, or use a NamedPipeline value.
+                """)
+        }
+        return plugs
+    }
+    return scope(prefix, through: plugs, build)
 }

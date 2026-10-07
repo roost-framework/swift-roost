@@ -25,37 +25,54 @@ private func authPlug() -> Plug {
 
 // MARK: - Fixture app
 
+private let browser = NamedPipeline { stamp("B") }
+private let api = NamedPipeline { stamp("A") }
+private let auth = NamedPipeline { authPlug() }
+/// A pipeline builder also takes a list of plugs, such as `browserPlugs()`.
+private let listed = NamedPipeline {
+    stamp("1")
+    [stamp("2"), stamp("3")]
+}
+
+private func trail(_ conn: Connection) -> Connection {
+    conn.text(conn.assigns["pipeline"] as? String ?? "")
+}
+
 private struct PipelineApp: RoostApp {
     @RouteBuilder var routes: [Route] {
-        // Named pipelines
-        pipeline("browser") {
-            stamp("B")
-        }
-        pipeline("api") {
-            stamp("A")
-        }
-        pipeline("auth") {
-            authPlug()
-        }
-
         // Public browser routes
-        scope("/", pipelines: ["browser"]) {
+        scope("/", pipelines: [browser]) {
             GET("/home") { conn in conn.text("home") }
         }
 
         // Authenticated browser routes (two pipelines stacked)
-        scope("/", pipelines: ["browser", "auth"]) {
+        scope("/", pipelines: [browser, auth]) {
             GET("/dashboard") { conn in conn.text("dashboard") }
         }
 
         // API routes
-        scope("/api", pipelines: ["api"]) {
+        scope("/api", pipelines: [api]) {
             GET("/status") { conn in conn.text("ok") }
+        }
+
+        // Pipelines run in the order they are listed
+        scope("/ordered", pipelines: [browser, api, listed]) {
+            GET("/trail") { conn in trail(conn) }
         }
 
         // Inline plugs (anonymous pipeline)
         scope("/admin", plugs: [stamp("X")]) {
             GET("/panel") { conn in conn.text("panel") }
+        }
+    }
+}
+
+/// The deprecated string pipelines keep working when declared first.
+private struct StringPipelineApp: RoostApp {
+    @RouteBuilder var routes: [Route] {
+        pipeline("browser") { stamp("B") }
+        scope("/", pipelines: ["browser"]) {
+            GET("/trail") { conn in trail(conn) }
         }
     }
 }
@@ -129,6 +146,33 @@ struct PipelineTests {
             let response = try await app.get("/admin/panel")
             #expect(response.status == .ok)
             #expect(response.text == "panel")
+        }
+    }
+
+    // MARK: - Ordering
+
+    @Suite("Pipeline Order")
+    struct PipelineOrder {
+
+        @Test("Pipelines run left to right, and a builder accepts a list of plugs")
+        func order() async throws {
+            let app = try await TestApp(PipelineApp.self)
+            #expect(try await app.get("/ordered/trail").text == "BA123")
+        }
+
+        @Test("Deprecated string pipelines still apply their plugs")
+        func stringPipelines() async throws {
+            let app = try await TestApp(StringPipelineApp.self)
+            #expect(try await app.get("/trail").text == "B")
+        }
+
+        @Test("An undeclared string pipeline stops the app instead of dropping its plugs")
+        func unknownStringPipeline() async {
+            await #expect(processExitsWith: .failure) {
+                _ = scope("/", pipelines: ["missing"]) {
+                    GET("/") { conn in conn }
+                }
+            }
         }
     }
 
