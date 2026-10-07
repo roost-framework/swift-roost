@@ -21,16 +21,38 @@ struct BrowserExample: RoostApp {
     var plugs: [Plug] { browserPlugs() }
 
     @RouteBuilder var routes: [Route] {
-        GET("/csrf") { conn in
-            try conn.json(value: ["token": conn.csrfToken])
+        GET("/csrf", MessageController.self, .token)
+        POST("/message", MessageController.self, .create)
+        GET("/message", MessageController.self, .show)
+    }
+}
+
+struct MessageParams: Codable, Sendable {
+    let message: String
+}
+
+struct MessageController: Controller {
+    enum Action: String, ControllerAction { case token, create, show }
+
+    static func action(_ action: Action) -> Plug {
+        switch action {
+        case .token: token
+        case .create: create
+        case .show: show
         }
-        POST("/message") { conn in
-            conn.putSessionValue("message", conn.bodyParams["message"] ?? "")
-                .redirect(to: "/message")
-        }
-        GET("/message") { conn in
-            conn.text(conn.sessionValue("message") as? String ?? "")
-        }
+    }
+
+    static func token(_ conn: Connection) async throws -> Connection {
+        try conn.json(value: ["token": conn.csrfToken])
+    }
+
+    static func create(_ conn: Connection) async throws -> Connection {
+        let params = try conn.permit(MessageParams.self)
+        return conn.putSessionValue("message", params.message).redirect(to: "/message")
+    }
+
+    static func show(_ conn: Connection) async throws -> Connection {
+        conn.text(conn.sessionValue("message") as? String ?? "")
     }
 }
 ```

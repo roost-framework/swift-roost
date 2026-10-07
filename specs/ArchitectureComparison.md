@@ -56,11 +56,11 @@ app.post("todos", use: todos.create)
 ### Routes as Data
 
 ```swift
-// Routes are just arrays
+// Routes are just arrays that name controller actions
 @RouteBuilder
 func userRoutes() -> [Route] {
-    GET("/") { conn in ... }
-    GET("/:id") { conn in ... }
+    GET("/", UserController.self, .index)
+    GET("/:id", UserController.self, .show)
 }
 
 // Composition is array concatenation
@@ -157,13 +157,13 @@ var plugs: [Plug] {
 
 @RouteBuilder var routes: [Route] {
     // Frontend pipeline (HTML, CSRF, sessions)
-    scope("/") {
-        GET("/donuts") { conn in ... }  // uses flash, CSRF
+    scope("/", pipelines: [browser]) {
+        resources("/donuts", DonutController.self)        // uses flash, CSRF
     }
 
     // API pipeline (JSON, no CSRF)
-    scope("/api/v1") {
-        GET("/donuts") { conn in ... }  // JSON only
+    scope("/api/v1", pipelines: [api]) {
+        resources("/donuts", DonutAPIController.self)     // JSON only
     }
 }
 ```
@@ -187,23 +187,36 @@ resources :users
 ```
 
 ```swift
-// Roost: Sources/DonutShop/Routes/CustomerRoutes.swift
-@RouteBuilder
-func customerRoutes() -> [Route] {
-    GET("/") { conn in
-        let customers = try await conn.repo().all(Customer.self)
-        return conn.html(...)
+// Roost: Sources/DonutShop/Controllers/CustomerController.swift
+struct CustomerController: Controller {
+    enum Action: String, ControllerAction { case index, show }
+
+    static func action(_ action: Action) -> Plug {
+        switch action {
+        case .index: index
+        case .show: show
+        }
     }
 
-    GET("/:id") { conn in
-        let id = conn.params["id"]
+    static func index(_ conn: Connection) async throws -> Connection {
+        let customers = try await conn.repo().all(Customer.self)
+        return try conn.render(CustomersIndexView(customers: customers), title: "Customers")
+    }
+
+    static func show(_ conn: Connection) async throws -> Connection {
+        let id: UUID = try conn.requireParam("id")
         let customer = try await conn.repo().get(Customer.self, id: id)
-        return conn.html(...)
+        return try conn.render(CustomerShowView(customer: customer), title: customer.name)
     }
 }
+
+// App.swift
+resources("/customers", CustomerController.self)
 ```
 
-**Key insight:** Roost eliminates the controller class. The route *is* the action.
+**Key insight:** like Phoenix, routes name actions and controllers hold them.
+Unlike a Vapor controller there is no instance to create: actions are static
+functions, and the compiler checks every action name a route uses.
 
 ---
 
@@ -212,23 +225,21 @@ func customerRoutes() -> [Route] {
 ### Compile-Time Route Validation
 
 ```swift
-// This compiles - valid route tree
 @RouteBuilder
 func validRoutes() -> [Route] {
-    GET("/") { ... }
-    POST("/items") { ... }
-}
-
-// This also compiles - RouteBuilder validates structure
-@RouteBuilder
-func nestedRoutes() -> [Route] {
-    scope("/api") {
-        scope("/v1") {
-            GET("/users") { ... }
-        }
+    GET("/", PageController.self, .home)
+    POST("/items", ItemController.self, .create)
+    scope("/api/v1") {
+        resources("/users", UserAPIController.self, only: [.index, .show])
     }
 }
+
+// Does not compile: ItemController.Action has no member 'publish'
+POST("/items/:id/publish", ItemController.self, .publish)
 ```
+
+An action without a function fails to compile too, because `action(_:)` is an
+exhaustive `switch`.
 
 Compare to:
 
@@ -245,18 +256,18 @@ app.get("users", ":id") { ... }  // silent overwrite!
 ### Pure Functions Enable Testing
 
 ```swift
-// Roost: Route handler is pure
-func showDonut(conn: Connection) async throws -> Connection {
-    let id = conn.params["id"]
+// Roost: a controller action is a plain function
+static func show(_ conn: Connection) async throws -> Connection {
+    let id: UUID = try conn.requireParam("id")
     let donut = try await conn.repo().get(Donut.self, id: id)
     return try conn.json(value: donut)
 }
 
-// Can test handler directly
-@Test func showDonutHandler() async throws {
-    let conn = TestConnection.get("/donuts/123")
-    let result = try await showDonut(conn: conn)
-    #expect(result.response.status == .ok)
+// Test the whole pipeline in-process, or call DonutAPIController.show directly
+@Test func showDonut() async throws {
+    let app = try await TestApp(DonutShop.self)
+    let response = try await app.get("/api/v1/donuts/\(donut.id)")
+    #expect(response.status == .ok)
 }
 ```
 
@@ -283,11 +294,11 @@ func showDonut(req: Request) async throws -> Donut { ... }
 |---------|-------------|-------|-----------|
 | **Route definition** | Imperative mutation | Imperative mutation | Declarative data |
 | **Route composition** | Awkward (group closures) | Awkward (controllers) | Natural (functions) |
-| **Handler isolation** | Tied to Router | Tied to Application | Pure functions |
+| **Handler isolation** | Tied to Router | Tied to Application | Static controller actions |
 | **Testing** | Full router required | Full app required | TestApp, no server |
 | **Frontend/API split** | Manual | Manual | scope/forward |
 | **Middleware** | Router-level | Route-level | Pipeline array |
-| **Type safety** | Path strings | Path strings | @RouteBuilder |
+| **Type safety** | Path strings | Path strings | @RouteBuilder, checked action names |
 | **Inspiration** | Swift NIO | Node/Express | Phoenix/Rails |
 
 ---
@@ -301,7 +312,7 @@ func showDonut(req: Request) async throws -> Donut { ... }
 
 **Use Vapor when:**
 - You want a large ecosystem
-- You prefer controller classes
+- You prefer controller class instances
 - You need ORM integration (Fluent)
 
 **Use Roost when:**

@@ -83,11 +83,11 @@ func donutRoutes() -> [Route] {
 ```swift
 @RouteBuilder var routes: [Route] {
     // Flat routes
-    GET("/health") { conn in ... }
+    GET("/health", HealthController.self, .show)
 
     // Nested scope
     scope("/api/v1") {
-        GET("/donuts") { ... }
+        resources("/donuts", DonutAPIController.self, only: [.index])
         scope("/orders") { orderRoutes() }
     }
 

@@ -133,10 +133,10 @@ so JSON and HTML callers follow the same rules.
 ### Use an inline fragment
 
 For a small response that does not contain a request-aware form, an inline
-template is enough:
+template in the controller action is enough:
 
 ```swift
-GET("/fragment") { conn in
+static func fragment(_ conn: Connection) async throws -> Connection {
     let name = conn.queryParams["name"] ?? "world"
     return conn.html(#hesw("<h1>Hello, {name}.</h1>"))
 }
