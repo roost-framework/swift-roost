@@ -1,5 +1,11 @@
 import Roost
 
+/// The fields the registration and login forms submit. Other fields are ignored.
+struct Credentials: Codable, Sendable {
+    let email: String
+    let password: String
+}
+
 struct AccountsContext: Sendable {
     let repo: any Repo
     static let sessionLifetime: TimeInterval = 24 * 60 * 60

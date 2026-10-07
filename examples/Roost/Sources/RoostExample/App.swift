@@ -11,7 +11,7 @@ struct RoostExample: RoostApp {
     }
 
     var plugs: [Plug] {
-        [requestId(), requestLogger(), roost_staticFiles()] + browserPlugs() + [
+        [requestId(), roost_requestLogger(), roost_staticFiles()] + browserPlugs() + [
             fetchCurrentUser(),
             // roost:plugs
         ]
@@ -19,12 +19,11 @@ struct RoostExample: RoostApp {
 
     @RouteBuilder var routes: [Route] {
         scope("/auth") { authRoutes() }
-        scope("/", plugs: [requireAuth()]) { bookmarksRoutes() }
-        bookmarksApiRoutes()
+        resources("/bookmarks", BookmarkController.self)
+        POST("/bookmarks/:id/read", BookmarkController.self, .read)
+        scope("/api") { resources("/bookmarks", BookmarkAPIController.self) }
         // roost:routes
-        GET("/") { conn in
-            conn.redirect(to: conn.authenticatedUserID == nil ? "/auth/login" : "/bookmarks")
-        }
+        GET("/", PageController.self, .home)
     }
 
     func willStart(spectro: SpectroClient) async throws {

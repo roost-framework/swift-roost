@@ -4,9 +4,9 @@ import Testing
 
 @Test("Form input is trimmed, notes are optional, and an unchecked box becomes false")
 func bookmarkValidForm() async throws {
-    let input = try await CreateBookmarkInput(form: [
+    let input = try await FormValues([
         "title": "  Swift guide  ", "url": " https://swift.org/documentation/ ", "note": "",
-    ]).validated()
+    ]).decode(as: CreateBookmarkInput.self).validated()
     #expect(input.title == "Swift guide")
     #expect(input.url == "https://swift.org/documentation/")
     #expect(input.note.isEmpty)

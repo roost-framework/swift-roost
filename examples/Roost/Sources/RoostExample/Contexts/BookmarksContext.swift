@@ -90,13 +90,3 @@ struct CreateBookmarkInput: Codable, Sendable {
         return try changeset.requireValid()
     }
 }
-
-extension CreateBookmarkInput {
-    init(form: [String: String]) throws {
-        let values = FormValues(form)
-        self.title = try values.decode("title", as: String.self)
-        self.url = try values.decode("url", as: String.self)
-        self.note = try values.decode("note", as: String.self)
-        self.read = try values.decode("read", as: Bool.self)
-    }
-}
