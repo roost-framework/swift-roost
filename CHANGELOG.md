@@ -2,15 +2,14 @@
 
 ## 2.1.1
 
-Roost apps download about 165 MB less.
+Roost apps download about 75 MB less.
 
-- Roost depends on Spectro 2.2.0 and Nexus 2.1.0 or later with their default
-  package traits turned off. SwiftPM no longer fetches Spectro's command-line
-  dependencies (ArgumentParser, Noora) or Nexus's Vapor adapter (Vapor,
-  routing-kit, multipart-kit, console-kit, websocket-kit) for an app built on
-  Roost: 39 packages and 447 MB of sources instead of 47 and 612 MB.
-- An app that also depends on Spectro or Nexus directly keeps their default
-  traits, so `SpectroMigrations` and `NexusVapor` keep working there.
+- Roost depends on Nexus 2.1.0 or later with its default `Vapor` trait turned
+  off. SwiftPM no longer fetches Vapor, routing-kit, multipart-kit,
+  console-kit, or websocket-kit for an app built on Roost. An app that depends
+  on Nexus directly keeps the trait, so `NexusVapor` keeps working there.
+- Spectro keeps its default traits, because `roost spectro` builds and runs the
+  app's own `spectro` command.
 
 ## 2.1.0
 

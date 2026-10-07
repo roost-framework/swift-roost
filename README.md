@@ -61,7 +61,7 @@ struct PageController: Controller {
 compiler checks, `resources` routes REST actions, controller plugs run before
 chosen actions, `conn.permit` decodes only the fields an input type declares, and
 every request is logged and traced by action with secrets filtered. It uses
-published Nexus 2.x (from 2.1.0), Spectro 2.x (from 2.2.0), and ESW 1.6.0. Moving from
+published Nexus 2.x (from 2.1.0), Spectro 2.x (from 2.0.0), and ESW 1.6.0. Moving from
 Peregrine? Follow the [upgrade guide](guides/renaming-to-roost.md).
 [See what has been verified and what remains.](guides/dx-acceptance.md)
 
@@ -181,11 +181,11 @@ swift build -c release --product roost
 
 Then copy `.build/release/roost` to a directory on your `PATH`.
 
-Generated apps download Roost 2.1.1, Spectro 2.x (from 2.2.0), Nexus 2.x (from 2.1.0),
+Generated apps download Roost 2.1.1, Spectro 2.x (from 2.0.0), Nexus 2.x (from 2.1.0),
 and ESW 1.6.0 through SwiftPM. No companion source checkouts or dependency overrides are needed.
-Roost turns off Spectro's and Nexus's default package traits, so SwiftPM skips their
-command-line tools and Vapor adapter: about 165 MB less to download. Existing apps
-retain their resolved versions until you run `swift package update`.
+Roost turns off Nexus's default `Vapor` trait, so SwiftPM skips Vapor and its
+dependencies: about 75 MB less to download. Existing apps retain their resolved
+versions until you run `swift package update`.
 
 Framework contributors can optionally set `ROOST_FRAMEWORK_PATH` to a checkout.
 `ROOST_ECOSYSTEM_PATH` selects the parent of all four repositories; `ROOST_ESW_PATH`

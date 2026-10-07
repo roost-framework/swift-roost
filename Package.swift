@@ -26,8 +26,9 @@ let package = Package(
         .library(name: "RoostTest", targets: ["RoostTest"]),
     ],
     dependencies: [
-        // Roost uses neither Spectro's command-line tools nor Nexus's Vapor adapter.
-        ecosystem("Spectro", from: "2.2.0", traits: []),
+        // Spectro keeps its default traits: `roost spectro` runs the app's own spectro command.
+        ecosystem("Spectro", from: "2.0.0"),
+        // Roost doesn't use Nexus's Vapor adapter.
         ecosystem("Nexus", from: "2.1.0", traits: []),
         ecosystem("ESW", from: "1.6.0"),
         .package(
