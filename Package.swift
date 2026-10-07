@@ -5,14 +5,15 @@ import Foundation
 
 // Opt in when developing the four repositories together. Published dependencies
 // remain the default and are tested separately in CI.
-func ecosystem(_ name: String, from version: Version) -> Package.Dependency {
+func ecosystem(_ name: String, from version: Version,
+               traits: Set<Package.Dependency.Trait> = [.defaults]) -> Package.Dependency {
     if name == "ESW", let path = ProcessInfo.processInfo.environment["ROOST_ESW_PATH"] {
         return .package(name: "esw", path: path)
     }
     if let root = ProcessInfo.processInfo.environment["ROOST_ECOSYSTEM_PATH"] {
-        return .package(name: name.lowercased(), path: "\(root)/\(name == "ESW" ? "esw" : name)")
+        return .package(name: name.lowercased(), path: "\(root)/\(name == "ESW" ? "esw" : name)", traits: traits)
     }
-    return .package(url: "https://github.com/roost-framework/\(name).git", from: version)
+    return .package(url: "https://github.com/roost-framework/\(name).git", from: version, traits: traits)
 }
 
 let package = Package(
@@ -25,8 +26,9 @@ let package = Package(
         .library(name: "RoostTest", targets: ["RoostTest"]),
     ],
     dependencies: [
-        ecosystem("Spectro", from: "2.0.0"),
-        ecosystem("Nexus", from: "2.0.0"),
+        // Roost uses neither Spectro's command-line tools nor Nexus's Vapor adapter.
+        ecosystem("Spectro", from: "2.2.0", traits: []),
+        ecosystem("Nexus", from: "2.1.0", traits: []),
         ecosystem("ESW", from: "1.6.0"),
         .package(
             url: "https://github.com/hummingbird-project/hummingbird.git",
