@@ -11,10 +11,10 @@ package func roost_applicationPipeline<App: RoostApp>(
     jobs: (any RoostJobQueue)?,
     pubSub: (any RoostPubSub)?
 ) -> Plug {
-    let router = Router { app.routes }
+    let router = Router { roost_recordingMatches(app.routes) }
     let layout = app.layout
     var plugs: [Plug] = [{ conn in
-        var result = conn.assign(ChannelRegistryKey.self, value: channels)
+        var result = conn.roost_recordingMatchedRoute().assign(ChannelRegistryKey.self, value: channels)
         if let layout { result = result.assign(HTMLLayoutKey.self, value: layout) }
         if let spectro { result = result.assign(SpectroKey.self, value: spectro) }
         if let repository { result = result.assign(RepositoryKey.self, value: repository) }

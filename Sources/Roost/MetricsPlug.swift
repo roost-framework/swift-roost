@@ -109,7 +109,7 @@ public func sharedMetricsStore() -> DevMetricsStore {
 ///
 /// ```swift
 /// var plugs: [Plug] {
-///     [metrics(), requestLogger()]
+///     [metrics(), roost_requestLogger()]
 /// }
 /// ```
 public func metrics() -> Plug {
@@ -141,8 +141,8 @@ public func metrics() -> Plug {
             histogram.record(seconds)
             inFlightGauge.decrement()
 
-            // Record for dev endpoint
-            let path = c.request.path ?? ""
+            // Record for dev endpoint, grouped by route pattern so IDs don't split one route
+            let path = c.matchedRoute.pattern ?? c.request.path ?? ""
             sharedDevStore.record(
                 method: method,
                 path: path,
@@ -163,7 +163,7 @@ public func metrics() -> Plug {
 ///
 /// ```swift
 /// var plugs: [Plug] {
-///     [metrics(), devMetricsEndpoint(), requestLogger()]
+///     [metrics(), devMetricsEndpoint(), roost_requestLogger()]
 /// }
 /// ```
 public func devMetricsEndpoint() -> Plug {

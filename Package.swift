@@ -42,7 +42,7 @@ let package = Package(
         ),
         .package(
             url: "https://github.com/apple/swift-distributed-tracing.git",
-            from: "1.0.0"
+            from: "1.3.0"
         ),
         .package(
             url: "https://github.com/apple/swift-log.git",
@@ -79,6 +79,8 @@ let package = Package(
                 "RoostTest",
                 .product(name: "NexusTest", package: "Nexus"),
                 .product(name: "Crypto", package: "swift-crypto"),
+                .product(name: "InMemoryTracing", package: "swift-distributed-tracing"),
+                .product(name: "Logging", package: "swift-log"),
             ]
         ),
     ]

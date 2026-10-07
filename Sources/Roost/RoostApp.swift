@@ -43,7 +43,7 @@ public protocol RoostApp {
     func authenticateSocket(_ conn: Connection) async throws -> SocketAssigns
 
     /// Middleware pipeline applied to every request.
-    /// Default: `[requestId(), requestLogger()]`.
+    /// Default: `[requestId(), roost_requestLogger()]`.
     var plugs: [Plug] { get }
 
     /// Route definitions.
@@ -96,7 +96,7 @@ extension RoostApp {
     public func authenticateSocket(_ conn: Connection) async throws -> SocketAssigns { [:] }
 
     public var plugs: [Plug] {
-        [requestId(), requestLogger()]
+        [requestId(), roost_requestLogger()]
     }
 
     public var server: ServerConfig {
