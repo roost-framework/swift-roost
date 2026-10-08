@@ -33,6 +33,8 @@ def main():
                         help="SwiftPM build directory (defaults outside the source checkout)")
     parser.add_argument("--output", type=Path, default=cache / "Roost.doccarchive",
                         help="combined documentation archive and static website directory")
+    parser.add_argument("--allow-warnings", action="store_true",
+                        help="do not fail on DocC warnings, for releases that predate later link fixes")
     parser.add_argument("--hosting-base-path", default="/",
                         help="URL prefix when hosting under a subdirectory, such as /swift-roost/docs")
     args = parser.parse_args()
@@ -88,7 +90,7 @@ def main():
                  "--fallback-bundle-identifier", f"dev.roost.{module}",
                  "--fallback-default-module-kind", "Library",
                  "--hosting-base-path", args.hosting_base_path,
-                 "--warnings-as-errors", "--analyze",
+                 *([] if args.allow_warnings else ["--warnings-as-errors"]), "--analyze",
                  "--enable-experimental-external-link-support"]
             for dependency in archives:
                 command.extend(["--dependency", dependency])

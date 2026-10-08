@@ -64,7 +64,8 @@ jobs:
       - name: Require a Swift 6.3 or newer DocC toolchain
         run: swift --version | grep -Eq "Swift version 6\.[3-9]"
       - name: Build the documentation archive
-        run: python3 scripts/build_docs.py --output "$RUNNER_TEMP/Roost.doccarchive"
+        # Backfilled tags may predate later DocC link fixes, so only new releases fail on warnings.
+        run: python3 scripts/build_docs.py --output "$RUNNER_TEMP/Roost.doccarchive" ${{ github.event_name == 'workflow_dispatch' && '--allow-warnings' || '' }}
       - name: Attach it to the release
         run: |
           ditto -c -k --keepParent "$RUNNER_TEMP/Roost.doccarchive" "$RUNNER_TEMP/Roost-$TAG.doccarchive.zip"
