@@ -128,3 +128,19 @@ Business operations belong in contexts that accept a repository. An action
 should permit its input, obtain trusted identity, call the context, and render
 or redirect.
 See <doc:DataAndMigrations> and <doc:AuthenticationAndSessions>.
+
+### Reload the browser during development
+
+In the `dev` environment, Roost keeps open pages in step with the development
+server. It adds a small script to HTML responses, which listens for events at
+`/_roost/live-reload`:
+
+- When a `.css` file under `Public/` changes, such as the `Public/css/app.css`
+  that Tailwind rewrites while `roost server` runs, the page loads the new
+  stylesheet before removing the old one. It keeps its state and scroll position.
+- When the server restarts, the page reloads once.
+
+The script is added to buffered HTML before response hooks such as `compress()`
+encode it. JSON, files from `Public/`, streams, and HEAD responses are
+unchanged. In `test` and `prod`, including `RoostTest.TestApp`, Roost serves
+neither the endpoint nor the script, so applications need no configuration.

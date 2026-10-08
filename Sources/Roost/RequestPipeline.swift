@@ -25,7 +25,7 @@ package func roost_applicationPipeline<App: RoostApp>(
     if let store = app.sessionStore { plugs.append(session(store: store)) }
     plugs += app.plugs
     plugs.append { conn in try await router(conn) }
-    return roost_requestPipeline(plugs, customErrorPage: app.customErrorPage)
+    return roost_liveReload(roost_requestPipeline(plugs, customErrorPage: app.customErrorPage))
 }
 
 /// The response lifecycle shared by the server and the in-process test harness.

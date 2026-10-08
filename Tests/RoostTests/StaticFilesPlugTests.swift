@@ -97,6 +97,15 @@ struct StaticFilesPlugTests {
         )
     }
 
+    @Test func servesFileRequestedWithQueryString() async throws {
+        let plug = roost_staticFiles(from: tempDir)
+        let conn = TestConnection.build(method: .get, path: "/css/main.css?v=2")
+        let result = try await plug(conn)
+
+        #expect(result.isHalted)
+        #expect(result.response.status == .ok)
+    }
+
     @Test func servesExistingJSFile() async throws {
         let plug = roost_staticFiles(from: tempDir)
         let conn = TestConnection.build(method: .get, path: "/app.js")
