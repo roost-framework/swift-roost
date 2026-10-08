@@ -93,7 +93,7 @@ struct LiveReloadTests {
         // A browser that disconnects and reconnects subscribes twice.
         _ = await hub?.subscribe()
         _ = await hub?.subscribe()
-        let sources = await hub?.shutdownSignals ?? []
+        let sources = hub?.shutdownSignals ?? []
         #expect(sources.count == 2)
 
         // The dropped streams unsubscribe asynchronously before the hub is released.

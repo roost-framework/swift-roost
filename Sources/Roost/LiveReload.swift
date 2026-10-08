@@ -58,7 +58,9 @@ actor LiveReloadHub {
     private let directory: String
     private var clients: [UUID: AsyncStream<ServerSentEvent>.Continuation] = [:]
     private var watcher: Task<Void, Never>?
-    private(set) var shutdownSignals: [any DispatchSourceSignal] = []
+    // Dispatch sources are not Sendable on Linux. They are only changed inside
+    // the actor and cancelled in deinit, when nothing else can reach the hub.
+    nonisolated(unsafe) private(set) var shutdownSignals: [any DispatchSourceSignal] = []
 
     init(directory: String) {
         self.directory = directory
