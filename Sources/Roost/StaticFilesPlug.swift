@@ -80,7 +80,8 @@ public func roost_staticFiles(
             return conn
         }
 
-        let requestPath = conn.request.path ?? "/"
+        // Ignore the query string, such as a cache-busting `?v=2`
+        let requestPath = conn.requestPath
 
         // Must match the URL prefix
         guard requestPath == normalizedPrefix

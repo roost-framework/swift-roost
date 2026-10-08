@@ -52,8 +52,10 @@ welcome message. This starter needs no PostgreSQL server or templates.
 
 The development server watches Swift and template files. A successful build
 restarts the app. A failed build prints diagnostics and leaves the previous
-server available. Refresh the browser after a successful restart; this command
-does not provide live state preservation.
+server available. Open HTML pages reload after a successful restart, and
+stylesheet changes in `Public/` apply without a reload; refresh other responses,
+such as this JSON, yourself. Page state is not preserved across a restart. See
+<doc:RoutingAndMiddleware#Reload-the-browser-during-development>.
 
 ### Write a controller
 
