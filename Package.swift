@@ -25,10 +25,22 @@ let package = Package(
         .library(name: "Roost", targets: ["Roost"]),
         .library(name: "RoostTest", targets: ["RoostTest"]),
     ],
+    traits: [
+        // Off by default: SwiftPM 6.4 cannot resolve a dependency trait enabled through a
+        // default trait of a non-root package. Apps opt in with
+        // `traits: [.defaults, "RichTerminal"]` on swift-roost, as `roost new` writes it.
+        .trait(name: "RichTerminal",
+               description: "Colors, spinners, prompts, and styled tables in `roost spectro`, from Spectro's Noora output."),
+        .default(enabledTraits: []),
+    ],
     dependencies: [
-        // `roost spectro` builds the app's own spectro command, which needs `CLI`. Without
-        // `RichTerminal` it prints plain text and Noora is not fetched.
-        ecosystem("Spectro", from: "2.3.0", traits: ["CLI"]),
+        // `roost spectro` builds the app's own spectro command, which needs `CLI`. Roost's
+        // `RichTerminal` trait passes Spectro's on; without it spectro prints plain text
+        // and Noora is not fetched.
+        ecosystem("Spectro", from: "2.3.0", traits: [
+            "CLI",
+            .trait(name: "RichTerminal", condition: .when(traits: ["RichTerminal"])),
+        ]),
         // Roost doesn't use Nexus's Vapor adapter.
         ecosystem("Nexus", from: "2.1.0", traits: []),
         ecosystem("ESW", from: "1.6.0"),

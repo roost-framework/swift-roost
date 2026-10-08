@@ -4,7 +4,7 @@ Distinguish the implemented application workflow from development integrations.
 
 ## Overview
 
-This catalog documents Roost 2.1.0 and its generators. Releases before 2.0.0
+This catalog documents Roost 2.1.3 and its generators. Releases before 2.0.0
 use the earlier Peregrine module and executable names.
 
 The core development path is a PostgreSQL-backed app with authentication,

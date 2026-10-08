@@ -1,5 +1,26 @@
 # Changelog
 
+## 2.1.3
+
+`roost spectro` can show Spectro's colors, spinners, and styled tables again.
+
+- Roost has a `RichTerminal` trait that turns on Spectro's. Apps opt in on their
+  swift-roost dependency:
+
+  ```swift
+  .package(url: "https://github.com/roost-framework/swift-roost", from: "2.1.3",
+           traits: [.defaults, "RichTerminal"])
+  ```
+
+  Apps created by roost-cli 2.1.1 or later include it. Without it, an app
+  downloads no Noora and `roost spectro` prints plain text, as in 2.1.2.
+- The trait is off by default because SwiftPM 6.4 can't resolve a dependency
+  trait that a non-root package turns on through its own default traits: every
+  app depending on Roost would fail with "exhausted attempts to resolve the
+  dependencies graph".
+- An app that added Spectro as a direct dependency to get the richer output can
+  drop that dependency and use the trait.
+
 ## 2.1.2
 
 Roost apps no longer download Noora: an app built on Roost resolves 39 packages

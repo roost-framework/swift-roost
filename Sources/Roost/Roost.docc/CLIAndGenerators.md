@@ -112,3 +112,9 @@ Run `roost <command> --help` for the command's supported options.
 `roost spectro` runs the `spectro` executable from the app's own dependencies,
 so its version always matches `Package.resolved`. Use it to create or drop
 databases. There is no seed command.
+
+Generated apps depend on swift-roost with `traits: [.defaults, "RichTerminal"]`,
+which gives `roost spectro` colors, spinners, and styled tables. Without the
+trait, `spectro` prints the same information as plain text and SwiftPM doesn't
+download Noora. Add the trait to an app created before roost-cli 2.1.1 the same
+way, with `from: "2.1.3"` or later.

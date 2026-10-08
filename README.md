@@ -162,7 +162,7 @@ Install the CLI with [Mint](https://github.com/yonaskolb/Mint):
 
 ```sh
 brew install mint
-mint install roost-framework/roost-cli@2.1.0
+mint install roost-framework/roost-cli@2.1.1
 roost --version
 ```
 
@@ -174,20 +174,27 @@ not resolve the framework's dependencies.
 Without Mint, for example on Linux, build from a checkout:
 
 ```sh
-git clone --branch 2.1.0 --depth 1 https://github.com/roost-framework/roost-cli.git
+git clone --branch 2.1.1 --depth 1 https://github.com/roost-framework/roost-cli.git
 cd roost-cli
 swift build -c release --product roost
 ```
 
 Then copy `.build/release/roost` to a directory on your `PATH`.
 
-Generated apps download Roost 2.1.2, Spectro 2.x (from 2.3.0), Nexus 2.x (from 2.1.0),
+Generated apps download Roost 2.1.3, Spectro 2.x (from 2.3.0), Nexus 2.x (from 2.1.0),
 and ESW 1.6.0 through SwiftPM. No companion source checkouts or dependency overrides are needed.
-Roost turns off Nexus's default `Vapor` trait and enables only Spectro's `CLI` trait,
-so SwiftPM skips Vapor and Noora and their dependencies. `roost spectro` then prints
-plain text; add Spectro to your app's dependencies with its default traits for colors,
-spinners, and tables. Existing apps retain their resolved versions until you run
-`swift package update`.
+Roost turns off Nexus's default `Vapor` trait, so SwiftPM skips Vapor and its dependencies.
+Generated apps enable Roost's `RichTerminal` trait, which gives `roost spectro` Spectro's
+colors, spinners, and styled tables:
+
+```swift
+.package(url: "https://github.com/roost-framework/swift-roost", from: "2.1.3",
+         traits: [.defaults, "RichTerminal"])
+```
+
+Leave the trait out to skip downloading Noora (about 80 MB the first time on a
+machine); `roost spectro` then prints plain text. Existing apps retain their
+resolved versions until you run `swift package update`.
 
 Framework contributors can optionally set `ROOST_FRAMEWORK_PATH` to a checkout.
 `ROOST_ECOSYSTEM_PATH` selects the parent of all four repositories; `ROOST_ESW_PATH`
