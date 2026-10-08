@@ -194,7 +194,10 @@ colors, spinners, and styled tables:
 
 Leave the trait out to skip downloading Noora (about 80 MB the first time on a
 machine); `roost spectro` then prints plain text. Existing apps retain their
-resolved versions until you run `swift package update`.
+resolved versions until you run `swift package update`. To add the trait to an
+existing app, run `swift package update swift-roost` first, then add the trait
+and run `swift package resolve`: SwiftPM rejects a trait that the app's
+currently resolved release doesn't declare.
 
 Framework contributors can optionally set `ROOST_FRAMEWORK_PATH` to a checkout.
 `ROOST_ECOSYSTEM_PATH` selects the parent of all four repositories; `ROOST_ESW_PATH`

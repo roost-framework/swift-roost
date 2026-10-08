@@ -21,6 +21,19 @@
 - An app that added Spectro as a direct dependency to get the richer output can
   drop that dependency and use the trait.
 
+### Upgrade
+
+Update swift-roost before adding the trait to an existing app. SwiftPM checks
+traits against the version an app already resolved, and releases before 2.1.3
+declare none, so adding the trait first fails with "enables traits
+[RichTerminal, default] on package 'swift-roost' that declares no traits":
+
+```sh
+swift package update swift-roost   # with the old dependency line
+# then add traits: [.defaults, "RichTerminal"] and run:
+swift package resolve
+```
+
 ## 2.1.2
 
 Roost apps no longer download Noora: an app built on Roost resolves 39 packages

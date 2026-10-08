@@ -118,3 +118,14 @@ which gives `roost spectro` colors, spinners, and styled tables. Without the
 trait, `spectro` prints the same information as plain text and SwiftPM doesn't
 download Noora. Add the trait to an app created before roost-cli 2.1.1 the same
 way, with `from: "2.1.3"` or later.
+
+Update swift-roost before adding the trait to an existing app. SwiftPM checks
+traits against the version an app already resolved, and releases before 2.1.3
+declare none, so adding the trait first fails with "enables traits
+[RichTerminal, default] on package 'swift-roost' that declares no traits":
+
+```sh
+swift package update swift-roost   # with the old dependency line
+# then add traits: [.defaults, "RichTerminal"] and run:
+swift package resolve
+```
