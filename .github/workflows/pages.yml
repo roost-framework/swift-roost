@@ -5,6 +5,10 @@ on:
     branches: [main]
     paths:
       - "website/**"
+      - "Sources/**"
+      - "Documentation/**"
+      - "scripts/build_docs.py"
+      - "Package.swift"
       - ".github/workflows/pages.yml"
   pull_request:
     paths:
@@ -32,9 +36,32 @@ jobs:
           node --test website/playground/examples.test.mjs
           python3 website/check.py
 
+  # The site is one Pages artifact, so every deploy must carry the docs too.
+  # Builds on pushes to main and manual runs (for a dry run from any branch), not on PRs.
+  docs:
+    if: github.event_name != 'pull_request'
+    needs: check
+    runs-on: macos-26
+    steps:
+      - uses: actions/checkout@v6
+      - name: Select the newest installed Xcode
+        run: echo "DEVELOPER_DIR=$(ls -d /Applications/Xcode_*.app | sort -V | tail -n 1)/Contents/Developer" >> "$GITHUB_ENV"
+      - name: Require a Swift 6.3 or newer DocC toolchain
+        run: swift --version | grep -Eq "Swift version 6\.[3-9]"
+      - name: Build documentation for the Pages subpath
+        run: python3 scripts/build_docs.py --hosting-base-path /swift-roost/docs --output "$RUNNER_TEMP/Roost-Pages.doccarchive"
+      # upload-artifact rejects the colons in DocC's file names, such as plug(_:).json,
+      # so the archive travels as one tarball and is unpacked by deploy.
+      - name: Pack the archive into one file
+        run: tar -C "$RUNNER_TEMP/Roost-Pages.doccarchive" -czf "$RUNNER_TEMP/roost-docs.tar.gz" .
+      - uses: actions/upload-artifact@v4
+        with:
+          name: roost-docs
+          path: ${{ runner.temp }}/roost-docs.tar.gz
+
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: check
+    needs: [check, docs]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -52,6 +79,14 @@ jobs:
           cp website/index.html website/404.html website/playground.html website/style.css website/playground.css website/script.js website/robots.txt website/sitemap.xml website/.nojekyll _site/
           cp website/playground/app.mjs website/playground/examples.mjs _site/playground/
           cp -R website/assets _site/assets
+      - uses: actions/download-artifact@v4
+        with:
+          name: roost-docs
+          path: ${{ runner.temp }}/roost-docs
+      - name: Unpack the docs under /docs
+        run: |
+          mkdir -p _site/docs
+          tar -xzf "$RUNNER_TEMP/roost-docs/roost-docs.tar.gz" -C _site/docs
       - uses: actions/upload-pages-artifact@v4
         with:
           path: _site

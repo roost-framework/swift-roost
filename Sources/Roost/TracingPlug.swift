@@ -15,7 +15,7 @@ import Tracing
 /// - Wraps each controller action in a child span named `RecipeController.show`
 /// - Records attributes: http.method, http.url, http.target, http.route,
 ///   http.status_code, roost.request_id, roost.controller, roost.action
-/// - Reuses the ID from ``requestId(generator:headerName:)`` when it ran first
+/// - Reuses the ID from `requestId()` when it ran first
 ///
 /// ```swift
 /// var plugs: [Plug] {
