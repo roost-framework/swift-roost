@@ -285,15 +285,16 @@ Dependencies to add:
 .package(url: "https://github.com/tuist/Noora", .upToNextMajor(from: "0.15.0")),
 ```
 
-Distribute via Mint:
+Distribute via Mint. Since Roost 2.1.0 the CLI is its own package,
+roost-framework/roost-cli; swift-roost has no executable product.
 
 ```
 # Mintfile
-roost-framework/swift-roost
+roost-framework/roost-cli
 ```
 
 ```bash
-mint install roost-framework/swift-roost
+mint install roost-framework/roost-cli
 ```
 
 ---
