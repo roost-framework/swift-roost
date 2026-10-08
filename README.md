@@ -132,7 +132,8 @@ checkouts and has not been published as a standalone release.
 
 Roost includes native DocC guides and API references for **Roost** and
 **RoostTest**, with the same searchable navigator used by ESW's documentation.
-Start with [Getting started](Sources/Roost/Roost.docc/GettingStarted.md), then
+Browse the [documentation for the latest release](https://roost-framework.github.io/swift-roost/docs/latest/)
+or [pick a release](https://roost-framework.github.io/swift-roost/docs/). In this checkout, start with [Getting started](Sources/Roost/Roost.docc/GettingStarted.md), then
 follow the guides for controllers, routes, views and forms, authentication, Spectro migrations,
 testing, and deployment.
 
