@@ -10,8 +10,8 @@ combined **Roost Libraries** navigator includes both libraries.
 - [RoostTest](../Sources/RoostTest/RoostTest.docc/RoostTest.md): HTTP assertions,
   browser sessions, CSRF-protected workflows, and database test isolation.
 
-These catalogs document Roost 2.0.0, with published ESW 1.5.0,
-Spectro 2.x (from 2.0.0), and Nexus 2.0.0 dependencies.
+These catalogs document Roost 2.1.3, with published ESW 1.6.0,
+Spectro 2.x (from 2.3.0), and Nexus 2.x (from 2.1.0) dependencies.
 
 ## Build
 
@@ -66,24 +66,22 @@ current declaration, parameters, and related symbols.
 The `.docc` catalogs are also available to Xcode's **Build Documentation**
 command. The script is the reproducible path for the merged, two-library site.
 
-## Prepare a GitHub Pages artifact
+## Publish
 
-Build for the URL prefix where the archive will be served:
+Each release carries its own documentation. When a release is published, the
+`release-docs` job in `.github/workflows/pages.yml` builds the archive from the
+release tag, attaches it to the release as `Roost-<tag>.doccarchive.zip`, and
+redeploys the site from `main`. To add documentation to an existing release, run
+the workflow manually with its `tag`; that build passes `--allow-warnings`,
+because older tags may predate later DocC link fixes.
 
-```sh
-python3 scripts/build_docs.py \
-  --hosting-base-path /swift-roost/docs \
-  --output /tmp/Roost-Pages.doccarchive
-```
-
-Copy the **contents** of that archive into `docs/` in the GitHub Pages artifact,
-beside the existing site's files. The entry point will then be
-`/swift-roost/docs/documentation/`; deep links and assets use that same prefix.
-This command prepares files only. It does not publish a site or change the
-repository's deployment settings.
-
-An archive built for `/` is for a server root. Rebuild with the hosting prefix
-before placing it under a project site's subdirectory.
+Every deploy runs `scripts/publish_docs.py`, which downloads each release's
+archive and serves it at `/swift-roost/<tag>/documentation/`, applying that
+prefix with `docc process-archive transform-for-static-hosting`. The
+[documentation index](https://roost-framework.github.io/swift-roost/docs/) lists
+the versions, newest first, and `/swift-roost/docs/latest/` redirects to the
+newest. Deploys never rebuild old versions, and documentation from `main`
+between releases is not published; preview it locally as described above.
 
 ## Maintain the guides
 

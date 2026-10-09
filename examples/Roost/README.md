@@ -37,8 +37,8 @@ Your development data remains available for the next run.
 Prerequisites: Swift 6.3+, Python 3, a local PostgreSQL server, and `psql`,
 `createdb`, and `dropdb` on `PATH`. On Linux, Nexus also needs `zlib1g-dev`.
 
-The app resolves **Roost 2.0.1, ESW 1.5.0, Spectro 2.x (from 2.0.0), and
-Nexus 2.0.0 from GitHub**. No local package dependency is required. If you
+The app requires **Roost from 2.1.0, ESW from 1.6.0, Spectro from 2.3.0, and
+Nexus from 2.1.0** and fetches them from GitHub. No local package dependency is required. If you
 previously used local dependencies, clear all overrides before starting:
 
 ```sh
